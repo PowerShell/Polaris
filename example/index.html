@@ -1,0 +1,57 @@
+<html>
+    <head>
+    </head>
+    <body>
+        <style>
+            *{
+            margin:0;
+            padding:0;
+            color:white;
+            font-family:sans-serif;
+        }
+        body{
+            background-color:#222222;
+            display:flex;
+            justify-content:center;
+            height: 100vh;
+        }
+        #square{
+            margin:auto;
+            width:500px;
+            height:500px;
+            background-color:transparent;
+            border:solid 20px white;
+        }
+        h1{
+            font-size:8em;
+            margin-top:3%;
+            margin-left:16.5%;
+        }
+        @media (max-width: 1000px) {
+            #square{
+                width:300px;
+                height:300px;
+                border:solid 15px white;
+            }
+            h1{
+                font-size:4.84em;
+            }
+        }
+        @media (max-width: 650px) {
+            #square{
+                width:250px;
+                height:250px;
+                border:solid 10px white;
+            }
+            h1{
+                font-size:4.00em;
+            }
+        }
+        </style>
+        <div id="square">
+            <h1 class="animated fadeInLeft">Hello</h1>
+            <h1 class="animated fadeInLeft">--------</h1>
+            <h1 class="animated fadeInLeft">World</h1>
+        </div>
+    </body>
+</html>
