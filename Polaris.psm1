@@ -76,7 +76,7 @@ param(`$request,`$response);
 `$response.ByteResponse = `$bytes;
 "@
 
-        New-GetRoute -Path "$($RoutePath.TrimEnd("/"))$($_.Substring($resolvedPath.Length))" `
+        New-GetRoute -Path "$($RoutePath.TrimEnd("/"))$($_.Substring($resolvedPath.Length).Replace('\','/'))" `
             -ScriptBlock ([ScriptBlock]::Create($scriptTemplate));
     }
 }
