@@ -23,15 +23,7 @@ $sbWow = {
     $response.Json(($json | ConvertTo-Json));
 }
 
-$sbHtml = {
-    param($request,$response);
-
-    # Send html files
-    $response.Send((Get-Content -Path /Users/tylerleonhardt/Desktop/CompSci/DotNET/Core/Polaris/example/index.html -Raw));
-}
-
 # Supports helper functions for Get, Post, Put, Delete
-New-GetRoute -Path "/html" -ScriptBlock $sbHtml
 New-PostRoute -Path "/wow" -ScriptBlock $sbWow
 
 # Pass in script file
