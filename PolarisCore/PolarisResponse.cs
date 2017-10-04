@@ -7,7 +7,7 @@ namespace PolarisCore
     public class PolarisResponse
     {
         public byte[] ByteResponse { get; set; }
-        public string ContentType { get; set; }
+        public string ContentType { get; set; } = "text/plain";
         public Dictionary<string, string> Headers { get; set; }
         public int StatusCode { get; set; } = 200;
 
