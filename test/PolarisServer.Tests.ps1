@@ -4,8 +4,8 @@ $sut = (Split-Path -Leaf $MyInvocation.MyCommand.Path).Replace(".Tests.", ".")
 
 Describe "Test webserver use" {
     It "test /helloworld route" {
-        $result = Invoke-RestMethod -Uri "http://localhost:$Port/helloworld"
-        $result | Should Be 'Hello World'
+        $result = Invoke-WebRequest -Uri "http://localhost:$Port/helloworld"
+        $result.Content | Should Be 'Hello World'
     }
 
     It "test /wow route" {
@@ -14,8 +14,8 @@ Describe "Test webserver use" {
     }
 
     It "test /example route" {
-        $result = Invoke-RestMethod -Uri "http://localhost:$Port/example"
-        $result | Should Be 'test file'
+        $result = Invoke-WebRequest -Uri "http://localhost:$Port/example"
+        $result.Content | Should Be 'test file'
     }
 
     It "test /example route" {
@@ -26,7 +26,7 @@ Describe "Test webserver use" {
 <img src="test.png" alt="yay" />
 <img src="test1.png" alt="yay" />'
 
-        $result = Invoke-RestMethod -Uri "http://localhost:$Port/public/index.html"
-        $result | Should Be $expectedHtml
+        $result = Invoke-WebRequest -Uri "http://localhost:$Port/public/index.html"
+        $result.Content | Should Be $expectedHtml
     }
 }
