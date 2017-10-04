@@ -192,7 +192,7 @@ function New-GetRoute ($Path, $ScriptBlock, $ScriptPath) {
 # Calling to localhost:8080/helloworld with a POST request would display the example.
 #
 ##############################
-function New-PostRoute ($Path, $ScriptBlock) {
+function New-PostRoute ($Path, $ScriptBlock, $ScriptPath) {
     CreateNewPolarisIfNeeded;
     New-WebRoute -Path $Path -Method "POST" -ScriptBlock $ScriptBlock -ScriptPath $ScriptPath;
 }
@@ -225,7 +225,7 @@ function New-PostRoute ($Path, $ScriptBlock) {
 # Calling to localhost:8080/helloworld with a PUT request would display the example.
 #
 ##############################
-function New-PutRoute ($Path, $ScriptBlock) {
+function New-PutRoute ($Path, $ScriptBlock, $ScriptPath) {
     CreateNewPolarisIfNeeded;
     New-WebRoute -Path $Path -Method "PUT" -ScriptBlock $ScriptBlock -ScriptPath $ScriptPath;
 }
@@ -258,7 +258,7 @@ function New-PutRoute ($Path, $ScriptBlock) {
 # Calling to localhost:8080/helloworld with a DELETE request would display the example.
 #
 ##############################
-function New-DeleteRoute ($Path, $ScriptBlock) {
+function New-DeleteRoute ($Path, $ScriptBlock, $ScriptPath) {
     CreateNewPolarisIfNeeded;
     New-WebRoute -Path $Path -Method "DELETE" -ScriptBlock $ScriptBlock -ScriptPath $ScriptPath;
 }
