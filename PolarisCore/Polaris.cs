@@ -18,10 +18,6 @@ namespace PolarisCore
         public Dictionary<string, Dictionary<string, string>> ScriptBlockRoutes
             = new Dictionary<string, Dictionary<string, string>>();
 
-        // path => method => script file
-        public Dictionary<string, Dictionary<string, string>> FileRoutes
-            = new Dictionary<string, Dictionary<string, string>>();
-
         HttpListener Listener;
 
         RunspacePool PowerShellPool;
