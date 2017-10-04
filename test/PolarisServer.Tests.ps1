@@ -6,6 +6,7 @@ Describe "Test webserver use" {
     It "test /helloworld route" {
         $result = Invoke-WebRequest -Uri "http://localhost:$Port/helloworld"
         $result.Content | Should Be 'Hello World'
+        $result.StatusCode | Should Be 200
     }
 
     It "test /wow route" {
@@ -16,6 +17,7 @@ Describe "Test webserver use" {
     It "test /example route" {
         $result = Invoke-WebRequest -Uri "http://localhost:$Port/example"
         $result.Content | Should Be 'test file'
+        $result.StatusCode | Should Be 200
     }
 
     It "test /example route" {
@@ -28,5 +30,6 @@ Describe "Test webserver use" {
 
         $result = Invoke-WebRequest -Uri "http://localhost:$Port/public/index.html"
         $result.Content | Should Be $expectedHtml
+        $result.StatusCode | Should Be 200
     }
 }
