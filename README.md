@@ -24,7 +24,7 @@ Start-Polaris
 1. run `dotnet build`
 1. run `cd ..`
 
-At this point, you can now run `Import-Module ./Polaris.psm1` to start using Polaris!
+At this point, you can now run `Import-Module ./Polaris.psm1` to start using Polaris! Checkout [the wiki](https://github.com/PowerShell/Polaris/wiki) for more usage!
 
 You can also run all the Pester tests by running `Invoke-Pester` in the `test` directory. You may need the [fork of Pester that supports PowerShell 6](https://github.com/powershell/psl-pester).
 
