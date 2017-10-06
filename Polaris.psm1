@@ -51,7 +51,10 @@ function New-WebRoute ($Path, $Method, $ScriptBlock, $ScriptPath) {
 #.DESCRIPTION
 # Defines routes to serve a folder at the "/" endpoint. Perfect for static websites.
 #
-#.PARAMETER Path
+#.PARAMETER RoutePath
+# (Optional) Root route that the folder path will be served to. Defaults to "/"
+#
+#.PARAMETER FolderPath
 # Path to the folder you want to serve.
 #
 #.EXAMPLE
@@ -90,6 +93,12 @@ param(`$request,`$response);
 #
 #.PARAMETER Port
 # (Optional) The port you want the web server to run on. Defaults to 8080.
+#
+#.PARAMETER MinRunspaces
+# (Optional) The minimum ammount of PowerShell runspaces you'd like to use. Defaults to 1.
+#
+#.PARAMETER MaxRunspaces
+# (Optional) The maximum ammount of PowerShell runspaces you'd like to use. Defaults to 1.
 #
 #.EXAMPLE
 # Start-Polaris
@@ -275,4 +284,12 @@ function CreateNewPolarisIfNeeded () {
 # Export only the functions using PowerShell standard verb-noun naming.
 # Be sure to list each exported functions in the FunctionsToExport field of the module manifest file.
 # This improves performance of command discovery in PowerShell.
-Export-ModuleMember -Function New-WebRoute, New-GetRoute, New-PostRoute, New-PutRoute, New-DeleteRoute, Start-Polaris, New-StaticRoute, Stop-Polaris
+Export-ModuleMember -Function `
+    New-WebRoute, `
+    New-GetRoute, `
+    New-PostRoute, `
+    New-PutRoute, `
+    New-DeleteRoute, `
+    Start-Polaris, `
+    New-StaticRoute, `
+    Stop-Polaris
