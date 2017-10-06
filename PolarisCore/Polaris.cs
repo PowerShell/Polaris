@@ -103,9 +103,12 @@ namespace PolarisCore
                     PowerShellInstance.AddParameter(nameof(response), response);
 
                     var res = PowerShellInstance.BeginInvoke<PSObject>(new PSDataCollection<PSObject>(), new PSInvocationSettings(), (result) => {
-                        Console.WriteLine(PowerShellInstance.InvocationStateInfo.State);
-                        Console.WriteLine(PowerShellInstance.InvocationStateInfo.Reason);
-
+                        if (PowerShellInstance.InvocationStateInfo.State == PSInvocationState.Failed)
+                        {
+                            Console.WriteLine(PowerShellInstance.InvocationStateInfo.Reason);
+                            response.Send(PowerShellInstance.InvocationStateInfo.Reason.ToString());
+                            response.SetStatusCode(500);
+                        }
                         Send(rawResponse, response);
                         PowerShellInstance.Dispose();
                     }, null);
