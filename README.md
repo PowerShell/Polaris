@@ -2,6 +2,15 @@
 
 A cross-platform, minimalist web framework for [PowerShell 6](https://github.com/powershell/powershell).
 
+## Disclaimer
+
+Polaris is currently an **unsupported, experimental, proof-of-concept**.
+It should not be used in any production system, and there is no current plan to turn it into a supported Microsoft product.
+
+That being said, we do plan on continuing to experiment within this repository for the forseeable future.
+
+## Example
+
 ```PowerShell
 Import-Module –Name .\Polaris.psm1
 
@@ -13,7 +22,6 @@ New-GetRoute -Path "/helloworld" -ScriptBlock {
 Start-Polaris
 ```
 
-#### _NOTE: This is an experiment from the PowerShell team and this should not be used in any production system yet._
 
 ## Getting Started
 
@@ -32,12 +40,26 @@ _Installation from the PowerShell Gallery coming soon!_
 
 ## Feedback
 
-This project is an experiment that has the possibility to grow into something great. We can't do that without great feedback from you.
+This project is an experiment that has the possibility to grow into something great.
+We can't do that without great feedback from you.
 
-If you have an idea or find a bug, join the descussions in the issues or create a new issue.
+If you have an idea or find a bug, join the discussions in the issues or create a new issue.
 
 ## Limitations
 
 * Currently, this only works in PowerShell 6. Support for older versions of PowerShell is on the roadmap
 * There's no support for route parameters or query parameters that you would expect from projects like ASP.NET or Express however, we have a few ideas in mind on how to add this ability
 * All script executions happen in a sandboxed runspace which means common parameters can not be shared between routes
+
+## License
+
+Polaris is licensed under the MIT License.
+
+## Code of Conduct
+
+This project has adopted the [Microsoft Open Source Code of Conduct][conduct-code].
+For more information see the [Code of Conduct FAQ][conduct-FAQ] or contact [opencode@microsoft.com][conduct-email] with any additional questions or comments.
+
+[conduct-code]: http://opensource.microsoft.com/codeofconduct/
+[conduct-FAQ]: http://opensource.microsoft.com/codeofconduct/faq/
+[conduct-email]: mailto:opencode@microsoft.com
