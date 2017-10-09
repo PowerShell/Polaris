@@ -1,4 +1,4 @@
-PowerShell 6.0
+Polaris
 
 Copyright (c) Microsoft Corporation
 
