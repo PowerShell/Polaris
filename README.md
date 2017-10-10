@@ -4,8 +4,7 @@ A cross-platform, minimalist web framework for [PowerShell 6](https://github.com
 
 ## Disclaimer
 
-Polaris is currently an **unsupported, experimental, proof-of-concept**.
-It should not be used in any production system, and there is no current plan to turn it into a supported Microsoft product.
+Polaris is currently an **unsupported, experimental, proof-of-concept**. There is no current plan to turn it into a supported Microsoft product.
 
 That being said, we do plan on continuing to experiment within this repository for the forseeable future.
 
@@ -54,6 +53,10 @@ If you have an idea or find a bug, join the discussions in the issues or create 
 ## License
 
 Polaris is licensed under the MIT License.
+
+## Maintainers
+
+* [Tyler Leonhardt](https://github.com/tylerl0706) - [@TylerLeonhardt](https://twitter.com/TylerLeonhardt)
 
 ## Code of Conduct
 
