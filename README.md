@@ -37,6 +37,18 @@ You can also run all the Pester tests by running `Invoke-Pester` in the `test` d
 
 _Installation from the PowerShell Gallery coming soon!_
 
+## Roadmap
+
+We have a few paths we are interested in taking. We hope the community helps direct us.
+
+* Expanding on the current implementation using HttpListener to deliver features you'd expect from projects ASP.NET or Expressjs (route parameters, query parameters, middleware etc)
+
+* Investigating the use of [Kestrel](https://github.com/aspnet/KestrelHttpServer)/[ASP.NET Routing](https://github.com/aspnet/routing) instead of HttpListener
+
+* Support for Windows PowerShell (5.x and lower)
+
+* Creating a routing domain-specific language (DSL) for isolating and running script blocks as routes. Drawing inspiration from [Pester](https://github.com/pester/Pester/).
+
 ## Feedback
 
 This project is an experiment that has the possibility to grow into something great.
