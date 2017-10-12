@@ -69,13 +69,15 @@ namespace PolarisCore
 
             HttpListener listener = new HttpListener();
 
-            listener.Prefixes.Add("http://localhost:" + Port + "/");
-
             // If user is administrator
-            if (Environment.OSVersion.Platform == PlatformID.Win32NT &&
-                (new WindowsPrincipal(WindowsIdentity.GetCurrent())).IsInRole(WindowsBuiltInRole.Administrator))
+            if (Environment.OSVersion.Platform != PlatformID.Win32NT ||
+                (Environment.OSVersion.Platform == PlatformID.Win32NT &&
+                (new WindowsPrincipal(WindowsIdentity.GetCurrent())).IsInRole(WindowsBuiltInRole.Administrator)))
             {
                 listener.Prefixes.Add("http://+:" + Port + "/");
+            } else 
+            {
+                listener.Prefixes.Add("http://localhost:" + Port + "/");
             }
 
             listener.Start();
