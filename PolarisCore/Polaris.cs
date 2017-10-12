@@ -65,9 +65,16 @@ namespace PolarisCore
         public HttpListener InitListener(int port)
         {
             Port = port;
-            var prefix = "http://localhost:" + Port + "/";
+            var prefixes = new [] {
+                "http://localhost:" + Port + "/",
+                "http://+:" + Port + "/",
+            };
             HttpListener listener = new HttpListener();
-            listener.Prefixes.Add(prefix);
+            foreach (string prefix in prefixes)
+            {
+                listener.Prefixes.Add(prefix);
+
+            }
 
             listener.Start();
             return listener;
