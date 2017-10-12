@@ -7,6 +7,7 @@ using System.Management.Automation.Runspaces;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.IO;
+using System.Security.Principal;
 
 namespace PolarisCore
 {
@@ -65,9 +66,19 @@ namespace PolarisCore
         public HttpListener InitListener(int port)
         {
             Port = port;
-            var prefix = "http://localhost:" + Port + "/";
+
             HttpListener listener = new HttpListener();
-            listener.Prefixes.Add(prefix);
+
+            // If user is on a non-windows system or windows as administrator
+            if (Environment.OSVersion.Platform != PlatformID.Win32NT ||
+                (Environment.OSVersion.Platform == PlatformID.Win32NT &&
+                (new WindowsPrincipal(WindowsIdentity.GetCurrent())).IsInRole(WindowsBuiltInRole.Administrator)))
+            {
+                listener.Prefixes.Add("http://+:" + Port + "/");
+            } else
+            {
+                listener.Prefixes.Add("http://localhost:" + Port + "/");
+            }
 
             listener.Start();
             return listener;
