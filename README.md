@@ -1,6 +1,6 @@
 # Polaris
 
-A cross-platform, minimalist web framework for [PowerShell 6](https://github.com/powershell/powershell).
+A cross-platform, minimalist web framework for [PowerShell Core 6](https://github.com/powershell/powershell).
 
 ## Disclaimer
 
@@ -24,8 +24,13 @@ Start-Polaris
 
 ## Getting Started
 
+### Prereqs
+* [.NET Standard 2.0 SDK](https://www.microsoft.com/net/download/core)
+* [PowerShell Core 6](https://github.com/powershell/powershell)
+
+### Steps
 1. Clone or download the zip of the repo
-1. Open [PowerShell 6](https://github.com/powershell/powershell)
+1. Open [PowerShell Core 6](https://github.com/powershell/powershell)
 1. run `cd Polaris/PolarisCore`
 1. run `dotnet restore`
 1. run `dotnet build`
@@ -33,7 +38,7 @@ Start-Polaris
 
 At this point, you can now run `Import-Module ./Polaris.psm1` to start using Polaris! Checkout [the wiki](https://github.com/PowerShell/Polaris/wiki) for more usage!
 
-You can also run all the Pester tests by running `Invoke-Pester` in the `test` directory. You may need the [fork of Pester that supports PowerShell 6](https://github.com/powershell/psl-pester).
+You can also run all the Pester tests by running `Invoke-Pester` in the `test` directory. You may need the [fork of Pester that supports PowerShell Core 6](https://github.com/powershell/psl-pester).
 
 _Installation from the PowerShell Gallery coming soon!_
 
