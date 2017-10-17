@@ -21,6 +21,12 @@ Describe "Test webserver use" {
         $result.StatusCode | Should Be 200
     }
 
+    It "test /hellome route without query param" {
+        $result = Invoke-WebRequest -Uri "http://localhost:$Port/hellome"
+        $result.Content | Should Be 'Hello World'
+        $result.StatusCode | Should Be 200
+    }
+
     It "test /wow route" {
         $result = Invoke-RestMethod -Uri "http://localhost:$Port/wow" -Method POST
         $result.wow | Should Be $true
