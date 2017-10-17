@@ -1,5 +1,7 @@
 # Polaris
 
+[![Join the chat at https://gitter.im/PowerShellPolaris/Lobby](https://badges.gitter.im/PowerShellPolaris/Lobby.svg)](https://gitter.im/PowerShellPolaris/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 A cross-platform, minimalist web framework for [PowerShell Core 6](https://github.com/powershell/powershell).
 
 ## Disclaimer
