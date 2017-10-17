@@ -12,6 +12,16 @@ New-WebRoute -Path "/helloworld" -Method "GET" -ScriptBlock {
     $response.Send('Hello World');
 }
 
+# Query Parameters are supported
+New-WebRoute -Path "/hellome" -Method "GET" -ScriptBlock {
+    param($request,$response);
+    if ($request.QueryParameters['name']) {
+        $response.Send('Hello ' + $request.QueryParameters['name']);
+    } else {
+        $response.Send('Hello World');
+    }
+}
+
 $sbWow = {
     param($request,$response);
 

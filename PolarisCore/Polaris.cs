@@ -100,10 +100,10 @@ namespace PolarisCore
 
                 Console.WriteLine("request came in: " + rawRequest.HttpMethod + " " + rawRequest.RawUrl);
 
-                PolarisRequest request = new PolarisRequest();
+                PolarisRequest request = new PolarisRequest(rawRequest);
                 PolarisResponse response = new PolarisResponse();
 
-                string route = rawRequest.RawUrl.TrimEnd('/').TrimStart('/');
+                string route = rawRequest.Url.AbsolutePath.TrimEnd('/').TrimStart('/');
                 PowerShell PowerShellInstance = PowerShell.Create();
                 PowerShellInstance.RunspacePool = PowerShellPool;
                 try
