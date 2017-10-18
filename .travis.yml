@@ -12,10 +12,10 @@ install:
   - sudo apt-get update
   - sudo apt-get install -y powershell
 script:
- - pushd PolarisCore
- - dotnet restore
- - dotnet build
-# Uncomment when Pester is supported in PowerShell for Linux
-- popd && pushd test
-- powershell -c 'Invoke-Pester -ExcludeTag VersionChecks -EnableExit'
-- popd
+  - pushd PolarisCore
+  - dotnet restore
+  - dotnet build
+  # Uncomment when Pester is supported in PowerShell for Linux
+  - popd && pushd test
+  - powershell -c 'Invoke-Pester -ExcludeTag VersionChecks -EnableExit'
+  - popd
