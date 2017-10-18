@@ -1,0 +1,21 @@
+language: csharp
+sudo: required
+mono: none
+dotnet: 2.0.0
+dist: trusty
+branches:
+  only:
+  - master
+install:
+  - curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+  - curl https://packages.microsoft.com/config/ubuntu/14.04/prod.list | sudo tee /etc/apt/sources.list.d/microsoft.list
+  - sudo apt-get update
+  - sudo apt-get install -y powershell
+script:
+  - pushd PolarisCore
+  - dotnet restore
+  - dotnet build
+  # Uncomment when Pester is supported in PowerShell for Linux
+  # - popd && pushd test
+  # - powershell -c 'Invoke-Pester -ExcludeTag VersionChecks -EnableExit'
+  # - popd
