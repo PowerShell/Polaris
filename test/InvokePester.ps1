@@ -1,7 +1,7 @@
 # Determine whether the build passed
 try {
     # this throws if there was an error
-    Invoke-Pester
+    Invoke-Pester -EnableExit
     $result = "PASS"
 }
 catch {
