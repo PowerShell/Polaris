@@ -16,6 +16,6 @@ script:
   - dotnet restore
   - dotnet build
   # Uncomment when Pester is supported in PowerShell for Linux
-  - popd && pushd test
-  - powershell -c 'Invoke-Pester -ExcludeTag VersionChecks -EnableExit'
-  - popd
+  # - popd && pushd test
+  # - powershell -c 'Invoke-Pester -ExcludeTag VersionChecks -EnableExit'
+  # - popd
