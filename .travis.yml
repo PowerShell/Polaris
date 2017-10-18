@@ -19,3 +19,10 @@ script:
   # - popd && pushd test
   # - powershell -c 'Invoke-Pester -ExcludeTag VersionChecks -EnableExit'
   # - popd
+notifications:
+  webhooks:
+    urls:
+      - https://webhooks.gitter.im/e/9b9664c60325fbb70dd7
+    on_success: always  # options: [always|never|change] default: always
+    on_failure: always  # options: [always|never|change] default: always
+    on_start: never     # options: [always|never|change] default: always
