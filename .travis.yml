@@ -11,6 +11,7 @@ script:
  - pushd PolarisCore
  - dotnet restore
  - dotnet build
- - popd && pushd test
- - powershell InvokePester.ps1
- - popd
+# Uncomment when Pester is supported in PowerShell for Linux
+# - popd && pushd test
+# - powershell InvokePester.ps1
+# - popd
