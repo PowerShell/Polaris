@@ -13,7 +13,7 @@ namespace PolarisCore
 {
     public class Polaris
     {
-        public Action<string> Logger {get; set;}
+        private Action<string> Logger {get; set;}
         public int Port {get; set;}
 
         // path => method => script block
