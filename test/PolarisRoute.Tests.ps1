@@ -39,8 +39,8 @@ Describe "Test route creation" {
     Context "Using New-GetRoute" {
         It "with -Path '<Path>' -ScriptPath '<ScriptPath>' -ScriptBlock '<ScriptBlock>'" `
             -TestCases @(
-            @{ Path = '/test'; ScriptPath = $defaultScriptPath; }
-            @{ Path = '/test'; ScriptBlock = $defaultScriptBlock }
+            @{ Path = '/test'; ScriptPath = $defaultScriptPath; ScriptBlock = $null }
+            @{ Path = '/test'; ScriptPath = $null; ScriptBlock = $defaultScriptBlock }
         ) {
             param ($Path, $ScriptPath, $ScriptBlock)
             if ($ScriptPath -ne $null -and $ScriptPath -ne '') {
