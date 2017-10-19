@@ -27,7 +27,11 @@ Describe "Test route creation" {
             @{ Path = '/test'; Method = 'DELETE'; ScriptPath = $defaultScriptPath; ScriptBlock = $null }
         ) {
             param ($Path, $Method, $ScriptPath, $ScriptBlock)
-            New-WebRoute -Path $Path -Method $Method -ScriptPath $ScriptPath -ScriptBlock $ScriptBlock
+            if ($ScriptPath) {
+                New-WebRoute -Path $Path -Method $Method -ScriptPath $ScriptPath
+            } else {
+                New-WebRoute -Path $Path -Method $Method -ScriptBlock $ScriptBlock
+            }
             RouteExists -Path $Path -Method $Method | Should Be $true
         }
     }
@@ -39,7 +43,11 @@ Describe "Test route creation" {
             @{ Path = '/test'; ScriptPath = $null; ScriptBlock = $defaultScriptBlock }
         ) {
             param ($Path, $ScriptPath, $ScriptBlock)
-            New-GetRoute -Path $Path -ScriptPath $ScriptPath -ScriptBlock $ScriptBlock
+            if ($ScriptPath -ne $null -and $ScriptPath -ne '') {
+                New-GetRoute -Path $Path -ScriptPath $ScriptPath
+            } else {
+                New-GetRoute -Path $Path -ScriptBlock $ScriptBlock
+            }
             RouteExists -Path $Path -Method 'GET' | Should Be $true
         }
     }
@@ -51,7 +59,11 @@ Describe "Test route creation" {
             @{ Path = '/test'; ScriptPath = $null; ScriptBlock = $defaultScriptBlock }
         ) {
             param ($Path, $ScriptPath, $ScriptBlock)
-            New-PostRoute -Path $Path -ScriptPath $ScriptPath -ScriptBlock $ScriptBlock
+            if ($ScriptPath) {
+                New-PostRoute -Path $Path -ScriptPath $ScriptPath
+            } else {
+                New-PostRoute -Path $Path -ScriptBlock $ScriptBlock
+            }
             RouteExists -Path $Path -Method 'POST' | Should Be $true
         }
     }
@@ -63,7 +75,11 @@ Describe "Test route creation" {
             @{ Path = '/test'; ScriptPath = $null; ScriptBlock = $defaultScriptBlock }
         ) {
             param ($Path, $ScriptPath, $ScriptBlock)
-            New-PutRoute -Path $Path -ScriptPath $ScriptPath -ScriptBlock $ScriptBlock
+            if ($ScriptPath) {
+                New-PutRoute -Path $Path -ScriptPath $ScriptPath
+            } else {
+                New-PutRoute -Path $Path -ScriptBlock $ScriptBlock
+            }
             RouteExists -Path $Path -Method 'PUT' | Should Be $true
         }
     }
@@ -75,7 +91,11 @@ Describe "Test route creation" {
             @{ Path = '/test'; ScriptPath = $null; ScriptBlock = $defaultScriptBlock }
         ) {
             param ($Path, $ScriptPath, $ScriptBlock)
-            New-DeleteRoute -Path $Path -ScriptPath $ScriptPath -ScriptBlock $ScriptBlock
+            if ($ScriptPath) {
+                New-DeleteRoute -Path $Path -ScriptPath $ScriptPath
+            } else {
+                New-DeleteRoute -Path $Path -ScriptBlock $ScriptBlock
+            }
             RouteExists -Path $Path -Method 'DELETE' | Should Be $true
         }
     }
