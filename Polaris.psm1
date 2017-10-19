@@ -32,9 +32,26 @@ $global:Polaris = $null;
 # Navigating to localhost:8080/helloworld would display the example.
 #
 ##############################
-function New-WebRoute ($Path, $Method, $ScriptBlock, $ScriptPath) {
+function New-WebRoute {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$True, Position=0)]
+        [string]
+        $Path,
+
+        [Parameter(Mandatory=$True, Position=1)]
+        [string]
+        $Method,
+
+        [Parameter(Position=2)]
+        [scriptblock]
+        $ScriptBlock,
+
+        [Parameter()]
+        [string]
+        $ScriptPath)
     CreateNewPolarisIfNeeded;
-    if ($ScriptPath -ne $null) {
+    if ($ScriptPath -ne $null -and $ScriptPath -ne "") {
         if(-Not (Test-Path -Path $ScriptPath)) {
             ThrowError -ExceptionName FileNotFoundException -ExceptionMessage "File does not exist at path $ScriptPath";
         }
@@ -61,7 +78,16 @@ function New-WebRoute ($Path, $Method, $ScriptBlock, $ScriptPath) {
 # New-StaticRoute -Path ./public
 #
 ##############################
-function New-StaticRoute ($RoutePath = "/", $FolderPath) {
+function New-StaticRoute {
+    [CmdletBinding()]
+    param(
+        [Parameter(Position=0)]
+        [string]
+        $RoutePath = "/",
+
+        [Parameter(Mandatory=$True, Position=1)]
+        [string]
+        $FolderPath)
     CreateNewPolarisIfNeeded;
     if(-Not (Test-Path -Path $FolderPath)) {
         ThrowError -ExceptionName FileNotFoundException -ExceptionMessage "Folder does not exist at path $FolderPath";
@@ -106,7 +132,20 @@ param(`$request,`$response);
 # Start-Polaris -Port 8081
 #
 ##############################
-function Start-Polaris ($Port = 8080, $MinRunspaces = 1, $MaxRunspaces = 1) {
+function Start-Polaris {
+    [CmdletBinding()]
+    param(
+        [Parameter(Position=0)]
+        [Int32]
+        $Port = 8080,
+
+        [Parameter(Position=1)]
+        [Int32]
+        $MinRunspaces = 1,
+
+        [Parameter(Position=2)]
+        [Int32]
+        $MaxRunspaces = 1)
     if ($global:Polaris -eq $null) {
         ThrowError -ExceptionName NoRoutesDefinedException -ExceptionMessage 'You must have at least 1 route defined.'
     }
@@ -132,7 +171,12 @@ function Start-Polaris ($Port = 8080, $MinRunspaces = 1, $MaxRunspaces = 1) {
 # Stop-Polaris -ServerContext $app
 #
 ##############################
-function Stop-Polaris ($ServerContext = $global:Polaris) {
+function Stop-Polaris {
+    [CmdletBinding()]
+    param(
+        [Parameter(Position=0)]
+        [PolarisCore.Polaris]
+        $ServerContext = $global:Polaris)
     $ServerContext.Stop();
 }
 
@@ -168,7 +212,20 @@ function Stop-Polaris ($ServerContext = $global:Polaris) {
 # Navigating to localhost:8080/helloworld would display the example.
 #
 ##############################
-function New-GetRoute ($Path, $ScriptBlock, $ScriptPath) {
+function New-GetRoute {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$True, Position=0)]
+        [string]
+        $Path,
+
+        [Parameter(Position=1, ParameterSetName = "ScriptBlock")]
+        [scriptblock]
+        $ScriptBlock,
+
+        [Parameter(ParameterSetName = "ScriptPath")]
+        [string]
+        $ScriptPath)
     CreateNewPolarisIfNeeded;
     New-WebRoute -Path $Path -Method "GET" -ScriptBlock $ScriptBlock -ScriptPath $ScriptPath;
 }
@@ -201,7 +258,20 @@ function New-GetRoute ($Path, $ScriptBlock, $ScriptPath) {
 # Calling to localhost:8080/helloworld with a POST request would display the example.
 #
 ##############################
-function New-PostRoute ($Path, $ScriptBlock, $ScriptPath) {
+function New-PostRoute {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$True, Position=0)]
+        [string]
+        $Path,
+
+        [Parameter(Position=1, ParameterSetName = "ScriptBlock")]
+        [scriptblock]
+        $ScriptBlock,
+
+        [Parameter(ParameterSetName = "ScriptPath")]
+        [string]
+        $ScriptPath)
     CreateNewPolarisIfNeeded;
     New-WebRoute -Path $Path -Method "POST" -ScriptBlock $ScriptBlock -ScriptPath $ScriptPath;
 }
@@ -234,7 +304,20 @@ function New-PostRoute ($Path, $ScriptBlock, $ScriptPath) {
 # Calling to localhost:8080/helloworld with a PUT request would display the example.
 #
 ##############################
-function New-PutRoute ($Path, $ScriptBlock, $ScriptPath) {
+function New-PutRoute {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$True, Position=0)]
+        [string]
+        $Path,
+
+        [Parameter(Position=1, ParameterSetName = "ScriptBlock")]
+        [scriptblock]
+        $ScriptBlock,
+
+        [Parameter(ParameterSetName = "ScriptPath")]
+        [string]
+        $ScriptPath)
     CreateNewPolarisIfNeeded;
     New-WebRoute -Path $Path -Method "PUT" -ScriptBlock $ScriptBlock -ScriptPath $ScriptPath;
 }
@@ -267,7 +350,20 @@ function New-PutRoute ($Path, $ScriptBlock, $ScriptPath) {
 # Calling to localhost:8080/helloworld with a DELETE request would display the example.
 #
 ##############################
-function New-DeleteRoute ($Path, $ScriptBlock, $ScriptPath) {
+function New-DeleteRoute {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$True, Position=0)]
+        [string]
+        $Path,
+
+        [Parameter(Position=1, ParameterSetName = "ScriptBlock")]
+        [scriptblock]
+        $ScriptBlock,
+
+        [Parameter(ParameterSetName = "ScriptPath")]
+        [string]
+        $ScriptPath)
     CreateNewPolarisIfNeeded;
     New-WebRoute -Path $Path -Method "DELETE" -ScriptBlock $ScriptBlock -ScriptPath $ScriptPath;
 }
@@ -277,7 +373,8 @@ function New-DeleteRoute ($Path, $ScriptBlock, $ScriptPath) {
 ##############################
 function CreateNewPolarisIfNeeded () {
     if ($global:Polaris -eq $null) {
-        $global:Polaris = [PolarisCore.Polaris]::new();
+        [Action[string]]$logger = { param($str) Write-Verbose "$str" }
+        $global:Polaris = [PolarisCore.Polaris]::new($logger);
     }
 }
 

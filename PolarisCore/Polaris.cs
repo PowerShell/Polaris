@@ -13,6 +13,7 @@ namespace PolarisCore
 {
     public class Polaris
     {
+        public Action<string> Logger {get; set;}
         public int Port {get; set;}
 
         // path => method => script block
@@ -24,6 +25,11 @@ namespace PolarisCore
         RunspacePool PowerShellPool;
 
         bool StopServer = false;
+
+        public Polaris(Action<string> logger)
+        {
+            Logger = logger;
+        }
 
         public void AddRoute(string path, string method, string scriptBlock)
         {
@@ -54,13 +60,13 @@ namespace PolarisCore
 
             // Loop until worker thread activates.
             while (!listenerThread.IsAlive);
-            Console.WriteLine("App listening on Port: " + port + "!");
+            Log("App listening on Port: " + port + "!");
         }
 
         public void Stop()
         {
             StopServer = true;
-            Console.WriteLine("Server Stopped.");
+            Log("Server Stopped.");
         }
 
         public HttpListener InitListener(int port)
@@ -98,7 +104,7 @@ namespace PolarisCore
                 HttpListenerRequest rawRequest = context.Request;
                 HttpListenerResponse rawResponse = context.Response;
 
-                Console.WriteLine("request came in: " + rawRequest.HttpMethod + " " + rawRequest.RawUrl);
+                Log("request came in: " + rawRequest.HttpMethod + " " + rawRequest.RawUrl);
 
                 PolarisRequest request = new PolarisRequest(rawRequest);
                 PolarisResponse response = new PolarisResponse();
@@ -116,7 +122,7 @@ namespace PolarisCore
                     var res = PowerShellInstance.BeginInvoke<PSObject>(new PSDataCollection<PSObject>(), new PSInvocationSettings(), (result) => {
                         if (PowerShellInstance.InvocationStateInfo.State == PSInvocationState.Failed)
                         {
-                            Console.WriteLine(PowerShellInstance.InvocationStateInfo.Reason);
+                            Log(PowerShellInstance.InvocationStateInfo.Reason.ToString());
                             response.Send(PowerShellInstance.InvocationStateInfo.Reason.ToString());
                             response.SetStatusCode(500);
                         }
@@ -129,11 +135,11 @@ namespace PolarisCore
                     if(e is KeyNotFoundException)
                     {
                         Send(rawResponse, System.Text.Encoding.UTF8.GetBytes("Not Found"), 404, "text/plain; charset=UTF-8");
-                        Console.WriteLine("404 Not Found");
+                        Log("404 Not Found");
                     }
                     else
                     {
-                        Console.WriteLine(e.Message);
+                        Log(e.Message);
                         throw e;
                     }
                 }
@@ -155,6 +161,17 @@ namespace PolarisCore
             rawResponse.ContentLength64 = byteResponse.Length;
             rawResponse.OutputStream.Write(byteResponse, 0, byteResponse.Length);
             rawResponse.OutputStream.Close();
+        }
+
+        private void Log(string logString)
+        {
+            try
+            {
+                Logger(logString);
+            } catch(PSInvalidOperationException e)
+            {
+                // ignore
+            }
         }
     }
 }
