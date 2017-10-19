@@ -38,7 +38,7 @@ Describe "Test webserver use" {
         $result.StatusCode | Should Be 200
     }
 
-    It "test /example route" {
+    It "test /public/index.html static route" {
         $expectedHtml = `
 '<div>hello world</div>
 
