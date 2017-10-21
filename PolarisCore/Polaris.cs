@@ -20,6 +20,9 @@ namespace PolarisCore
         public Dictionary<string, Dictionary<string, string>> ScriptBlockRoutes
             = new Dictionary<string, Dictionary<string, string>>();
 
+        public List<string> RouteMiddleware
+            = new List<string>();
+
         HttpListener Listener;
 
         RunspacePool PowerShellPool;
@@ -45,6 +48,15 @@ namespace PolarisCore
                 ScriptBlockRoutes[sanitizedPath] = new Dictionary<string, string>();
             }
             ScriptBlockRoutes[sanitizedPath][method] = scriptBlock;
+        }
+
+        public void AddMiddleware(string scriptBlock)
+        {
+            if (scriptBlock == null)
+            {
+                throw new ArgumentNullException(nameof(scriptBlock));
+            }
+            RouteMiddleware.Add(scriptBlock);
         }
 
         public void Start(int port = 3000, int minRunspaces = 1, int maxRunspaces = 1)
@@ -114,10 +126,18 @@ namespace PolarisCore
                 PowerShellInstance.RunspacePool = PowerShellPool;
                 try
                 {
-                    // this script has a sleep in it to simulate a long running script
+                    // Set up PowerShell instance by making request and response global
+                    PowerShellInstance.AddScript(PolarisHelperScripts.InitializeRequestAndResponseScript);
+                    PowerShellInstance.AddParameter("req", request);
+                    PowerShellInstance.AddParameter("res", response);
+
+                    // Run middleware in the order in which it was added
+                    foreach (string middleware in RouteMiddleware)
+                    {
+                        PowerShellInstance.AddScript(middleware);
+                    }
+
                     PowerShellInstance.AddScript(ScriptBlockRoutes[route][rawRequest.HttpMethod]);
-                    PowerShellInstance.AddParameter(nameof(request), request);
-                    PowerShellInstance.AddParameter(nameof(response), response);
 
                     var res = PowerShellInstance.BeginInvoke<PSObject>(new PSDataCollection<PSObject>(), new PSInvocationSettings(), (result) => {
                         if (PowerShellInstance.InvocationStateInfo.State == PSInvocationState.Failed)
@@ -170,7 +190,8 @@ namespace PolarisCore
                 Logger(logString);
             } catch(PSInvalidOperationException e)
             {
-                // ignore
+                Console.WriteLine(e.Message);
+                Console.WriteLine(logString);
             }
         }
     }

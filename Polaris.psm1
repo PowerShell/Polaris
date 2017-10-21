@@ -99,7 +99,6 @@ function New-StaticRoute {
 
     $allPaths | ForEach-Object {
     $scriptTemplate = @"
-param(`$request,`$response);
 `$bytes = Get-Content "$_" -Encoding Byte -ReadCount 0
 `$response.SetContentType(([PolarisCore.PolarisResponse]::GetContentType("$_")));
 `$response.ByteResponse = `$bytes;
@@ -108,6 +107,28 @@ param(`$request,`$response);
         New-GetRoute -Path "$($RoutePath.TrimEnd("/"))$($_.Substring($resolvedPath.Length).Replace('\','/'))" `
             -ScriptBlock ([ScriptBlock]::Create($scriptTemplate));
     }
+}
+
+function New-RouteMiddleware {
+    [CmdletBinding()]
+    param(
+        [Parameter(Position=0)]
+        [scriptblock]
+        $ScriptBlock,
+
+        [Parameter()]
+        [string]
+        $ScriptPath
+    )
+    CreateNewPolarisIfNeeded;
+    if ($ScriptPath -ne $null -and $ScriptPath -ne "") {
+        if(-Not (Test-Path -Path $ScriptPath)) {
+            ThrowError -ExceptionName FileNotFoundException -ExceptionMessage "File does not exist at path $ScriptPath";
+        }
+
+        $ScriptBlock = [ScriptBlock]::Create((Get-Content -Path $ScriptPath -Raw));
+    }
+    $global:Polaris.AddMiddleware($ScriptBlock.ToString());
 }
 
 ##############################
@@ -125,6 +146,9 @@ param(`$request,`$response);
 #
 #.PARAMETER MaxRunspaces
 # (Optional) The maximum ammount of PowerShell runspaces you'd like to use. Defaults to 1.
+#
+#.PARAMETER UseJsonBodyParserMiddleware
+# (Optional) Will enable the Json body parser middleware.
 #
 #.EXAMPLE
 # Start-Polaris
@@ -145,12 +169,20 @@ function Start-Polaris {
 
         [Parameter(Position=2)]
         [Int32]
-        $MaxRunspaces = 1)
+        $MaxRunspaces = 1,
+        
+        [Parameter()]
+        [switch]
+        $UseJsonBodyParserMiddleware = $false
+        )
     if ($global:Polaris -eq $null) {
         ThrowError -ExceptionName NoRoutesDefinedException -ExceptionMessage 'You must have at least 1 route defined.'
     }
-    #Invoke-Command -AsJob $global:Polaris.Start($Port, $MinRunspaces, $MaxRunspaces);
-    #Start-Job -ScriptBlock { param($Polaris); $Polaris.Start(); } -ArgumentList $global:Polaris
+    
+    if ($UseJsonBodyParserMiddleware) {
+        New-RouteMiddleware -ScriptBlock $JsonBodyParserMiddlerware;
+    }
+
     $global:Polaris.Start($Port, $MinRunspaces, $MaxRunspaces);
     return $global:Polaris;
 }
@@ -226,7 +258,6 @@ function New-GetRoute {
         [Parameter(ParameterSetName = "ScriptPath")]
         [string]
         $ScriptPath)
-    CreateNewPolarisIfNeeded;
     New-WebRoute -Path $Path -Method "GET" -ScriptBlock $ScriptBlock -ScriptPath $ScriptPath;
 }
 
@@ -272,7 +303,6 @@ function New-PostRoute {
         [Parameter(ParameterSetName = "ScriptPath")]
         [string]
         $ScriptPath)
-    CreateNewPolarisIfNeeded;
     New-WebRoute -Path $Path -Method "POST" -ScriptBlock $ScriptBlock -ScriptPath $ScriptPath;
 }
 
@@ -318,7 +348,6 @@ function New-PutRoute {
         [Parameter(ParameterSetName = "ScriptPath")]
         [string]
         $ScriptPath)
-    CreateNewPolarisIfNeeded;
     New-WebRoute -Path $Path -Method "PUT" -ScriptBlock $ScriptBlock -ScriptPath $ScriptPath;
 }
 
@@ -364,7 +393,6 @@ function New-DeleteRoute {
         [Parameter(ParameterSetName = "ScriptPath")]
         [string]
         $ScriptPath)
-    CreateNewPolarisIfNeeded;
     New-WebRoute -Path $Path -Method "DELETE" -ScriptBlock $ScriptBlock -ScriptPath $ScriptPath;
 }
 
@@ -378,6 +406,12 @@ function CreateNewPolarisIfNeeded () {
     }
 }
 
+$JsonBodyParserMiddlerware = {
+    if ($Request.BodyString -ne $null) {
+        $Request.Body = $Request.BodyString | ConvertFrom-Json
+    }
+}
+
 # Export only the functions using PowerShell standard verb-noun naming.
 # Be sure to list each exported functions in the FunctionsToExport field of the module manifest file.
 # This improves performance of command discovery in PowerShell.
@@ -387,6 +421,7 @@ Export-ModuleMember -Function `
     New-PostRoute, `
     New-PutRoute, `
     New-DeleteRoute, `
-    Start-Polaris, `
     New-StaticRoute, `
+    New-RouteMiddleware, `
+    Start-Polaris, `
     Stop-Polaris

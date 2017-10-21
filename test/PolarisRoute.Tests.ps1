@@ -3,7 +3,6 @@ $sut = (Split-Path -Leaf $MyInvocation.MyCommand.Path).Replace(".Tests.", ".")
 . "$here\$sut"
 
 $defaultScriptBlock = {
-    param($request, $response)
     $response.Send("test script");
 }
 $defaultScriptPath = './test.ps1';
