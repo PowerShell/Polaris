@@ -1,6 +1,6 @@
 if(-not (Test-Path -Path "..\Polaris.psm1")) {
     Write-Error -Message "Cannot find Polaris.psm1"
-    return;
+    return
 }
 
 # Import Polaris
@@ -8,29 +8,29 @@ Import-Module –Name ..\Polaris.psm1
 
 # Hello World passing in the Path, Method & ScriptBlock
 New-WebRoute -Path "/helloworld" -Method "GET" -ScriptBlock {
-    param($request,$response);
-    $response.Send('Hello World');
+    param($request,$response)
+    $response.Send('Hello World')
 }
 
 # Query Parameters are supported
 New-WebRoute -Path "/hellome" -Method "GET" -ScriptBlock {
-    param($request,$response);
+    param($request,$response)
     if ($request.QueryParameters['name']) {
-        $response.Send('Hello ' + $request.QueryParameters['name']);
+        $response.Send('Hello ' + $request.QueryParameters['name'])
     } else {
-        $response.Send('Hello World');
+        $response.Send('Hello World')
     }
 }
 
 $sbWow = {
-    param($request,$response);
+    param($request,$response)
 
     $json = @{
         wow = $true
     }
 
     # .Json helper function that sets content type
-    $response.Json(($json | ConvertTo-Json));
+    $response.Json(($json | ConvertTo-Json))
 }
 
 # Supports helper functions for Get, Post, Put, Delete
