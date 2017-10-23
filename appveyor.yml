@@ -25,5 +25,6 @@ install:
 # Invoke Pester to run all of the unit tests, then save the results into XML in order to populate the AppVeyor tests section
 # If any of the tests fail, consider the pipeline failed
 test_script:
-  - pushd C:\projects\polaris\build
-  - ps: "C:\Program Files\PowerShell\powershell.exe" .\appveyor.ps1
+  - ps: |
+        pushd C:\projects\polaris\build
+        "C:\Program Files\PowerShell\\powershell.exe" .\appveyor.ps1
