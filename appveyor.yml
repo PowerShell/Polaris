@@ -1,0 +1,31 @@
+# Version number
+version: 0.0.1.{build}
+
+# Ignore testing a commit if only the README.md file changed
+# Or if various strings are found in the commit message: updated readme, update readme, update docs, update version, update appveyor
+skip_commits:
+  files:
+    - README.md
+  message: /updated readme.*|update readme.*s|update docs.*|update version.*|update appveyor.*/
+
+# There's no need to alter the build number for a Pull Request (PR) since they don't modify anything
+pull_requests:
+  do_not_increment_build_number: true
+
+# Install NuGet to interact with the PowerShell Gallery
+install:
+- ps: (New-Object System.Net.WebClient).DownloadFile("https://github.com/PowerShell/PowerShell/releases/download/v6.0.0-beta.8/PowerShell-6.0.0-beta.8-win-x64.msi", "powershell6.msi")
+- ps: .\powershell6.msi /quiet
+- pushd PowerShellCore
+- dotnet restore
+- dotnet build
+- popd
+# Invoke Pester to run all of the unit tests, then save the results into XML in order to populate the AppVeyor tests section
+# If any of the tests fail, consider the pipeline failed
+test_script:
+  - ps: pushd test
+  - ps: |
+        $env:ProgramFiles\PowerShell\powershell.exe -c '$res = Invoke-Pester -OutputFormat NUnitXml -OutputFile TestsResults.xml -PassThru; `
+        (New-Object "System.Net.WebClient").UploadFile("https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\TestsResults.xml)); `
+        if ($res.FailedCount -gt 0) { throw "$($res.FailedCount) tests failed."}'
+  - ps: popd
