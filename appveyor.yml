@@ -15,7 +15,7 @@ pull_requests:
 # Install NuGet to interact with the PowerShell Gallery
 install:
 - ps: (New-Object System.Net.WebClient).DownloadFile("https://github.com/PowerShell/PowerShell/releases/download/v6.0.0-beta.8/PowerShell-6.0.0-beta.8-win-x64.msi", "powershell6.msi")
-- ps: .\powershell6.msi /quiet
+- .\powershell6.msi /quiet
 - pushd PowerShellCore
 - dotnet restore
 - dotnet build
