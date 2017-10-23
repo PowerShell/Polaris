@@ -27,4 +27,4 @@ install:
 test_script:
   - ps: |
         pushd C:\projects\polaris\build
-        & 'C:\Program Files\PowerShell\6.0.0-beta.8\powershell.exe' -File appveyor.ps1
+        & 'C:\Program Files\PowerShell\6.0.0-beta.8\powershell.exe' -NonInteractive -NoProfile -File appveyor.ps1
