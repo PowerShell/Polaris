@@ -26,4 +26,4 @@ install:
 # If any of the tests fail, consider the pipeline failed
 test_script:
   - pushd C:\projects\polaris\build
-  - cmd: "C:\\Program Files\\PowerShell\\powershell.exe" .\appveyor.ps1
+  - ps: "C:\Program Files\PowerShell\powershell.exe" .\appveyor.ps1
