@@ -17,7 +17,7 @@ install:
 - ps: mkdir C:\temp
 - ps: (New-Object System.Net.WebClient).DownloadFile("https://github.com/PowerShell/PowerShell/releases/download/v6.0.0-beta.8/PowerShell-6.0.0-beta.8-win-x64.msi", "C:\temp\powershell6.msi")
 - C:\temp\powershell6.msi /quiet
-- pushd C:\projects\polaris\PowerShellCore
+- pushd C:\projects\polaris\PolarisCore
 - dotnet restore
 - dotnet build
 - popd
