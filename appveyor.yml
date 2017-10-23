@@ -17,14 +17,14 @@ install:
 - ps: mkdir C:\temp
 - ps: (New-Object System.Net.WebClient).DownloadFile("https://github.com/PowerShell/PowerShell/releases/download/v6.0.0-beta.8/PowerShell-6.0.0-beta.8-win-x64.msi", "C:\temp\powershell6.msi")
 - C:\temp\powershell6.msi /quiet
-- pushd PowerShellCore
+- pushd C:\projects\polaris\PowerShellCore
 - dotnet restore
 - dotnet build
 - popd
 # Invoke Pester to run all of the unit tests, then save the results into XML in order to populate the AppVeyor tests section
 # If any of the tests fail, consider the pipeline failed
 test_script:
-  - ps: pushd test
+  - ps: pushd C:\projects\polaris\test
   - ps: |
         $env:ProgramFiles\PowerShell\powershell.exe -c '$res = Invoke-Pester -OutputFormat NUnitXml -OutputFile TestsResults.xml -PassThru; `
         (New-Object "System.Net.WebClient").UploadFile("https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\TestsResults.xml)); `
