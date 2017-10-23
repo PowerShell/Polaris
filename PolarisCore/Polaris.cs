@@ -20,8 +20,8 @@ namespace PolarisCore
         public Dictionary<string, Dictionary<string, string>> ScriptBlockRoutes
             = new Dictionary<string, Dictionary<string, string>>();
 
-        public List<string> RouteMiddleware
-            = new List<string>();
+        public List<PolarisMiddleware> RouteMiddleware
+            = new List<PolarisMiddleware>();
 
         HttpListener Listener;
 
@@ -50,13 +50,44 @@ namespace PolarisCore
             ScriptBlockRoutes[sanitizedPath][method] = scriptBlock;
         }
 
-        public void AddMiddleware(string scriptBlock)
+        public void RemoveRoute(string path, string method)
+        {
+            if (path == null)
+            {
+                throw new ArgumentNullException(nameof(path));
+            }
+            if (method == null)
+            {
+                throw new ArgumentNullException(nameof(method));
+            }
+
+            string sanitizedPath = path.TrimEnd('/').TrimStart('/');
+            ScriptBlockRoutes[sanitizedPath].Remove(method);
+            if (ScriptBlockRoutes[sanitizedPath].Count == 0)
+            {
+                ScriptBlockRoutes.Remove(sanitizedPath);
+            }
+        }
+
+        public void AddMiddleware(string name, string scriptBlock)
         {
             if (scriptBlock == null)
             {
                 throw new ArgumentNullException(nameof(scriptBlock));
             }
-            RouteMiddleware.Add(scriptBlock);
+            RouteMiddleware.Add(new PolarisMiddleware {
+                Name = name,
+                ScriptBlock = scriptBlock
+            });
+        }
+
+        public void RemoveMiddleware(string name)
+        {
+            if (name == null)
+            {
+                throw new ArgumentNullException(nameof(name));
+            }
+            RouteMiddleware.RemoveAll(m => m.Name == name);
         }
 
         public void Start(int port = 3000, int minRunspaces = 1, int maxRunspaces = 1)
@@ -132,9 +163,9 @@ namespace PolarisCore
                     PowerShellInstance.AddParameter("res", response);
 
                     // Run middleware in the order in which it was added
-                    foreach (string middleware in RouteMiddleware)
+                    foreach (PolarisMiddleware middleware in RouteMiddleware)
                     {
-                        PowerShellInstance.AddScript(middleware);
+                        PowerShellInstance.AddScript(middleware.ScriptBlock);
                     }
 
                     PowerShellInstance.AddScript(ScriptBlockRoutes[route][rawRequest.HttpMethod]);

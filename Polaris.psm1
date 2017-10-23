@@ -61,6 +61,59 @@ function New-WebRoute {
     $global:Polaris.AddRoute($Path, $Method, $ScriptBlock.ToString());
 }
 
+<#
+.SYNOPSIS
+Removes the web route.
+
+.DESCRIPTION
+Removes the web route with the specified path and method.
+
+.PARAMETER Path
+The path of the route you want to remove.
+
+.PARAMETER Method
+The method of the route you want to remove.
+
+.EXAMPLE
+Remove-WebRoute -Path /out -Method PUT
+
+#>
+function Remove-WebRoute {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory=$True, Position=0)]
+        [string]
+        $Path,
+
+        [Parameter(Mandatory=$True, Position=1)]
+        [string]
+        $Method
+    )
+    if ($global:Polaris -ne $null) {
+        $global:Polaris.RemoveRoute($Path, $Method);
+    }
+}
+
+<#
+.SYNOPSIS
+Get the object containing the routes.
+
+.DESCRIPTION
+Get the object containing the routes. They are organized by Path -> Method -> Script block
+
+.EXAMPLE
+Get-WebRoute
+
+#>
+function Get-WebRoute {
+    [CmdletBinding()]
+    param()
+
+    if ($global:Polaris -ne $null) {
+        return $global:Polaris.ScriptBlockRoutes;
+    }
+}
+
 ##############################
 #.SYNOPSIS
 # Defines routes to serve a folder at the "/" endpoint
@@ -109,10 +162,39 @@ function New-StaticRoute {
     }
 }
 
+<#
+.SYNOPSIS
+Add a new route middleware.
+
+.DESCRIPTION
+Route middleware is used to manipulate request and response objects before it makes it to your route logic.
+
+.PARAMETER Name
+The name of the middleware.
+
+.PARAMETER ScriptBlock
+The middleware script block that will be executed
+
+.PARAMETER ScriptPath
+A path to the middleware script that will be executed
+
+.EXAMPLE
+$JsonBodyParserMiddlerware = {
+    if ($Request.BodyString -ne $null) {
+        $Request.Body = $Request.BodyString | ConvertFrom-Json
+    }
+}
+New-RouteMiddleware -Name JsonBodyParser -ScriptBlock $JsonBodyParserMiddleware
+
+#>
 function New-RouteMiddleware {
     [CmdletBinding()]
     param(
-        [Parameter(Position=0)]
+        [Parameter(Mandatory=$True, Position=0)]
+        [string]
+        $Name,
+
+        [Parameter(Position=1)]
         [scriptblock]
         $ScriptBlock,
 
@@ -128,7 +210,66 @@ function New-RouteMiddleware {
 
         $ScriptBlock = [ScriptBlock]::Create((Get-Content -Path $ScriptPath -Raw));
     }
-    $global:Polaris.AddMiddleware($ScriptBlock.ToString());
+    $global:Polaris.AddMiddleware($Name, $ScriptBlock.ToString());
+}
+
+<#
+.SYNOPSIS
+Removes the middleware.
+
+.DESCRIPTION
+Removes the middleware from the list of middleware.
+
+.PARAMETER Name
+The name of the middleware you want to remove.
+
+.EXAMPLE
+Remove-RouteMiddleware -Name JsonBodyParser
+
+#>
+function Remove-RouteMiddleware {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$True, Position=0)]
+        [string]
+        $Name
+    )
+    if ($global:Polaris -ne $null) {
+        $global:Polaris.RemoveMiddleware($Name);
+    }
+}
+
+<#
+.SYNOPSIS
+Get the route middlewares.
+
+.DESCRIPTION
+Get the route middlewares. You can optionally specify a name for a filter.
+
+.PARAMETER Name
+(Optional) The specific middleware you're looking for.
+
+.EXAMPLE
+Get-RouteMiddleware
+
+Get-RouteMiddleware -Name JsonBodyParser
+
+#>
+
+function Get-RouteMiddleware {
+    [CmdletBinding()]
+    param(
+        [Parameter(Position=0)]
+        [string]
+        $Name
+    )
+
+    if ($global:Polaris -ne $null) {
+        if ($Name -ne $null -and $Name -ne "") {
+            return $global:Polaris.RouteMiddleware.Where({ $_.Name -eq $Name })
+        }
+        return $global:Polaris.RouteMiddleware;
+    }
 }
 
 ##############################
@@ -170,7 +311,7 @@ function Start-Polaris {
         [Parameter(Position=2)]
         [Int32]
         $MaxRunspaces = 1,
-        
+
         [Parameter()]
         [switch]
         $UseJsonBodyParserMiddleware = $false
@@ -178,9 +319,9 @@ function Start-Polaris {
     if ($global:Polaris -eq $null) {
         ThrowError -ExceptionName NoRoutesDefinedException -ExceptionMessage 'You must have at least 1 route defined.'
     }
-    
+
     if ($UseJsonBodyParserMiddleware) {
-        New-RouteMiddleware -ScriptBlock $JsonBodyParserMiddlerware;
+        New-RouteMiddleware -Name JsonBodyParser -ScriptBlock $JsonBodyParserMiddlerware;
     }
 
     $global:Polaris.Start($Port, $MinRunspaces, $MaxRunspaces);
@@ -209,7 +350,9 @@ function Stop-Polaris {
         [Parameter(Position=0)]
         [PolarisCore.Polaris]
         $ServerContext = $global:Polaris)
-    $ServerContext.Stop();
+    if ($ServerContext -eq $null) {
+        $ServerContext.Stop();
+    }
 }
 
 ##############################
@@ -396,6 +539,24 @@ function New-DeleteRoute {
     New-WebRoute -Path $Path -Method "DELETE" -ScriptBlock $ScriptBlock -ScriptPath $ScriptPath;
 }
 
+<#
+.SYNOPSIS
+Helper function that turns on the Json Body parsing middleware.
+
+.DESCRIPTION
+Helper function that turns on the Json Body parsing middleware.
+
+.EXAMPLE
+Use-JsonBodyParserMiddleware
+
+#>
+function Use-JsonBodyParserMiddleware {
+    [CmdletBinding()]
+    param()
+
+    New-RouteMiddleware -Name JsonBodyParser -ScriptBlock $JsonBodyParserMiddlerware;
+}
+
 ##############################
 # INTERNAL
 ##############################
@@ -412,16 +573,18 @@ $JsonBodyParserMiddlerware = {
     }
 }
 
-# Export only the functions using PowerShell standard verb-noun naming.
-# Be sure to list each exported functions in the FunctionsToExport field of the module manifest file.
-# This improves performance of command discovery in PowerShell.
 Export-ModuleMember -Function `
     New-WebRoute, `
+    Remove-WebRoute, `
+    Get-WebRoute, `
     New-GetRoute, `
     New-PostRoute, `
     New-PutRoute, `
     New-DeleteRoute, `
     New-StaticRoute, `
     New-RouteMiddleware, `
+    Remove-RouteMiddleware, `
+    Get-RouteMiddleware, `
+    Use-JsonBodyParserMiddleware, `
     Start-Polaris, `
     Stop-Polaris

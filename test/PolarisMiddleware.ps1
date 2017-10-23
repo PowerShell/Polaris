@@ -1,6 +1,6 @@
 Import-Module ..\Polaris.psm1
 
-New-WebRoute -Path "/helloworld" -Method "GET" -ScriptBlock {
+New-WebRoute -Path /helloworld -Method GET -ScriptBlock {
     $Response.Send('Hello World');
 }
 

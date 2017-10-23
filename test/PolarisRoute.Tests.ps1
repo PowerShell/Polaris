@@ -118,6 +118,22 @@ Describe "Test route creation" {
         }
     }
 
+    Context "Using Get-WebRoute and Remove-WebRoute" {
+        It "Will get the object with the routes" {
+            (Get-WebRoute)["test"]["GET"] | Should Be $defaultScriptBlock.ToString()
+        }
+        It "will remove the routes" {
+            Remove-WebRoute -Path "/test" -Method "GET"
+            (Get-WebRoute).Count | Should Be 0
+        }
+        BeforeEach {
+            New-WebRoute -Path "/test" -Method "GET" -ScriptBlock $defaultScriptBlock
+        }
+        AfterEach {
+            $Global:Polaris = $null
+        }
+    }
+
     AfterEach {
         $Global:Polaris = $null
     }
