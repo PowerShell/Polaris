@@ -1,2 +1,2 @@
 param($request, $response)
-$response.Send("test file");
+$response.Send("test file")

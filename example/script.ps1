@@ -1,2 +1,2 @@
 param($request, $response)
-$response.Send("example");
+$response.Send("example")
