@@ -1,6 +1,6 @@
 if(-not (Test-Path -Path ..\Polaris.psm1)) {
     Write-Error -Message "Cannot find Polaris.psm1"
-    return;
+    return
 }
 
 # Import Polaris
@@ -8,15 +8,15 @@ Import-Module -Name ..\Polaris.psm1
 
 # Hello World passing in the Path, Method & ScriptBlock
 New-WebRoute -Path /helloworld -Method GET -ScriptBlock {
-    $Response.Send('Hello World');
+    $Response.Send('Hello World')
 }
 
 # Hello World passing in the Path, Method & ScriptBlock
 New-WebRoute -Path /hellome -Method GET -ScriptBlock {
     if ($Request.Query['name']) {
-        $Response.Send('Hello ' + $Request.Query['name']);
+        $Response.Send('Hello ' + $Request.Query['name'])
     } else {
-        $Response.Send('Hello World');
+        $Response.Send('Hello World')
     }
 }
 
@@ -26,7 +26,7 @@ $sbWow = {
     }
 
     # .Json helper function that sets content type
-    $Response.Json(($json | ConvertTo-Json));
+    $response.Json(($json | ConvertTo-Json))
 }
 
 # Supports helper functions for Get, Post, Put, Delete

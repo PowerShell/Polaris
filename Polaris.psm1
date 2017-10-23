@@ -1,5 +1,5 @@
 Add-Type -Path "$PSScriptRoot/PolarisCore/bin/Debug/netstandard2.0/Polaris.dll"
-$global:Polaris = $null;
+$global:Polaris = $null
 
 ##############################
 #.SYNOPSIS
@@ -22,8 +22,7 @@ $global:Polaris = $null;
 #
 #.EXAMPLE
 # New-WebRoute -Path "/helloworld" -Method "GET" -ScriptBlock {
-#    param($request,$response);
-#    $response.Send('Hello World');
+#    $response.Send('Hello World')
 # }
 #
 # New-WebRoute -Path "/helloworld" -Method "GET" -ScriptPath ./example.ps1
@@ -50,15 +49,15 @@ function New-WebRoute {
         [Parameter()]
         [string]
         $ScriptPath)
-    CreateNewPolarisIfNeeded;
+    CreateNewPolarisIfNeeded
     if ($ScriptPath -ne $null -and $ScriptPath -ne "") {
         if(-Not (Test-Path -Path $ScriptPath)) {
-            ThrowError -ExceptionName FileNotFoundException -ExceptionMessage "File does not exist at path $ScriptPath";
+            ThrowError -ExceptionName FileNotFoundException -ExceptionMessage "File does not exist at path $ScriptPath"
         }
 
-        $ScriptBlock = [ScriptBlock]::Create((Get-Content -Path $ScriptPath -Raw));
+        $ScriptBlock = [ScriptBlock]::Create((Get-Content -Path $ScriptPath -Raw))
     }
-    $global:Polaris.AddRoute($Path, $Method, $ScriptBlock.ToString());
+    $global:Polaris.AddRoute($Path, $Method, $ScriptBlock.ToString())
 }
 
 <#
@@ -141,24 +140,24 @@ function New-StaticRoute {
         [Parameter(Mandatory=$True, Position=1)]
         [string]
         $FolderPath)
-    CreateNewPolarisIfNeeded;
+    CreateNewPolarisIfNeeded
     if(-Not (Test-Path -Path $FolderPath)) {
-        ThrowError -ExceptionName FileNotFoundException -ExceptionMessage "Folder does not exist at path $FolderPath";
+        ThrowError -ExceptionName FileNotFoundException -ExceptionMessage "Folder does not exist at path $FolderPath"
     }
 
-    $allPaths = Get-ChildItem -Path $FolderPath -Recurse | ForEach-Object { $_.FullName };
-    $resolvedPath = (Resolve-Path -Path $FolderPath).Path;
+    $allPaths = Get-ChildItem -Path $FolderPath -Recurse | ForEach-Object { $_.FullName }
+    $resolvedPath = (Resolve-Path -Path $FolderPath).Path
 
 
     $allPaths | ForEach-Object {
     $scriptTemplate = @"
 `$bytes = Get-Content "$_" -Encoding Byte -ReadCount 0
-`$response.SetContentType(([PolarisCore.PolarisResponse]::GetContentType("$_")));
-`$response.ByteResponse = `$bytes;
+`$response.SetContentType(([PolarisCore.PolarisResponse]::GetContentType("$_")))
+`$response.ByteResponse = `$bytes
 "@
 
         New-GetRoute -Path "$($RoutePath.TrimEnd("/"))$($_.Substring($resolvedPath.Length).Replace('\','/'))" `
-            -ScriptBlock ([ScriptBlock]::Create($scriptTemplate));
+            -ScriptBlock ([ScriptBlock]::Create($scriptTemplate))
     }
 }
 
@@ -321,11 +320,11 @@ function Start-Polaris {
     }
 
     if ($UseJsonBodyParserMiddleware) {
-        New-RouteMiddleware -Name JsonBodyParser -ScriptBlock $JsonBodyParserMiddlerware;
+        New-RouteMiddleware -Name JsonBodyParser -ScriptBlock $JsonBodyParserMiddlerware
     }
 
-    $global:Polaris.Start($Port, $MinRunspaces, $MaxRunspaces);
-    return $global:Polaris;
+    $global:Polaris.Start($Port, $MinRunspaces, $MaxRunspaces)
+    return $global:Polaris
 }
 
 ##############################
@@ -351,7 +350,7 @@ function Stop-Polaris {
         [PolarisCore.Polaris]
         $ServerContext = $global:Polaris)
     if ($ServerContext -eq $null) {
-        $ServerContext.Stop();
+        $ServerContext.Stop()
     }
 }
 
@@ -377,8 +376,7 @@ function Stop-Polaris {
 #
 #.EXAMPLE
 # New-GetRoute -Path "/helloworld" -ScriptBlock {
-#    param($request,$response);
-#    $response.Send('Hello World');
+#    $response.Send('Hello World')
 # }
 #
 # New-GetRoute -Path "/helloworld" -ScriptPath ./example.ps1
@@ -401,7 +399,7 @@ function New-GetRoute {
         [Parameter(ParameterSetName = "ScriptPath")]
         [string]
         $ScriptPath)
-    New-WebRoute -Path $Path -Method "GET" -ScriptBlock $ScriptBlock -ScriptPath $ScriptPath;
+    New-WebRoute -Path $Path -Method "GET" -ScriptBlock $ScriptBlock -ScriptPath $ScriptPath
 }
 
 ##############################
@@ -422,8 +420,7 @@ function New-GetRoute {
 #
 #.EXAMPLE
 # New-PostRoute -Path "/helloworld" -ScriptBlock {
-#    param($request,$response);
-#    $response.Send('Hello World');
+#    $response.Send('Hello World')
 # }
 #
 # New-PostRoute -Path "/helloworld" -ScriptPath ./example.ps1
@@ -446,7 +443,7 @@ function New-PostRoute {
         [Parameter(ParameterSetName = "ScriptPath")]
         [string]
         $ScriptPath)
-    New-WebRoute -Path $Path -Method "POST" -ScriptBlock $ScriptBlock -ScriptPath $ScriptPath;
+    New-WebRoute -Path $Path -Method "POST" -ScriptBlock $ScriptBlock -ScriptPath $ScriptPath
 }
 
 ##############################
@@ -467,8 +464,7 @@ function New-PostRoute {
 #
 #.EXAMPLE
 # New-PutRoute -Path "/helloworld" -ScriptBlock {
-#    param($request,$response);
-#    $response.Send('Hello World');
+#    $response.Send('Hello World')
 # }
 #
 # New-PutRoute -Path "/helloworld" -ScriptPath ./example.ps1
@@ -491,7 +487,7 @@ function New-PutRoute {
         [Parameter(ParameterSetName = "ScriptPath")]
         [string]
         $ScriptPath)
-    New-WebRoute -Path $Path -Method "PUT" -ScriptBlock $ScriptBlock -ScriptPath $ScriptPath;
+    New-WebRoute -Path $Path -Method "PUT" -ScriptBlock $ScriptBlock -ScriptPath $ScriptPath
 }
 
 ##############################
@@ -512,8 +508,7 @@ function New-PutRoute {
 #
 #.EXAMPLE
 # New-DeleteRoute -Path "/helloworld" -ScriptBlock {
-#    param($request,$response);
-#    $response.Send('Hello World');
+#    $response.Send('Hello World')
 # }
 #
 # New-DeleteRoute -Path "/helloworld" -ScriptPath ./example.ps1
@@ -536,7 +531,8 @@ function New-DeleteRoute {
         [Parameter(ParameterSetName = "ScriptPath")]
         [string]
         $ScriptPath)
-    New-WebRoute -Path $Path -Method "DELETE" -ScriptBlock $ScriptBlock -ScriptPath $ScriptPath;
+    CreateNewPolarisIfNeeded
+    New-WebRoute -Path $Path -Method "DELETE" -ScriptBlock $ScriptBlock -ScriptPath $ScriptPath
 }
 
 <#
@@ -563,7 +559,7 @@ function Use-JsonBodyParserMiddleware {
 function CreateNewPolarisIfNeeded () {
     if ($global:Polaris -eq $null) {
         [Action[string]]$logger = { param($str) Write-Verbose "$str" }
-        $global:Polaris = [PolarisCore.Polaris]::new($logger);
+        $global:Polaris = [PolarisCore.Polaris]::new($logger)
     }
 }
 
