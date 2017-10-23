@@ -3,7 +3,6 @@ $sut = (Split-Path -Leaf $MyInvocation.MyCommand.Path).Replace(".Tests.", ".")
 . "$here\$sut"
 
 $defaultScriptBlock = {
-    param($request, $response)
     $response.Send("test script");
 }
 $defaultScriptPath = './test.ps1';
@@ -116,6 +115,22 @@ Describe "Test route creation" {
             RouteExists -Path 'test/index.html' -Method 'GET' | Should Be $true
             RouteExists -Path 'test/test.png' -Method 'GET' | Should Be $true
             RouteExists -Path 'test/test1.png' -Method 'GET' | Should Be $true
+        }
+    }
+
+    Context "Using Get-WebRoute and Remove-WebRoute" {
+        It "Will get the object with the routes" {
+            (Get-WebRoute)["test"]["GET"] | Should Be $defaultScriptBlock.ToString()
+        }
+        It "will remove the routes" {
+            Remove-WebRoute -Path "/test" -Method "GET"
+            (Get-WebRoute).Count | Should Be 0
+        }
+        BeforeEach {
+            New-WebRoute -Path "/test" -Method "GET" -ScriptBlock $defaultScriptBlock
+        }
+        AfterEach {
+            $Global:Polaris = $null
         }
     }
 

@@ -14,10 +14,7 @@ That being said, we do plan on continuing to experiment within this repository f
 ## Example
 
 ```PowerShell
-Import-Module –Name .\Polaris.psm1
-
 New-GetRoute -Path "/helloworld" -ScriptBlock {
-    param($request,$response);
     $response.Send('Hello World!');
 }
 
