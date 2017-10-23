@@ -38,7 +38,7 @@ Describe "Test webserver use" {
         $result.StatusCode | Should Be 200
     }
 
-    It "test /example route" {
+    It "test /public/index.html static route" {
         $expectedHtml = `
 '<div>hello world</div>
 
@@ -49,5 +49,8 @@ Describe "Test webserver use" {
         $result = Invoke-WebRequest -Uri "http://localhost:$Port/public/index.html"
         $result.Content | Should Be $expectedHtml
         $result.StatusCode | Should Be 200
+    }
+    AfterAll {
+        Stop-Polaris
     }
 }

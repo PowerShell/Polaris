@@ -20,6 +20,9 @@ namespace PolarisCore
         public Dictionary<string, Dictionary<string, string>> ScriptBlockRoutes
             = new Dictionary<string, Dictionary<string, string>>();
 
+        public List<PolarisMiddleware> RouteMiddleware
+            = new List<PolarisMiddleware>();
+
         HttpListener Listener;
 
         RunspacePool PowerShellPool;
@@ -45,6 +48,46 @@ namespace PolarisCore
                 ScriptBlockRoutes[sanitizedPath] = new Dictionary<string, string>();
             }
             ScriptBlockRoutes[sanitizedPath][method] = scriptBlock;
+        }
+
+        public void RemoveRoute(string path, string method)
+        {
+            if (path == null)
+            {
+                throw new ArgumentNullException(nameof(path));
+            }
+            if (method == null)
+            {
+                throw new ArgumentNullException(nameof(method));
+            }
+
+            string sanitizedPath = path.TrimEnd('/').TrimStart('/');
+            ScriptBlockRoutes[sanitizedPath].Remove(method);
+            if (ScriptBlockRoutes[sanitizedPath].Count == 0)
+            {
+                ScriptBlockRoutes.Remove(sanitizedPath);
+            }
+        }
+
+        public void AddMiddleware(string name, string scriptBlock)
+        {
+            if (scriptBlock == null)
+            {
+                throw new ArgumentNullException(nameof(scriptBlock));
+            }
+            RouteMiddleware.Add(new PolarisMiddleware {
+                Name = name,
+                ScriptBlock = scriptBlock
+            });
+        }
+
+        public void RemoveMiddleware(string name)
+        {
+            if (name == null)
+            {
+                throw new ArgumentNullException(nameof(name));
+            }
+            RouteMiddleware.RemoveAll(m => m.Name == name);
         }
 
         public void Start(int port = 3000, int minRunspaces = 1, int maxRunspaces = 1)
@@ -114,10 +157,18 @@ namespace PolarisCore
                 PowerShellInstance.RunspacePool = PowerShellPool;
                 try
                 {
-                    // this script has a sleep in it to simulate a long running script
+                    // Set up PowerShell instance by making request and response global
+                    PowerShellInstance.AddScript(PolarisHelperScripts.InitializeRequestAndResponseScript);
+                    PowerShellInstance.AddParameter("req", request);
+                    PowerShellInstance.AddParameter("res", response);
+
+                    // Run middleware in the order in which it was added
+                    foreach (PolarisMiddleware middleware in RouteMiddleware)
+                    {
+                        PowerShellInstance.AddScript(middleware.ScriptBlock);
+                    }
+
                     PowerShellInstance.AddScript(ScriptBlockRoutes[route][rawRequest.HttpMethod]);
-                    PowerShellInstance.AddParameter(nameof(request), request);
-                    PowerShellInstance.AddParameter(nameof(response), response);
 
                     var res = PowerShellInstance.BeginInvoke<PSObject>(new PSDataCollection<PSObject>(), new PSInvocationSettings(), (result) => {
                         if (PowerShellInstance.InvocationStateInfo.State == PSInvocationState.Failed)
@@ -170,7 +221,8 @@ namespace PolarisCore
                 Logger(logString);
             } catch(PSInvalidOperationException e)
             {
-                // ignore
+                Console.WriteLine(e.Message);
+                Console.WriteLine(logString);
             }
         }
     }
