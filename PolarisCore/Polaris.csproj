@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>net451</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="System.Management.Automation" Version="6.0.0-alpha17" />
