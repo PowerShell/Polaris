@@ -2,6 +2,7 @@
 
 [![Join the chat at https://gitter.im/PowerShellPolaris/Lobby](https://badges.gitter.im/PowerShellPolaris/Lobby.svg)](https://gitter.im/PowerShellPolaris/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Travis](https://img.shields.io/travis/PowerShell/Polaris.svg)](https://travis-ci.org/PowerShell/Polaris)
+[![Build status](https://ci.appveyor.com/api/projects/status/0ak497mbjn6dibxw/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/polaris/branch/master)
 
 A cross-platform, minimalist web framework for [PowerShell Core 6](https://github.com/powershell/powershell).
 
