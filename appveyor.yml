@@ -10,6 +10,9 @@ skip_commits:
     - README.md
   message: /updated readme.*|update readme.*s|update docs.*|update version.*|update appveyor.*/
 
+branches:
+  only:
+    - master
 # There's no need to alter the build number for a Pull Request (PR) since they don't modify anything
 pull_requests:
   do_not_increment_build_number: true
