@@ -13,6 +13,7 @@ skip_commits:
 branches:
   only:
     - master
+
 # There's no need to alter the build number for a Pull Request (PR) since they don't modify anything
 pull_requests:
   do_not_increment_build_number: true
@@ -31,3 +32,7 @@ test_script:
   - ps: |
         pushd C:\projects\polaris\build
         . .\appveyor.ps1
+
+notifications:
+  - provider: Webhook
+    url: https://webhooks.gitter.im/e/7df8f5e3e64fdfe09739
