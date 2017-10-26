@@ -22,6 +22,10 @@ New-GetRoute -Path "/helloworld" -ScriptBlock {
 Start-Polaris
 ```
 
+### Why yet another web framework for PowerShell? 
+There have been a great list of[other](https://github.com/StartAutomating/Pipeworks)  [micro](https://github.com/toenuff/flancy) [web](https://github.com/Jaykul/NancyPS/) [frameworks](https://github.com/toenuff/PshOdata) [written](https://github.com/straightdave/presley) [over](https://github.com/cofonseca/WebListener) [the](https://github.com/DataBooster/PS-WebApi) [years](https://github.com/ChristopherGLewis/PowerShellWebServers) (Thanks @jaykul for the list!).
+
+Polaris' differentiation is that it is cross-platform and uses the .NET HttpListener class.
 
 ## Getting Started
 
