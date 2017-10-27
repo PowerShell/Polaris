@@ -165,6 +165,82 @@ function New-StaticRoute {
     }
 }
 
+##############################
+#.SYNOPSIS
+# Parse a list of PowerShell cmdlets and add them as HTTP routes
+#
+#.DESCRIPTION
+# This cmdlet will parse PowerShell cmdlets and defines HTTP routes that your server will listen for
+#
+#.PARAMETER CmdletList
+# A list of PowerShell cmdlet names
+#
+#.EXAMPLE
+# $cmdlets = @('Get-Item','Set-Item','Remove-Item')
+# Build-WebRoutes -Name $cmdlets
+#
+#.EXAMPLE
+# Get-Command -Module PSReadline -CommandType Cmdlet | Build-WebRoute
+#
+#.NOTES
+# Navigating to localhost:8080/$noun with a related Method will route your request to the related cmdlet
+# Verb Mapping
+# 'Get' maps to 'GET'
+# 'New' maps to 'POST'
+# 'Set' maps to 'PATCH'
+# 'Delete' maps to 'DELETE'
+# unmatched verbs map to 'POST'
+#
+##############################
+function Build-WebRoute {
+    [cmdletbinding()]
+    Param(
+        [Parameter(
+            Mandatory=$true,
+            ValueFromPipeline=$True
+        )]
+        [string[]]$Name
+    )
+
+    Begin{}
+
+    Process{
+        $cmdlet = Get-Command -Name $Name
+
+        $queryBlock = '
+            $params = $request.Query
+            $result = {0} @params
+            $response.Send($result)
+        ' -f $Name
+
+        $bodyBlock = '
+            $params = @{{}}
+            $request.body.psobject.properties | ForEach-Object {{ $params[$_.Name] = $_.Value }}
+            $result = {0} @params
+            $response.Send($result)
+        ' -f $Name
+
+        Switch ($cmdlet.Verb) {
+            'Get' { $verb = 'GET' }
+            'New' { $verb = 'POST' }
+            'Set' { $verb = 'PATCH' }
+            'Remove' { $verb = 'DELETE' }
+            default { $verb = 'POST' }
+        }
+
+        If ($verb -eq 'GET') {
+            $sb = [ScriptBlock]::Create($queryBlock)
+        }
+        Else {
+            $sb = [ScriptBlock]::Create($bodyBlock)
+        }
+
+        New-WebRoute -Path "/$Name" -Method $verb -ScriptBlock $sb
+    }
+
+    End{}
+}
+
 <#
 .SYNOPSIS
 Add a new route middleware.
@@ -582,6 +658,7 @@ Export-ModuleMember -Function `
     New-PutRoute, `
     New-DeleteRoute, `
     New-StaticRoute, `
+    Build-WebRoute, `
     New-RouteMiddleware, `
     Remove-RouteMiddleware, `
     Get-RouteMiddleware, `
