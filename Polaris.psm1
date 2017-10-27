@@ -319,9 +319,7 @@ function Start-Polaris {
         [switch]
         $UseJsonBodyParserMiddleware = $false
         )
-    if ($global:Polaris -eq $null) {
-        ThrowError -ExceptionName NoRoutesDefinedException -ExceptionMessage 'You must have at least 1 route defined.'
-    }
+    CreateNewPolarisIfNeeded
 
     if ($UseJsonBodyParserMiddleware) {
         New-RouteMiddleware -Name JsonBodyParser -ScriptBlock $JsonBodyParserMiddlerware
@@ -353,7 +351,7 @@ function Stop-Polaris {
         [Parameter(Position=0)]
         [PolarisCore.Polaris]
         $ServerContext = $global:Polaris)
-    if ($ServerContext -eq $null) {
+    if ($ServerContext -ne $null) {
         $ServerContext.Stop()
     }
 }

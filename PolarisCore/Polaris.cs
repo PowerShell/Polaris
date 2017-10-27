@@ -109,6 +109,8 @@ namespace PolarisCore
         public void Stop()
         {
             StopServer = true;
+            Listener.Close();
+            PowerShellPool.Dispose();
             Log("Server Stopped.");
         }
 
@@ -137,9 +139,20 @@ namespace PolarisCore
         {
             while(!StopServer)
             {
-                var context = await Listener.GetContextAsync();
+                HttpListenerContext context = null;
+                try
+                {
+                    context = await Listener.GetContextAsync();
+                }
+                catch (Exception e)
+                {
+                    if (!(e is ObjectDisposedException))
+                    {
+                        throw;
+                    }
+                }
 
-                if(StopServer)
+                if(StopServer || context == null)
                 {
                     break;
                 }
@@ -195,9 +208,6 @@ namespace PolarisCore
                     }
                 }
             }
-
-            Listener.Close();
-            PowerShellPool.Dispose();
         }
 
         private static void Send(HttpListenerResponse rawResponse, PolarisResponse response)
@@ -219,10 +229,13 @@ namespace PolarisCore
             try
             {
                 Logger(logString);
-            } catch(PSInvalidOperationException e)
+            } catch(Exception e)
             {
-                Console.WriteLine(e.Message);
-                Console.WriteLine(logString);
+                if (!(e is PSInvalidOperationException))
+                {
+                    Console.WriteLine(e.Message);
+                    Console.WriteLine(logString);
+                }
             }
         }
     }
