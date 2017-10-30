@@ -353,7 +353,12 @@ function Stop-Polaris {
         $ServerContext = $global:Polaris)
     if ($ServerContext -ne $null) {
         $ServerContext.Stop()
-        Invoke-RestMethod "http://localhost:$($global:Polaris.Port)/ping"
+        try {
+            Invoke-RestMethod "http://localhost:$($global:Polaris.Port)/ping"
+        }
+        finally {
+            Write-Verbose "Server Stopped"
+        }
     }
 }
 
