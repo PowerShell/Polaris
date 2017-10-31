@@ -109,7 +109,7 @@ namespace PolarisCore
         public void Stop()
         {
             StopServer = true;
-            Listener.Close();
+            //Listener.Close();
             PowerShellPool.Dispose();
             Log("Server Stopped.");
         }
@@ -154,6 +154,11 @@ namespace PolarisCore
 
                 if(StopServer || context == null)
                 {
+                    if (Listener != null)
+                    {
+                        Listener.Stop();
+                        Listener.Close();
+                    }
                     break;
                 }
 
