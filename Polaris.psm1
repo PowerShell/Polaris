@@ -356,8 +356,11 @@ function Stop-Polaris {
         try {
             Invoke-RestMethod "http://localhost:$($global:Polaris.Port)/ping"
         }
+        catch {
+            Write-Host "idk"
+        }
         finally {
-            Write-Verbose "Server Stopped"
+            Write-Host "Server Stopped"
         }
     }
 }

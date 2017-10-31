@@ -154,6 +154,11 @@ namespace PolarisCore
 
                 if(StopServer || context == null)
                 {
+                    if (Listener != null)
+                    {
+                        Listener.Stop();
+                        Listener.Close();
+                    }
                     break;
                 }
 
@@ -208,7 +213,6 @@ namespace PolarisCore
                     }
                 }
             }
-            Listener.Close();
         }
 
         private static void Send(HttpListenerResponse rawResponse, PolarisResponse response)
