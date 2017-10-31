@@ -156,7 +156,6 @@ namespace PolarisCore
                 {
                     if (Listener != null)
                     {
-                        Listener.Stop();
                         Listener.Close();
                     }
                     break;
