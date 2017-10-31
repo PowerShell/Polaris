@@ -5,6 +5,13 @@ if (Test-Path "$PSScriptRoot/PolarisCore/bin/Debug/net451/") {
 }
 $global:Polaris = $null
 
+# Handles the removal of the module
+$m = $ExecutionContext.SessionState.Module
+$m.OnRemove = {
+    Stop-Polaris
+    Remove-Variable -Name Polaris -Scope global
+}.GetNewClosure()
+
 ##############################
 #.SYNOPSIS
 # Adds a new HTTP Route
@@ -93,7 +100,7 @@ function Remove-WebRoute {
         $Method
     )
     if ($global:Polaris -ne $null) {
-        $global:Polaris.RemoveRoute($Path, $Method);
+        $global:Polaris.RemoveRoute($Path, $Method)
     }
 }
 
@@ -113,7 +120,7 @@ function Get-WebRoute {
     param()
 
     if ($global:Polaris -ne $null) {
-        return $global:Polaris.ScriptBlockRoutes;
+        return $global:Polaris.ScriptBlockRoutes
     }
 }
 
@@ -205,15 +212,15 @@ function New-RouteMiddleware {
         [string]
         $ScriptPath
     )
-    CreateNewPolarisIfNeeded;
+    CreateNewPolarisIfNeeded
     if ($ScriptPath -ne $null -and $ScriptPath -ne "") {
         if(-Not (Test-Path -Path $ScriptPath)) {
-            ThrowError -ExceptionName FileNotFoundException -ExceptionMessage "File does not exist at path $ScriptPath";
+            ThrowError -ExceptionName FileNotFoundException -ExceptionMessage "File does not exist at path $ScriptPath"
         }
 
-        $ScriptBlock = [ScriptBlock]::Create((Get-Content -Path $ScriptPath -Raw));
+        $ScriptBlock = [ScriptBlock]::Create((Get-Content -Path $ScriptPath -Raw))
     }
-    $global:Polaris.AddMiddleware($Name, $ScriptBlock.ToString());
+    $global:Polaris.AddMiddleware($Name, $ScriptBlock.ToString())
 }
 
 <#
@@ -238,7 +245,7 @@ function Remove-RouteMiddleware {
         $Name
     )
     if ($global:Polaris -ne $null) {
-        $global:Polaris.RemoveMiddleware($Name);
+        $global:Polaris.RemoveMiddleware($Name)
     }
 }
 
@@ -271,7 +278,7 @@ function Get-RouteMiddleware {
         if ($Name -ne $null -and $Name -ne "") {
             return $global:Polaris.RouteMiddleware.Where({ $_.Name -eq $Name })
         }
-        return $global:Polaris.RouteMiddleware;
+        return $global:Polaris.RouteMiddleware
     }
 }
 
@@ -558,7 +565,7 @@ function Use-JsonBodyParserMiddleware {
     [CmdletBinding()]
     param()
 
-    New-RouteMiddleware -Name JsonBodyParser -ScriptBlock $JsonBodyParserMiddlerware;
+    New-RouteMiddleware -Name JsonBodyParser -ScriptBlock $JsonBodyParserMiddlerware
 }
 
 ##############################
