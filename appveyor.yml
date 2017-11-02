@@ -30,8 +30,8 @@ install:
 # If any of the tests fail, consider the pipeline failed
 test_script:
   - ps: |
-        pushd C:\projects\polaris\build
-        . .\appveyor.ps1
+        Install-Module InvokeBuild
+        Invoke-Build
 
 notifications:
   - provider: Webhook
