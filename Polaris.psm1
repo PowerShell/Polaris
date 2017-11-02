@@ -162,7 +162,11 @@ function New-StaticRoute {
 
     $allPaths | ForEach-Object {
     $scriptTemplate = @"
-`$bytes = Get-Content "$_" -Encoding Byte -ReadCount 0
+if(`$PSVersionTable.PSEdition -eq "Core") {
+    `$bytes = Get-Content "$_" -AsByteStream -ReadCount 0
+} else {
+    `$bytes = Get-Content "$_" -Encoding Byte -ReadCount 0
+}
 `$response.SetContentType(([PolarisCore.PolarisResponse]::GetContentType("$_")))
 `$response.ByteResponse = `$bytes
 "@
