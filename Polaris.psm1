@@ -1,7 +1,7 @@
-if (Test-Path "$PSScriptRoot/PolarisCore/bin/Debug/net451/") {
-    Add-Type -Path "$PSScriptRoot/PolarisCore/bin/Debug/net451/Polaris.dll"
-} else {
+if ($PSVersionTable.PSEdition -eq "Core") {
     Add-Type -Path "$PSScriptRoot/PolarisCore/bin/Debug/netstandard2.0/Polaris.dll"
+} else {
+    Add-Type -Path "$PSScriptRoot/PolarisCore/bin/Debug/net451/Polaris.dll"
 }
 $global:Polaris = $null
 
