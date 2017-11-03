@@ -34,20 +34,10 @@ Polaris' differentiation is that it is cross-platform and uses the .NET HttpList
 * [PowerShell Core 6](https://github.com/powershell/powershell)
 
 ### Steps
-#### Windows
 1. Clone or download the zip of the repo
 1. Open [PowerShell Core 6](https://github.com/powershell/powershell)
-1. run `cd Polaris/PolarisCore`
-1. run `dotnet restore`
-1. run `dotnet build`
-1. run `cd ..`
-#### Unix/Linux
-1. Clone or download the zip of the repo
-1. Open [PowerShell Core 6](https://github.com/powershell/powershell)
-1. run `cd Polaris/PolarisCore`
-1. run `dotnet restore`
-1. run `dotnet build -f netstandard2.0`
-1. run `cd ..`
+1. run `Install-Module InvokeBuild`
+1. run `Invoke-Build Build`
 
 At this point, you can now run `Import-Module ./Polaris.psm1` to start using Polaris! Checkout [the wiki](https://github.com/PowerShell/Polaris/wiki) for more usage!
 

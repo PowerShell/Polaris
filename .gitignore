@@ -298,3 +298,6 @@ __pycache__/
 *.dll
 
 # End of https://www.gitignore.io/api/csharp,powershell
+
+# Pester output
+test/TestsResults.xml

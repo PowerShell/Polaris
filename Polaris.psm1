@@ -1,7 +1,7 @@
-if (Test-Path "$PSScriptRoot/PolarisCore/bin/Debug/net451/") {
-    Add-Type -Path "$PSScriptRoot/PolarisCore/bin/Debug/net451/Polaris.dll"
-} else {
+if ($PSVersionTable.PSEdition -eq "Core") {
     Add-Type -Path "$PSScriptRoot/PolarisCore/bin/Debug/netstandard2.0/Polaris.dll"
+} else {
+    Add-Type -Path "$PSScriptRoot/PolarisCore/bin/Debug/net451/Polaris.dll"
 }
 $global:Polaris = $null
 
@@ -162,7 +162,11 @@ function New-StaticRoute {
 
     $allPaths | ForEach-Object {
     $scriptTemplate = @"
-`$bytes = Get-Content "$_" -Encoding Byte -ReadCount 0
+if(`$PSVersionTable.PSEdition -eq "Core") {
+    `$bytes = Get-Content "$_" -AsByteStream -ReadCount 0
+} else {
+    `$bytes = Get-Content "$_" -Encoding Byte -ReadCount 0
+}
 `$response.SetContentType(([PolarisCore.PolarisResponse]::GetContentType("$_")))
 `$response.ByteResponse = `$bytes
 "@
