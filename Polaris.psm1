@@ -578,7 +578,7 @@ function Use-JsonBodyParserMiddleware {
 function CreateNewPolarisIfNeeded () {
     if ($global:Polaris -eq $null) {
         [Action[string]]$logger = { param($str) Write-Verbose "$str" }
-        $global:Polaris = [PolarisCore.Polaris]::new($logger)
+        $global:Polaris = New-Object -TypeName PolarisCore.Polaris -ArgumentList $logger
     }
 }
 
