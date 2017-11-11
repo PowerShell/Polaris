@@ -193,6 +193,17 @@ namespace PolarisCore
                             Log(PowerShellInstance.InvocationStateInfo.Reason.ToString());
                             response.Send(PowerShellInstance.InvocationStateInfo.Reason.ToString());
                             response.SetStatusCode(500);
+                        } else if (PowerShellInstance.HadErrors)
+                        {
+                            var errorsBody = "";
+                            for (int i = 0; i < PowerShellInstance.Streams.Error.Count; i++)
+                            {
+                                errorsBody += "[ " + i + " ]:\n";
+                                errorsBody += PowerShellInstance.Streams.Error[i].Exception.ToString();
+                                errorsBody += PowerShellInstance.Streams.Error[i].InvocationInfo.PositionMessage + "\n\n";
+                            }
+                            response.Send(errorsBody);
+                            response.SetStatusCode(500);
                         }
                         Send(rawResponse, response);
                         PowerShellInstance.Dispose();

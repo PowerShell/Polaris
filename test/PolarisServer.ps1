@@ -38,6 +38,12 @@ New-WebRoute -Path /example -Method GET -ScriptPath .\test.ps1
 # Also support static serving of a directory
 New-StaticRoute -FolderPath ./static -RoutePath /public
 
+New-PostRoute -Path /error -ScriptBlock {
+    $params = @{}
+    $request.body.psobject.properties | ForEach-Object { $params[$_.Name] = $_.Value }
+    $response.Send("this should not show up in response")
+}
+
 $Port = Get-Random -Minimum 8000 -Maximum 8999
 
 # Start the app

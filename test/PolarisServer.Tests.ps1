@@ -52,6 +52,10 @@ Describe "Test webserver use" {
             $result.StatusCode | Should Be 200
         }
 
+        It "test /error route that returns 500" {
+            { Invoke-WebRequest -Uri "http://localhost:$Port/error" } | Should Throw
+        }
+
         AfterAll {
             Stop-Polaris
         }
