@@ -2,6 +2,8 @@ $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 $sut = (Split-Path -Leaf $MyInvocation.MyCommand.Path).Replace(".Tests.", ".")
 . "$here\$sut"
 
+$IsUnix = $PSVersionTable.Platform -eq "Unix"
+
 Describe "Test webserver use" {
     Context "Test different route responses" {
         It "test /helloworld route" {
@@ -13,6 +15,19 @@ Describe "Test webserver use" {
         It "test /helloworld route with query params that do nothing" {
             $result = Invoke-WebRequest -Uri "http://localhost:$Port/helloworld?test=true&another=one"
             $result.Content | Should Be 'Hello World'
+            $result.StatusCode | Should Be 200
+        }
+
+        It "test /helloworld route with log query param" {
+            $expectedText = `
+"
+[PSHOST]This is Write-Host
+[Tag0]This is Write-Information
+
+Hello World"
+
+            $result = Invoke-WebRequest -Uri "http://localhost:$Port/helloworld?PolarisLogs=true"
+            $result.Content | Should Be $expectedText
             $result.StatusCode | Should Be 200
         }
 
@@ -52,6 +67,10 @@ Describe "Test webserver use" {
             $result.StatusCode | Should Be 200
         }
 
+        It "test /error route that returns 500" {
+            { Invoke-WebRequest -Uri "http://localhost:$Port/error" } | Should Throw
+        }
+
         AfterAll {
             Stop-Polaris
         }
@@ -59,17 +78,19 @@ Describe "Test webserver use" {
 
     Context "Test starting and stopping of the server" {
         BeforeAll {
-            Stop-Polaris
-            Start-Polaris -Port $Port
-
-            $result = Invoke-WebRequest -Uri "http://localhost:$Port/helloworld"
-            $result.StatusCode | Should Be 200
+            if (-not $IsUnix) {
+                Stop-Polaris
+                Start-Polaris -Port $Port
+    
+                $result = Invoke-WebRequest -Uri "http://localhost:$Port/helloworld"
+                $result.StatusCode | Should Be 200
+            }
         }
 
         It "Can properly shut down the server" {
             Stop-Polaris
 
             { Invoke-WebRequest -Uri "http://localhost:$Port/helloworld" } | Should Throw
-        }
+        } -Skip:$IsUnix
     }
 }
