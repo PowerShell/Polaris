@@ -2,6 +2,8 @@ $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 $sut = (Split-Path -Leaf $MyInvocation.MyCommand.Path).Replace(".Tests.", ".")
 . "$here\$sut"
 
+$IsUnix = $PSVersionTable.Platform -eq "Unix"
+
 Describe "Test webserver use" {
     Context "Test different route responses" {
         It "test /helloworld route" {
@@ -13,6 +15,19 @@ Describe "Test webserver use" {
         It "test /helloworld route with query params that do nothing" {
             $result = Invoke-WebRequest -Uri "http://localhost:$Port/helloworld?test=true&another=one"
             $result.Content | Should Be 'Hello World'
+            $result.StatusCode | Should Be 200
+        }
+
+        It "test /helloworld route with log query param" {
+            $expectedText = `
+"
+[PSHOST]This is Write-Host
+[Tag0]This is Write-Information
+
+Hello World"
+
+            $result = Invoke-WebRequest -Uri "http://localhost:$Port/helloworld?PolarisLogs=true"
+            $result.Content | Should Be $expectedText
             $result.StatusCode | Should Be 200
         }
 
@@ -68,12 +83,12 @@ Describe "Test webserver use" {
 
             $result = Invoke-WebRequest -Uri "http://localhost:$Port/helloworld"
             $result.StatusCode | Should Be 200
-        }
+        } -Skip:$IsUnix
 
         It "Can properly shut down the server" {
             Stop-Polaris
 
             { Invoke-WebRequest -Uri "http://localhost:$Port/helloworld" } | Should Throw
-        }
+        } -Skip:$IsUnix
     }
 }

@@ -8,6 +8,8 @@ Import-Module -Name ..\Polaris.psm1
 
 # Hello World passing in the Path, Method & ScriptBlock
 New-WebRoute -Path /helloworld -Method GET -ScriptBlock {
+    Write-Host "This is Write-Host"
+    Write-Information "This is Write-Information" -Tags Tag0
     $Response.Send('Hello World')
 }
 
@@ -40,6 +42,7 @@ New-StaticRoute -FolderPath ./static -RoutePath /public
 
 New-PostRoute -Path /error -ScriptBlock {
     $params = @{}
+    Write-Host "asdf"
     $request.body.psobject.properties | ForEach-Object { $params[$_.Name] = $_.Value }
     $response.Send("this should not show up in response")
 }

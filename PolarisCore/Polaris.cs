@@ -28,6 +28,7 @@ namespace PolarisCore
         RunspacePool PowerShellPool;
 
         bool StopServer = false;
+        string GetLogsString = "PolarisLogs";
 
         public Polaris(Action<string> logger)
         {
@@ -188,6 +189,7 @@ namespace PolarisCore
                     PowerShellInstance.AddScript(ScriptBlockRoutes[route][rawRequest.HttpMethod]);
 
                     var res = PowerShellInstance.BeginInvoke<PSObject>(new PSDataCollection<PSObject>(), new PSInvocationSettings(), (result) => {
+                        // Handle errors
                         if (PowerShellInstance.InvocationStateInfo.State == PSInvocationState.Failed)
                         {
                             Log(PowerShellInstance.InvocationStateInfo.Reason.ToString());
@@ -195,16 +197,40 @@ namespace PolarisCore
                             response.SetStatusCode(500);
                         } else if (PowerShellInstance.HadErrors)
                         {
-                            var errorsBody = "";
+                            var errorsBody = "\n";
                             for (int i = 0; i < PowerShellInstance.Streams.Error.Count; i++)
                             {
-                                errorsBody += "[ " + i + " ]:\n";
+                                errorsBody += "[" + i + "]:\n";
                                 errorsBody += PowerShellInstance.Streams.Error[i].Exception.ToString();
                                 errorsBody += PowerShellInstance.Streams.Error[i].InvocationInfo.PositionMessage + "\n\n";
                             }
                             response.Send(errorsBody);
                             response.SetStatusCode(500);
                         }
+
+                        // Handle logs
+                        if (request.Query[GetLogsString] != null)
+                        {
+                            var informationBody = "\n";
+                            for (int i = 0; i < PowerShellInstance.Streams.Information.Count; i++)
+                            {
+                                foreach (var tag in PowerShellInstance.Streams.Information[i].Tags)
+                                {
+                                    informationBody += "[" + tag + "]";
+                                }
+
+                                informationBody += PowerShellInstance.Streams.Information[i].MessageData.ToString() + "\n";
+                            }
+                            informationBody += "\n";
+
+                            // Set response to the logs and the actual response (could be errors)
+                            var logBytes = System.Text.Encoding.UTF8.GetBytes(informationBody);
+                            var bytes = new byte[logBytes.Length + response.ByteResponse.Length];
+                            logBytes.CopyTo(bytes, 0);
+                            response.ByteResponse.CopyTo(bytes, logBytes.Length);
+                            response.ByteResponse = bytes;
+                        }
+
                         Send(rawResponse, response);
                         PowerShellInstance.Dispose();
                     }, null);
