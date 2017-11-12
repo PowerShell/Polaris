@@ -78,12 +78,14 @@ Hello World"
 
     Context "Test starting and stopping of the server" {
         BeforeAll {
-            Stop-Polaris
-            Start-Polaris -Port $Port
-
-            $result = Invoke-WebRequest -Uri "http://localhost:$Port/helloworld"
-            $result.StatusCode | Should Be 200
-        } -Skip:$IsUnix
+            if (-not $IsUnix) {
+                Stop-Polaris
+                Start-Polaris -Port $Port
+    
+                $result = Invoke-WebRequest -Uri "http://localhost:$Port/helloworld"
+                $result.StatusCode | Should Be 200
+            }
+        }
 
         It "Can properly shut down the server" {
             Stop-Polaris
