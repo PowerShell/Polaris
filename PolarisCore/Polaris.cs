@@ -111,7 +111,7 @@ namespace PolarisCore
         {
             StopServer = true;
             //Listener.Close();
-            PowerShellPool.Dispose();
+            PowerShellPool.Close();
             Log("Server Stopped.");
         }
 
@@ -232,7 +232,7 @@ namespace PolarisCore
                         }
 
                         Send(rawResponse, response);
-                        PowerShellInstance.Dispose();
+                        // PowerShellInstance.Dispose();
                     }, null);
                 }
                 catch(Exception e)
