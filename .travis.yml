@@ -17,7 +17,7 @@ script:
   - dotnet build -f netstandard2.0
   # Uncomment when Pester is supported in PowerShell for Linux
   - popd && pushd test
-  - powershell -c 'Invoke-Pester -ExcludeTag VersionChecks -EnableExit'
+  - pwsh -c 'Invoke-Pester -ExcludeTag VersionChecks -EnableExit'
   - popd
 notifications:
   webhooks:
