@@ -15,7 +15,6 @@ script:
   - pushd PolarisCore
   - dotnet restore
   - dotnet build -f netstandard2.0
-  # Uncomment when Pester is supported in PowerShell for Linux
   - popd && pushd test
   - pwsh -c 'Invoke-Pester -ExcludeTag VersionChecks -EnableExit'
   - popd
