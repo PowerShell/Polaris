@@ -69,7 +69,7 @@ Copyright = '(c) tylerleonhardt. All rights reserved.'
 # NestedModules = @()
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-FunctionsToExport = @('New-WebRoute', 'New-GetRoute', 'New-PostRoute', 'New-PutRoute', 'New-DeleteRoute', 'Start-Polaris', 'New-StaticRoute', 'Stop-Polaris')
+FunctionsToExport = '*'
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
 CmdletsToExport = '*'
