@@ -805,11 +805,13 @@ function CreateNewPolarisIfNeeded ()
     }
 }
 
-$JsonBodyParserMiddlerware =
-{
-    if ( $Request.BodyString -ne $Null )
-    {
-        $Request.Body = $Request.BodyString | ConvertFrom-Json
+$JsonBodyParserMiddlerware = {
+    if ($Request.BodyString -ne $null) {
+        try {
+            $Request.Body = $Request.BodyString | ConvertFrom-Json
+        } catch {
+            Write-Verbose "Failed to convert body from json"
+        }
     }
 }
 

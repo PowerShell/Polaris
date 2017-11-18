@@ -4,7 +4,7 @@
 [![Travis](https://img.shields.io/travis/PowerShell/Polaris.svg)](https://travis-ci.org/PowerShell/Polaris)
 [![Build status](https://ci.appveyor.com/api/projects/status/0ak497mbjn6dibxw/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/polaris/branch/master)
 
-A cross-platform, minimalist web framework for [PowerShell Core 6](https://github.com/powershell/powershell).
+A cross-platform, minimalist web framework for [PowerShell](https://github.com/powershell/powershell).
 
 ## Disclaimer
 
@@ -30,18 +30,18 @@ Polaris' differentiation is that it is cross-platform and uses the .NET HttpList
 ## Getting Started
 
 ### Prereqs
-* [.NET Standard 2.0 SDK](https://www.microsoft.com/net/download/core)
-* [PowerShell Core 6](https://github.com/powershell/powershell)
+* [.NET Standard 2.0 SDK](https://www.microsoft.com/net/download/core) or .NET Framework 4.5.1
+* [PowerShell](https://github.com/powershell/powershell)
 
 ### Steps
 1. Clone or download the zip of the repo
-1. Open [PowerShell Core 6](https://github.com/powershell/powershell)
+1. Open [PowerShell](https://github.com/powershell/powershell)
 1. run `Install-Module InvokeBuild`
 1. run `Invoke-Build Build`
 
 At this point, you can now run `Import-Module ./Polaris.psm1` to start using Polaris! Checkout [the wiki](https://github.com/PowerShell/Polaris/wiki) for more usage!
 
-You can also run all the Pester tests by running `Invoke-Pester` in the `test` directory. You may need the [fork of Pester that supports PowerShell Core 6](https://github.com/powershell/psl-pester).
+You can also run all the Pester tests by running `Invoke-Pester` in the `test` directory. You may need the [fork of Pester that supports PowerShell](https://github.com/powershell/psl-pester).
 
 _Installation from the PowerShell Gallery coming soon!_
 
@@ -49,11 +49,9 @@ _Installation from the PowerShell Gallery coming soon!_
 
 We have a few paths we are interested in taking. We hope the community helps direct us.
 
-* Expanding on the current implementation using HttpListener to deliver features you'd expect from projects ASP.NET or Expressjs (route parameters, query parameters, middleware etc)
+* Expanding on the current implementation using HttpListener to deliver features you'd expect from projects ASP.NET or Expressjs (route parameters, query parameters, middleware, auth etc)
 
 * Investigating the use of [Kestrel](https://github.com/aspnet/KestrelHttpServer)/[ASP.NET Routing](https://github.com/aspnet/routing) instead of HttpListener
-
-* Support for Windows PowerShell (5.x and lower)
 
 * Creating a routing domain-specific language (DSL) for isolating and running script blocks as routes. Drawing inspiration from [Pester](https://github.com/pester/Pester/).
 
@@ -66,8 +64,6 @@ If you have an idea or find a bug, join the discussions in the issues or create 
 
 ## Limitations
 
-* Currently, this only works in PowerShell 6. Support for older versions of PowerShell is on the roadmap
-* There's no support for route parameters or query parameters that you would expect from projects like ASP.NET or Express however, we have a few ideas in mind on how to add this ability
 * All script executions happen in a sandboxed runspace which means common parameters can not be shared between routes
 
 ## License
