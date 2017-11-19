@@ -21,7 +21,7 @@ Describe "Test middleware creation/usage" {
             $filtered.Count | Should Be 1
         }
         It "Can use the body parameters in route scripts" {
-            New-PostRoute -Path "/hello" -ScriptBlock {
+            New-PolarisPostRoute -Path "/hello" -ScriptBlock {
                 if ($request.Body.Name) {
                     $response.Send('Hello ' + $request.Body.Name);
                 } else {
@@ -35,7 +35,7 @@ Describe "Test middleware creation/usage" {
     }
     Context "Test adding a new middleware" {
         It "Adds the middleware to the list of middlewares" {
-            (Get-RouteMiddleware -Name TestMiddleware).Name | Should Be "TestMiddleware"
+            (Get-PolarisRouteMiddleware -Name TestMiddleware).Name | Should Be "TestMiddleware"
         }
         It "Manipulates the Request before the Route script gets it" {
             $body = @{ Name = 'Atlas' } | ConvertTo-Json
@@ -43,10 +43,10 @@ Describe "Test middleware creation/usage" {
         }
         BeforeEach {
             $app.RouteMiddleware.Count | Should Be 1;
-            New-RouteMiddleware -Name TestMiddleware -ScriptBlock $defaultMiddleware
+            New-PolarisRouteMiddleware -Name TestMiddleware -ScriptBlock $defaultMiddleware
         }
         AfterEach {
-            Remove-RouteMiddleware -Name TestMiddleware
+            Remove-PolarisRouteMiddleware -Name TestMiddleware
             $app.RouteMiddleware.Count | Should Be 1;
         }
     }

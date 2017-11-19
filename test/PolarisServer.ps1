@@ -7,14 +7,14 @@ if(-not (Test-Path -Path ..\Polaris.psm1)) {
 Import-Module -Name ..\Polaris.psm1
 
 # Hello World passing in the Path, Method & ScriptBlock
-New-WebRoute -Path /helloworld -Method GET -ScriptBlock {
+New-PolarisWebRoute -Path /helloworld -Method GET -ScriptBlock {
     Write-Host "This is Write-Host"
     Write-Information "This is Write-Information" -Tags Tag0
     $Response.Send('Hello World')
 }
 
 # Hello World passing in the Path, Method & ScriptBlock
-New-WebRoute -Path /hellome -Method GET -ScriptBlock {
+New-PolarisWebRoute -Path /hellome -Method GET -ScriptBlock {
     if ($Request.Query['name']) {
         $Response.Send('Hello ' + $Request.Query['name'])
     } else {
@@ -32,15 +32,15 @@ $sbWow = {
 }
 
 # Supports helper functions for Get, Post, Put, Delete
-New-PostRoute -Path /wow -ScriptBlock $sbWow
+New-PolarisPostRoute -Path /wow -ScriptBlock $sbWow
 
 # Pass in script file
-New-WebRoute -Path /example -Method GET -ScriptPath .\test.ps1
+New-PolarisWebRoute -Path /example -Method GET -ScriptPath .\test.ps1
 
 # Also support static serving of a directory
-New-StaticRoute -FolderPath ./static -RoutePath /public
+New-PolarisStaticRoute -FolderPath ./static -RoutePath /public
 
-New-PostRoute -Path /error -ScriptBlock {
+New-PolarisPostRoute -Path /error -ScriptBlock {
     $params = @{}
     Write-Host "asdf"
     $request.body.psobject.properties | ForEach-Object { $params[$_.Name] = $_.Value }
