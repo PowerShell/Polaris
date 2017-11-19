@@ -32,17 +32,17 @@ $m.OnRemove = {
 # A path to a script that will be triggered when this HTTP Route/Path/endpoint has been called
 #
 #.EXAMPLE
-# New-WebRoute -Path "/helloworld" -Method "GET" -ScriptBlock {
+# New-PolarisWebRoute -Path "/helloworld" -Method "GET" -ScriptBlock {
 #    $response.Send('Hello World')
 # }
 #
-# New-WebRoute -Path "/helloworld" -Method "GET" -ScriptPath ./example.ps1
+# New-PolarisWebRoute -Path "/helloworld" -Method "GET" -ScriptPath ./example.ps1
 #
 #.NOTES
 # Navigating to localhost:8080/helloworld would display the example.
 #
 ##############################
-function New-WebRoute {
+function New-PolarisWebRoute {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$True, Position=0)]
@@ -85,10 +85,10 @@ The path of the route you want to remove.
 The method of the route you want to remove.
 
 .EXAMPLE
-Remove-WebRoute -Path /out -Method PUT
+Remove-PolarisWebRoute -Path /out -Method PUT
 
 #>
-function Remove-WebRoute {
+function Remove-PolarisWebRoute {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory=$True, Position=0)]
@@ -112,10 +112,10 @@ Get the object containing the routes.
 Get the object containing the routes. They are organized by Path -> Method -> Script block
 
 .EXAMPLE
-Get-WebRoute
+Get-PolarisWebRoute
 
 #>
-function Get-WebRoute {
+function Get-PolarisWebRoute {
     [CmdletBinding()]
     param()
 
@@ -138,10 +138,10 @@ function Get-WebRoute {
 # Path to the folder you want to serve.
 #
 #.EXAMPLE
-# New-StaticRoute -Path ./public
+# New-PolarisStaticRoute -Path ./public
 #
 ##############################
-function New-StaticRoute {
+function New-PolarisStaticRoute {
     [CmdletBinding()]
     param(
         [Parameter(Position=0)]
@@ -171,7 +171,7 @@ if(`$PSVersionTable.PSEdition -eq "Core") {
 `$response.ByteResponse = `$bytes
 "@
 
-        New-GetRoute -Path "$($RoutePath.TrimEnd("/"))$($_.Substring($resolvedPath.Length).Replace('\','/'))" `
+        New-PolarisGetRoute -Path "$($RoutePath.TrimEnd("/"))$($_.Substring($resolvedPath.Length).Replace('\','/'))" `
             -ScriptBlock ([ScriptBlock]::Create($scriptTemplate))
     }
 }
@@ -198,10 +198,10 @@ $JsonBodyParserMiddlerware = {
         $Request.Body = $Request.BodyString | ConvertFrom-Json
     }
 }
-New-RouteMiddleware -Name JsonBodyParser -ScriptBlock $JsonBodyParserMiddleware
+New-PolarisRouteMiddleware -Name JsonBodyParser -ScriptBlock $JsonBodyParserMiddleware
 
 #>
-function New-RouteMiddleware {
+function New-PolarisRouteMiddleware {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$True, Position=0)]
@@ -238,10 +238,10 @@ Removes the middleware from the list of middleware.
 The name of the middleware you want to remove.
 
 .EXAMPLE
-Remove-RouteMiddleware -Name JsonBodyParser
+Remove-PolarisRouteMiddleware -Name JsonBodyParser
 
 #>
-function Remove-RouteMiddleware {
+function Remove-PolarisRouteMiddleware {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$True, Position=0)]
@@ -264,13 +264,13 @@ Get the route middlewares. You can optionally specify a name for a filter.
 (Optional) The specific middleware you're looking for.
 
 .EXAMPLE
-Get-RouteMiddleware
+Get-PolarisRouteMiddleware
 
-Get-RouteMiddleware -Name JsonBodyParser
+Get-PolarisRouteMiddleware -Name JsonBodyParser
 
 #>
 
-function Get-RouteMiddleware {
+function Get-PolarisRouteMiddleware {
     [CmdletBinding()]
     param(
         [Parameter(Position=0)]
@@ -333,7 +333,7 @@ function Start-Polaris {
     CreateNewPolarisIfNeeded
 
     if ($UseJsonBodyParserMiddleware) {
-        New-RouteMiddleware -Name JsonBodyParser -ScriptBlock $JsonBodyParserMiddlerware
+        New-PolarisRouteMiddleware -Name JsonBodyParser -ScriptBlock $JsonBodyParserMiddlerware
     }
 
     $global:Polaris.Start($Port, $MinRunspaces, $MaxRunspaces)
@@ -382,7 +382,7 @@ function Stop-Polaris {
 # Adds a new Route with HTTP Method "GET"
 #
 #.DESCRIPTION
-# A shorthand version of doing New-WebRoute -Method "GET"
+# A shorthand version of doing New-PolarisWebRoute -Method "GET"
 #
 #.PARAMETER Path
 # The HTTP Route/Path/endpoint that you call to trigger this script
@@ -394,17 +394,17 @@ function Stop-Polaris {
 # A path to a script that will be triggered when this HTTP Route/Path/endpoint has been called
 #
 #.EXAMPLE
-# New-GetRoute -Path "/helloworld" -ScriptBlock {
+# New-PolarisGetRoute -Path "/helloworld" -ScriptBlock {
 #    $response.Send('Hello World')
 # }
 #
-# New-GetRoute -Path "/helloworld" -ScriptPath ./example.ps1
+# New-PolarisGetRoute -Path "/helloworld" -ScriptPath ./example.ps1
 #
 #.NOTES
 # Navigating to localhost:8080/helloworld would display the example.
 #
 ##############################
-function New-GetRoute {
+function New-PolarisGetRoute {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$True, Position=0)]
@@ -418,7 +418,7 @@ function New-GetRoute {
         [Parameter(ParameterSetName = "ScriptPath")]
         [string]
         $ScriptPath)
-    New-WebRoute -Path $Path -Method "GET" -ScriptBlock $ScriptBlock -ScriptPath $ScriptPath
+    New-PolarisWebRoute -Path $Path -Method "GET" -ScriptBlock $ScriptBlock -ScriptPath $ScriptPath
 }
 
 ##############################
@@ -426,7 +426,7 @@ function New-GetRoute {
 # Adds a new Route with HTTP Method "POST"
 #
 #.DESCRIPTION
-# A shorthand version of doing New-WebRoute -Method "POST"
+# A shorthand version of doing New-PolarisWebRoute -Method "POST"
 #
 #.PARAMETER Path
 # The HTTP Route/Path/endpoint that you call to trigger this script
@@ -438,17 +438,17 @@ function New-GetRoute {
 # A path to a script that will be triggered when this HTTP Route/Path/endpoint has been called
 #
 #.EXAMPLE
-# New-PostRoute -Path "/helloworld" -ScriptBlock {
+# New-PolarisPostRoute -Path "/helloworld" -ScriptBlock {
 #    $response.Send('Hello World')
 # }
 #
-# New-PostRoute -Path "/helloworld" -ScriptPath ./example.ps1
+# New-PolarisPostRoute -Path "/helloworld" -ScriptPath ./example.ps1
 #
 #.NOTES
 # Calling to localhost:8080/helloworld with a POST request would display the example.
 #
 ##############################
-function New-PostRoute {
+function New-PolarisPostRoute {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$True, Position=0)]
@@ -462,7 +462,7 @@ function New-PostRoute {
         [Parameter(ParameterSetName = "ScriptPath")]
         [string]
         $ScriptPath)
-    New-WebRoute -Path $Path -Method "POST" -ScriptBlock $ScriptBlock -ScriptPath $ScriptPath
+    New-PolarisWebRoute -Path $Path -Method "POST" -ScriptBlock $ScriptBlock -ScriptPath $ScriptPath
 }
 
 ##############################
@@ -470,7 +470,7 @@ function New-PostRoute {
 # Adds a new Route with HTTP Method "PUT"
 #
 #.DESCRIPTION
-# A shorthand version of doing New-WebRoute -Method "PUT"
+# A shorthand version of doing New-PolarisWebRoute -Method "PUT"
 #
 #.PARAMETER Path
 # The HTTP Route/Path/endpoint that you call to trigger this script
@@ -482,17 +482,17 @@ function New-PostRoute {
 # A path to a script that will be triggered when this HTTP Route/Path/endpoint has been called
 #
 #.EXAMPLE
-# New-PutRoute -Path "/helloworld" -ScriptBlock {
+# New-PolarisPutRoute -Path "/helloworld" -ScriptBlock {
 #    $response.Send('Hello World')
 # }
 #
-# New-PutRoute -Path "/helloworld" -ScriptPath ./example.ps1
+# New-PolarisPutRoute -Path "/helloworld" -ScriptPath ./example.ps1
 #
 #.NOTES
 # Calling to localhost:8080/helloworld with a PUT request would display the example.
 #
 ##############################
-function New-PutRoute {
+function New-PolarisPutRoute {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$True, Position=0)]
@@ -506,7 +506,7 @@ function New-PutRoute {
         [Parameter(ParameterSetName = "ScriptPath")]
         [string]
         $ScriptPath)
-    New-WebRoute -Path $Path -Method "PUT" -ScriptBlock $ScriptBlock -ScriptPath $ScriptPath
+    New-PolarisWebRoute -Path $Path -Method "PUT" -ScriptBlock $ScriptBlock -ScriptPath $ScriptPath
 }
 
 ##############################
@@ -514,7 +514,7 @@ function New-PutRoute {
 # Adds a new Route with HTTP Method "DELETE"
 #
 #.DESCRIPTION
-# A shorthand version of doing New-WebRoute -Method "DELETE"
+# A shorthand version of doing New-PolarisWebRoute -Method "DELETE"
 #
 #.PARAMETER Path
 # The HTTP Route/Path/endpoint that you call to trigger this script
@@ -526,17 +526,17 @@ function New-PutRoute {
 # A path to a script that will be triggered when this HTTP Route/Path/endpoint has been called
 #
 #.EXAMPLE
-# New-DeleteRoute -Path "/helloworld" -ScriptBlock {
+# New-PolarisDeleteRoute -Path "/helloworld" -ScriptBlock {
 #    $response.Send('Hello World')
 # }
 #
-# New-DeleteRoute -Path "/helloworld" -ScriptPath ./example.ps1
+# New-PolarisDeleteRoute -Path "/helloworld" -ScriptPath ./example.ps1
 #
 #.NOTES
 # Calling to localhost:8080/helloworld with a DELETE request would display the example.
 #
 ##############################
-function New-DeleteRoute {
+function New-PolarisDeleteRoute {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$True, Position=0)]
@@ -551,7 +551,7 @@ function New-DeleteRoute {
         [string]
         $ScriptPath)
     CreateNewPolarisIfNeeded
-    New-WebRoute -Path $Path -Method "DELETE" -ScriptBlock $ScriptBlock -ScriptPath $ScriptPath
+    New-PolarisWebRoute -Path $Path -Method "DELETE" -ScriptBlock $ScriptBlock -ScriptPath $ScriptPath
 }
 
 <#
@@ -569,7 +569,7 @@ function Use-JsonBodyParserMiddleware {
     [CmdletBinding()]
     param()
 
-    New-RouteMiddleware -Name JsonBodyParser -ScriptBlock $JsonBodyParserMiddlerware
+    New-PolarisRouteMiddleware -Name JsonBodyParser -ScriptBlock $JsonBodyParserMiddlerware
 }
 
 ##############################
@@ -593,17 +593,17 @@ $JsonBodyParserMiddlerware = {
 }
 
 Export-ModuleMember -Function `
-    New-WebRoute, `
-    Remove-WebRoute, `
-    Get-WebRoute, `
-    New-GetRoute, `
-    New-PostRoute, `
-    New-PutRoute, `
-    New-DeleteRoute, `
-    New-StaticRoute, `
-    New-RouteMiddleware, `
-    Remove-RouteMiddleware, `
-    Get-RouteMiddleware, `
+    New-PolarisWebRoute, `
+    Remove-PolarisWebRoute, `
+    Get-PolarisWebRoute, `
+    New-PolarisGetRoute, `
+    New-PolarisPostRoute, `
+    New-PolarisPutRoute, `
+    New-PolarisDeleteRoute, `
+    New-PolarisStaticRoute, `
+    New-PolarisRouteMiddleware, `
+    Remove-PolarisRouteMiddleware, `
+    Get-PolarisRouteMiddleware, `
     Use-JsonBodyParserMiddleware, `
     Start-Polaris, `
     Stop-Polaris
