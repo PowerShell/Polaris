@@ -5,10 +5,6 @@
         #  Import module
         Import-Module ..\Polaris.psd1
 
-        #  Create test folder
-        $GUID = [string][guid]::NewGuid()
-        $TestPath = ( New-Item -Path $Env:Temp -Name $GUID -ItemType Directory ).FullName
-        
         #  Start with a clean slate
         Remove-RouteMiddleware
         }
@@ -30,7 +26,7 @@
 
         #  Define middleware
         $Name   = "TestMiddlewareScriptPath"
-        $ScriptPath = "$TestPath\$Name.ps1"
+        $ScriptPath = "TestDrive:\$Name.ps1"
 
         #  Create script file
         $Name | Out-File -FilePath $ScriptPath -NoNewline
@@ -46,7 +42,7 @@
 
         #  Define middleware
         $Name   = "TestScriptPathNotFound"
-        $ScriptPath = "$TestPath\DOESNOTEXIST.ps1"
+        $ScriptPath = "TestDrive:\DOESNOTEXIST.ps1"
 
         #  Create middleware
         { New-RouteMiddleware -Name $Name -ScriptPath $ScriptPath -ErrorAction Stop } |
@@ -85,9 +81,5 @@
 
         #  Clean up test middleware
         Remove-RouteMiddleware
-
-        #  Clean up test folder
-        Get-ChildItem -Path $TestPath -Recurse | Remove-Item -Recurse -Force
-        Remove-Item -Path $TestPath
         }
     }
