@@ -120,7 +120,8 @@ Describe "Test route creation" {
 
     Context "Using Get-WebRoute and Remove-WebRoute" {
         It "Will get the object with the routes" {
-            (Get-WebRoute)["test"]["GET"] | Should Be $defaultScriptBlock.ToString()
+            ( Get-WebRoute -Path "/test" -Method "GET" ).ScriptBlock |
+                Should Be $defaultScriptBlock.ToString()
         }
         It "will remove the routes" {
             Remove-WebRoute -Path "/test" -Method "GET"
