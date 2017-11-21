@@ -292,6 +292,12 @@ function New-StaticRoute
         [switch]
         $Force )
     
+    $ErrorAction = $PSBoundParameters["ErrorAction"]
+    If ( -not $ErrorAction )
+    {
+        $ErrorAction = $ErrorActionPreference
+    }
+    
     CreateNewPolarisIfNeeded
     
     if ( -not ( Test-Path -Path $FolderPath ) )
@@ -323,7 +329,7 @@ function New-StaticRoute
             `$response.ByteResponse = `$bytes
 "@ )
 
-        New-WebRoute -Path $StaticPath -Method GET -ScriptBlock $ScriptBlock -Force:$Force
+        New-WebRoute -Path $StaticPath -Method GET -ScriptBlock $ScriptBlock -Force:$Force -ErrorAction:$ErrorAction
     }
 }
 
@@ -805,13 +811,11 @@ function CreateNewPolarisIfNeeded ()
     }
 }
 
-$JsonBodyParserMiddlerware = {
-    if ($Request.BodyString -ne $null) {
-        try {
-            $Request.Body = $Request.BodyString | ConvertFrom-Json
-        } catch {
-            Write-Verbose "Failed to convert body from json"
-        }
+$JsonBodyParserMiddlerware =
+{
+    if ( $Request.BodyString -ne $Null )
+    {
+        $Request.Body = $Request.BodyString | ConvertFrom-Json
     }
 }
 

@@ -69,7 +69,21 @@ Copyright = '(c) tylerleonhardt. All rights reserved.'
 # NestedModules = @()
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-FunctionsToExport = '*'
+FunctionsToExport = @(
+    'New-WebRoute'
+    'Remove-WebRoute'
+    'Get-WebRoute'
+    'New-GetRoute'
+    'New-PostRoute'
+    'New-PutRoute'
+    'New-DeleteRoute'
+    'New-StaticRoute'
+    'New-RouteMiddleware'
+    'Remove-RouteMiddleware'
+    'Get-RouteMiddleware'
+    'Use-JsonBodyParserMiddleware'
+    'Start-Polaris'
+    'Stop-Polaris' )
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
 CmdletsToExport = '*'
