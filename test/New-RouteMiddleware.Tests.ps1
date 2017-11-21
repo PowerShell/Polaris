@@ -49,7 +49,8 @@
         $ScriptPath = "$TestPath\DOESNOTEXIST.ps1"
 
         #  Create middleware
-        New-RouteMiddleware -Name $Name -ScriptPath $ScriptPath
+        { New-RouteMiddleware -Name $Name -ScriptPath $ScriptPath -ErrorAction Stop } |
+            Should Throw
         }
 
     It "Should throw error if middleware exists" {
@@ -62,7 +63,8 @@
         New-RouteMiddleware -Name $Name -ScriptBlock $Scriptblock
 
         #  Create middleware
-        New-RouteMiddleware -Name $Name -ScriptBlock $Scriptblock | Should Throw
+        { New-RouteMiddleware -Name $Name -ScriptBlock $Scriptblock -ErrorAction Stop } |
+            Should Throw
         }
 
     It "Should overwrite middleware with Force switch" {
