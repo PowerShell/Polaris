@@ -3,26 +3,58 @@
     BeforeAll {
         
         #  Import module
-        Import-Module -Name Polaris
+        Import-Module "$PSScriptRoot\..\Polaris.psd1"
 
         #  Define test function to reduce redundancy
-        function Test-RemoveRoute ( [string[]]$Path, [string[]]$Method )
+        function Test-RemoveRoute
             {
-            #  Get before state
-            $RoutesBefore   = Get-WebRoute
-            $RoutesToDelete = @( Get-WebRoute -Path $Path -Method $Method )
-            $RoutesExpectedAfter = $RoutesBefore.Count - $RoutesToDelete.Count
+            [CmdletBinding()]
+            Param (
+                [string[]]$Path,
+                [string[]]$Method,
 
-            #  Remove
-            Remove-WebRoute -Path $Path -Method $Method
+                [Parameter( ValueFromPipeline = $True )]
+                [object[]]$Object
+                )
+            begin
+                {
+                $Objects = @()
+                }
 
-            #  Get after state
-            $DeletedRoutesRemaining = $RoutesToDelete | Get-WebRoute
-            $TotalRemainingRoutes   = Get-WebRoute
+            process
+                {
+                $Objects += $Object
+                }
 
-            #  Test after state
-            $DeletedRoutesRemaining.Count | Should Be 0
-            $TotalRemainingRoutes.Count   | Should Be $RoutesExpectedAfter
+            End
+                {
+                #  Get before state
+                $RoutesBefore = Get-WebRoute
+
+                If ( $Objects )
+                    {
+                    $RoutesToDelete = $Objects | Get-WebRoute
+                    $RoutesExpectedAfter = $RoutesBefore.Count - $RoutesToDelete.Count
+                    #  Remove
+                    $Objects | Remove-WebRoute
+                    }
+                Else
+                    {
+                    $RoutesToDelete = @( Get-WebRoute -Path $Path -Method $Method )
+                    $RoutesExpectedAfter = $RoutesBefore.Count - $RoutesToDelete.Count
+
+                    #  Remove
+                    Remove-WebRoute -Path $Path -Method $Method
+                    }
+
+                #  Get after state
+                $DeletedRoutesRemaining = $RoutesToDelete | Get-WebRoute
+                $TotalRemainingRoutes   = Get-WebRoute
+
+                #  Test after state
+                $DeletedRoutesRemaining.Count | Should Be 0
+                $TotalRemainingRoutes.Count   | Should Be $RoutesExpectedAfter
+                }
             }
 
         #  Start with a clean slate
@@ -37,8 +69,8 @@
         New-WebRoute -Path 'Test3A' -Method PUT  -ScriptBlock {}
         New-WebRoute -Path 'Test3B' -Method PUT  -ScriptBlock {}
         New-WebRoute -Path 'Test3C' -Method GET  -ScriptBlock {}
-        New-WebRoute -Path 'Test4A' -Method PUT  -ScriptBlock {}
-        New-WebRoute -Path 'Test4B' -Method PUT  -ScriptBlock {}
+        New-WebRoute -Path 'Test4A' -Method GET  -ScriptBlock {}
+        New-WebRoute -Path 'Test4B' -Method GET  -ScriptBlock {}
         New-WebRoute -Path 'Test5'  -Method GET  -ScriptBlock {}
         New-WebRoute -Path 'Test5'  -Method POST -ScriptBlock {}
         New-WebRoute -Path 'Test5'  -Method PUT  -ScriptBlock {}
@@ -73,41 +105,11 @@
         }
 
     It "Should accept Path from pipeline" {
-
-        #  Get before state
-        $RoutesBefore   = Get-WebRoute
-        $RoutesToDelete = @( Get-WebRoute -Path 'Test6A', 'Test6B' )
-        $RoutesExpectedAfter = $RoutesBefore.Count - $RoutesToDelete.Count
-
-        #  Remove
-        'Test6A', 'Test6B' | Remove-WebRoute
-
-        #  Get after state
-        $DeletedRoutesRemaining = $RoutesToDelete | Get-WebRoute
-        $TotalRemainingRoutes   = Get-WebRoute
-
-        #  Test after state
-        $DeletedRoutesRemaining.Count | Should Be 0
-        $TotalRemainingRoutes.Count   | Should Be $RoutesExpectedAfter
+        'Test6A', 'Test6B' | Test-RemoveRoute
         }
 
     It "Should accept Path and Method from pipeline variables" {
-
-        #  Get before state
-        $RoutesBefore   = Get-WebRoute
-        $RoutesToDelete = @( Get-WebRoute -Path 'Test7A', 'Test7B' )
-        $RoutesExpectedAfter = $RoutesBefore.Count - $RoutesToDelete.Count
-
-        #  Remove
-        $RoutesToDelete | Remove-WebRoute
-
-        #  Get after state
-        $DeletedRoutesRemaining = $RoutesToDelete | Get-WebRoute
-        $TotalRemainingRoutes   = Get-WebRoute
-
-        #  Test after state
-        $DeletedRoutesRemaining.Count | Should Be 0
-        $TotalRemainingRoutes.Count   | Should Be $RoutesExpectedAfter
+        Get-WebRoute -Path 'Test7A', 'Test7B' | Test-RemoveRoute
         }
 
     AfterAll {

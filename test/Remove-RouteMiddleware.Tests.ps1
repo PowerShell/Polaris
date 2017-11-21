@@ -3,26 +3,62 @@
     BeforeAll {
 
         #  Import Module
-        Import-Module -Name Polaris
+        Import-Module "$PSScriptRoot\..\Polaris.psd1"
 
         #  Define test function to reduce redundancy
-        function Test-RemoveMiddleware ( [string[]]$Name )
+        function Test-RemoveMiddleware
             {
-            #  Get before state
-            $MiddlewareBefore   = Get-RouteMiddleware
-            $MiddlewareToDelete = @( Get-RouteMiddleware -Name $Name )
-            $MiddlewareExpectedAfter = $MiddlewareBefore.Count - $MiddlewareToDelete.Count
+            [CmdletBinding()]
+            param (
+                [string[]]
+                $Name,
 
-            #  Remove
-            Remove-RouteMiddleware -Name $Name
+                [Parameter( ValueFromPipeline = $True,
+                            ValueFromPipelineByPropertyName = $True )]
+                [object[]]
+                $Object
+                )
 
-            #  Get after state
-            $DeletedMiddlewareRemaining = $MiddlewareToDelete | Get-RouteMiddleware
-            $TotalRemainingMiddleware   = Get-RouteMiddleware
+            begin
+                {
+                $Objects = @()
+                }
 
-            #  Test after state
-            $DeletedMiddlewareRemaining.Count | Should Be 0
-            $TotalRemainingMiddleware.Count   | Should Be $MiddlewareExpectedAfter
+            process
+                {
+                $Objects += $Object
+                }
+
+            End
+                {
+                #  Get before state
+                $MiddlewareBefore   = Get-RouteMiddleware
+
+                If ( $Objects )
+                    {
+                    $MiddlewareToDelete = $Objects | Get-RouteMiddleware
+                    $MiddlewareExpectedAfter = $MiddlewareBefore.Count - $MiddlewareToDelete.Count
+
+                    #  Remove
+                    $Objects | Remove-RouteMiddleware
+                    }
+                Else
+                    {
+                    $MiddlewareToDelete = @( Get-RouteMiddleware -Name $Name )
+                    $MiddlewareExpectedAfter = $MiddlewareBefore.Count - $MiddlewareToDelete.Count
+
+                    #  Remove
+                    Remove-RouteMiddleware -Name $Name
+                    }
+
+                #  Get after state
+                $DeletedMiddlewareRemaining = $MiddlewareToDelete | Get-RouteMiddleware
+                $TotalRemainingMiddleware   = Get-RouteMiddleware
+
+                #  Test after state
+                $DeletedMiddlewareRemaining.Count | Should Be 0
+                $TotalRemainingMiddleware.Count   | Should Be $MiddlewareExpectedAfter
+                }
             }
 
         #  Start with a clean slate
@@ -65,44 +101,12 @@
 
     It "Should accept Name from pipeline" {
 
-        $Name = 'Test4A', 'Test4B'
-
-        #  Get before state
-        $MiddlewareBefore   = Get-RouteMiddleware
-        $MiddlewareToDelete = @( Get-RouteMiddleware -Name $Name )
-        $MiddlewareExpectedAfter = $MiddlewareBefore.Count - $MiddlewareToDelete.Count
-
-        #  Remove
-        $Name | Remove-RouteMiddleware
-
-        #  Get after state
-        $DeletedMiddlewareRemaining = $MiddlewareToDelete | Get-RouteMiddleware
-        $TotalRemainingMiddleware   = Get-RouteMiddleware
-
-        #  Test after state
-        $DeletedMiddlewareRemaining.Count | Should Be 0
-        $TotalRemainingMiddleware.Count   | Should Be $MiddlewareExpectedAfter
+        'Test4A', 'Test4B' | Test-RemoveMiddleware
         }
 
     It "Should accept Name from pipeline variables" {
 
-        $Name = 'Test5*'
-
-        #  Get before state
-        $MiddlewareBefore   = Get-RouteMiddleware
-        $MiddlewareToDelete = @( Get-RouteMiddleware -Name $Name )
-        $MiddlewareExpectedAfter = $MiddlewareBefore.Count - $MiddlewareToDelete.Count
-
-        #  Remove
-        $MiddlewareToDelete | Remove-RouteMiddleware
-
-        #  Get after state
-        $DeletedMiddlewareRemaining = $MiddlewareToDelete | Get-RouteMiddleware
-        $TotalRemainingMiddleware   = Get-RouteMiddleware
-
-        #  Test after state
-        $DeletedMiddlewareRemaining.Count | Should Be 0
-        $TotalRemainingMiddleware.Count   | Should Be $MiddlewareExpectedAfter
+        Get-RouteMiddleware -Name 'Test5*' | Test-RemoveMiddleware
         }
 
     It "Should delete all middleware if no Name parameter" {

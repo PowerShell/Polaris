@@ -3,14 +3,10 @@
     BeforeAll {
         
         #  Import module
-        Import-Module -Name Polaris
+        Import-Module "$PSScriptRoot\..\Polaris.psd1"
 
-        #  Create test folder
-        $GUID = [string][guid]::NewGuid()
-        $TestPath = ( New-Item -Path $Env:Temp -Name $GUID -ItemType Directory ).FullName
-        
         #  Create test script
-        $ScriptPath = "$TestPath\TestScript.ps1"
+        $ScriptPath = 'TestDrive:\TestScript.ps1'
         $Script = 'Script'
         $Script | Out-File -FilePath $ScriptPath -NoNewline
 
@@ -142,9 +138,5 @@
 
         #  Clean up test routes
         Remove-WebRoute
-
-        #  Clean up test folder
-        Get-ChildItem -Path $TestPath -Recurse | Remove-Item -Recurse -Force
-        Remove-Item -Path $TestPath
         }
     }

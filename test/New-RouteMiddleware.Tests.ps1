@@ -3,7 +3,7 @@
     BeforeAll {
 
         #  Import module
-        Import-Module -Name Polaris
+        Import-Module "$PSScriptRoot\..\Polaris.psd1"
 
         #  Create test folder
         $GUID = [string][guid]::NewGuid()

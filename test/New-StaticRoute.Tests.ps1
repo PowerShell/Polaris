@@ -3,16 +3,16 @@
     BeforeAll {
 
         #  Import module
-        Import-Module -Name Polaris
+        Import-Module "$PSScriptRoot\..\Polaris.psd1"
 
         #  Start with a clean slate
         Remove-WebRoute
 
         #  Create test folders
         $GUID = [string][guid]::NewGuid()
-        $TestPath   = ( New-Item -Path $Env:Temp -Name $GUID  -ItemType Directory ).FullName
-        $TestFolder = ( New-Item -Path $TestPath -Name 'Sub1' -ItemType Directory ).FullName
-        
+        $TestPath   = ( New-Item -Path 'TestDrive:\' -Name $GUID  -ItemType Directory ).FullName
+        $TestFolder = ( New-Item -Path $TestPath     -Name 'Sub1' -ItemType Directory ).FullName
+
         #  Create test files
         $File1 =  ( New-Item -Path $TestPath   -Name 'File1.txt' -ItemType File ).FullName
         $Null  =    New-Item -Path $TestPath   -Name 'File2.txt' -ItemType File
@@ -72,7 +72,8 @@
         New-WebRoute -Path $Paths[0] -Method GET -ScriptBlock {'Existing script'}
 
         #  Create static routes
-        New-StaticRoute -RoutePath 'BaseRoot' -FolderPath $TestPath | Should throw
+        { New-StaticRoute -RoutePath 'BaseRoot' -FolderPath $TestPath -ErrorAction Stop } |
+            Should Throw
         }
 
     It "Should overwrite matching route with Force switch" {
@@ -102,9 +103,5 @@
 
         #  Stop Polaris
         Stop-Polaris
-
-        #  Clean up test folders
-        Get-ChildItem -Path $TestPath -Recurse | Remove-Item -Recurse -Force
-        Remove-Item -Path $TestPath
         }
     }

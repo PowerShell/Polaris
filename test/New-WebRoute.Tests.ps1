@@ -3,12 +3,8 @@
     BeforeAll {
 
         #  Import module
-        Import-Module -Name Polaris
+        Import-Module "$PSScriptRoot\..\Polaris.psd1"
 
-        #  Create 
-        $GUID = [string][guid]::NewGuid()
-        $TestPath = ( New-Item -Path $Env:Temp -Name $GUID -ItemType Directory ).FullName
-        
         #  Start with a clean slate
         Remove-WebRoute
         }
@@ -74,7 +70,7 @@
         #  Define route
         $Method = 'GET'
         $Path   = "TestScriptBlockRoute$Method"
-        $ScriptPath = "$TestPath\$Path.ps1"
+        $ScriptPath = "TestDrive:\$Path.ps1"
 
         $Path | Out-File -FilePath $ScriptPath -NoNewline
 
@@ -90,10 +86,11 @@
         #  Define route
         $Method = 'GET'
         $Path   = "TestScriptBlockRoute$Method"
-        $ScriptPath = "$TestPath\DOESNOTEXIST.ps1"
+        $ScriptPath = "TestDrive:\DOESNOTEXIST.ps1"
 
         #  Create route
-        New-WebRoute -Path $Path -Method $Method -ScriptPath $ScriptPath | Should Throw
+        { New-WebRoute -Path $Path -Method $Method -ScriptPath $ScriptPath -ErrorAction Stop } |
+            Should Throw
         }
 
     It "Should create route with matching Path but new Method" {
@@ -128,7 +125,8 @@
         New-WebRoute -Path $Path -Method $Method -ScriptBlock $Scriptblock
 
         #  Create route
-        New-WebRoute -Path $Path -Method $Method -ScriptBlock $Scriptblock | Should Throw
+        { New-WebRoute -Path $Path -Method $Method -ScriptBlock $Scriptblock -ErrorAction Stop } |
+            Should Throw
         }
 
     It "Should overwrite route with matching Path and Method with Force switch" {
@@ -153,9 +151,5 @@
 
         #  Clean up test routes
         Remove-WebRoute
-
-        #  Clean up test files
-        Get-ChildItem -Path $TestPath -Recurse | Remove-Item -Recurse -Force
-        Remove-Item -Path $TestPath
         }
     }
