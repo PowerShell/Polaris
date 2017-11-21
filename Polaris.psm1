@@ -242,9 +242,9 @@ function Get-WebRoute
 
             $Filter = [scriptblock]::Create( (
                 '( ' + 
-                ( $Path.ForEach({   "`$_.Path   -like `"$_`"" } ) -join ' -or ' ) + 
+                ( $Path.ForEach({   "`$_.Path   -like `"$($_.TrimStart('/'))`"" } ) -join ' -or ' ) + 
                 ' ) -and ( ' +
-                ( $Method.ForEach({ "`$_.Method -like `"$_`"" } ) -join ' -or ' ) +
+                ( $Method.ForEach({ "`$_.Method -like `"$($_.TrimStart('/'))`"" } ) -join ' -or ' ) +
                 ' )' ) )
 
             $WebRoutes = $WebRoutes.Where( $Filter )
