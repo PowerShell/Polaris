@@ -573,10 +573,37 @@ function Use-JsonBodyParserMiddleware {
 }
 
 
+<#
+.SYNOPSIS
+Returns the internal instance of Polaris
+
+.DESCRIPTION
+Returns the instance of the Polaris .NET Standard object
+
+.EXAMPLE
+Get-Polaris
+
+.NOTES
+Should only be used for testing
+#>
 function Get-Polaris {
     return $script:Polaris
 }
 
+
+<#
+.SYNOPSIS
+Clears the internal instance of Polaris
+
+.DESCRIPTION
+Clears the internal Polaris .NET Standard object.  The instance will be reinstantiated in other module calls.
+
+.EXAMPLE
+Clear-Polaris
+
+.NOTES
+Should only be used for testing
+#>
 function Clear-Polaris {
     $script:Polaris = $null
 }
