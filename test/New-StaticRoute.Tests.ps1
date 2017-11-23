@@ -27,21 +27,14 @@
             'BaseRoot/Sub1/File4.txt' )
 
         #  Add content to a file
-        $File1Uri = 'http://localhost:8080/BaseRoot/File1.txt'
+        $File1Uri = 'http://localhost:9999/BaseRoot/File1.txt'
         $File1Content = 'File1Content'
         $File1Content | Out-File -FilePath $File1 -Encoding ascii -NoNewline
 
         ####  Create static routes
         New-StaticRoute -RoutePath 'BaseRoot' -FolderPath $TestPath
 
-        #  Start Polaris server
-        #  Wrapped due to ignore bugs in current version
-        try
-            {
-            $Null = Start-Polaris -ErrorAction SilentlyContinue
-            Start-Sleep -Seconds 5
-            }
-        catch {}
+        Start-Polaris -Port 9999
         }
 
 
