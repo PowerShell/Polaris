@@ -80,9 +80,9 @@ Hello World"
         BeforeAll {
             if (-not $IsUnix) {
                 Stop-Polaris
-                Start-Polaris -Port $Port
+                Start-Polaris -Port 9998
     
-                $result = Invoke-WebRequest -Uri "http://localhost:$Port/helloworld"
+                $result = Invoke-WebRequest -Uri "http://localhost:9998/helloworld"
                 $result.StatusCode | Should Be 200
             }
         }
@@ -90,7 +90,7 @@ Hello World"
         It "Can properly shut down the server" {
             Stop-Polaris
 
-            { Invoke-WebRequest -Uri "http://localhost:$Port/helloworld" } | Should Throw
+            { Invoke-WebRequest -Uri "http://localhost:9998/helloworld" } | Should Throw
         } -Skip:$IsUnix
     }
 }
