@@ -1,4 +1,4 @@
-﻿Describe "New-PolarisWebRoute" {
+﻿Describe "New-PolarisRoute" {
 
     BeforeAll {
 
@@ -6,7 +6,7 @@
         Import-Module ..\Polaris.psd1
 
         #  Start with a clean slate
-        Remove-PolarisWebRoute
+        Remove-PolarisRoute
         }
 
     It "Should create GET route" {
@@ -17,10 +17,10 @@
         $Scriptblock = [scriptblock]::Create( $Path )
 
         #  Create route
-        New-PolarisWebRoute -Path $Path -Method $Method -ScriptBlock $Scriptblock
+        New-PolarisRoute -Path $Path -Method $Method -ScriptBlock $Scriptblock
         
         #  Test route
-        ( Get-PolarisWebRoute -Path $Path -Method $Method ).Scriptblock | Should Be $Path
+        ( Get-PolarisRoute -Path $Path -Method $Method ).Scriptblock | Should Be $Path
         }
 
     It "Should create POST route" {
@@ -31,10 +31,10 @@
         $Scriptblock = [scriptblock]::Create( $Path )
 
         #  Create route
-        New-PolarisWebRoute -Path $Path -Method $Method -ScriptBlock $Scriptblock
+        New-PolarisRoute -Path $Path -Method $Method -ScriptBlock $Scriptblock
         
         #  Test route
-        ( Get-PolarisWebRoute -Path $Path -Method $Method ).Scriptblock | Should Be $Path
+        ( Get-PolarisRoute -Path $Path -Method $Method ).Scriptblock | Should Be $Path
         }
 
     It "Should create PUT route" {
@@ -45,10 +45,10 @@
         $Scriptblock = [scriptblock]::Create( $Path )
 
         #  Create route
-        New-PolarisWebRoute -Path $Path -Method $Method -ScriptBlock $Scriptblock
+        New-PolarisRoute -Path $Path -Method $Method -ScriptBlock $Scriptblock
         
         #  Test route
-        ( Get-PolarisWebRoute -Path $Path -Method $Method ).Scriptblock | Should Be $Path
+        ( Get-PolarisRoute -Path $Path -Method $Method ).Scriptblock | Should Be $Path
         }
 
     It "Should create DELETE route" {
@@ -59,10 +59,10 @@
         $Scriptblock = [scriptblock]::Create( $Path )
 
         #  Create route
-        New-PolarisWebRoute -Path $Path -Method $Method -ScriptBlock $Scriptblock
+        New-PolarisRoute -Path $Path -Method $Method -ScriptBlock $Scriptblock
         
         #  Test route
-        ( Get-PolarisWebRoute -Path $Path -Method $Method ).Scriptblock | Should Be $Path
+        ( Get-PolarisRoute -Path $Path -Method $Method ).Scriptblock | Should Be $Path
         }
 
     It "Should create route with Scriptpath" {
@@ -75,10 +75,10 @@
         $Path | Out-File -FilePath $ScriptPath -NoNewline
 
         #  Create route
-        New-PolarisWebRoute -Path $Path -Method $Method -ScriptPath $ScriptPath
+        New-PolarisRoute -Path $Path -Method $Method -ScriptPath $ScriptPath
         
         #  Test route
-        ( Get-PolarisWebRoute -Path $Path -Method $Method ).Scriptblock | Should Be $Path
+        ( Get-PolarisRoute -Path $Path -Method $Method ).Scriptblock | Should Be $Path
         }
 
     It "Should throw error if Scriptpath not found" {
@@ -89,7 +89,7 @@
         $ScriptPath = "TestDrive:\DOESNOTEXIST.ps1"
 
         #  Create route
-        { New-PolarisWebRoute -Path $Path -Method $Method -ScriptPath $ScriptPath -ErrorAction Stop } |
+        { New-PolarisRoute -Path $Path -Method $Method -ScriptPath $ScriptPath -ErrorAction Stop } |
             Should Throw
         }
 
@@ -101,17 +101,17 @@
         $Scriptblock = [scriptblock]::Create( $Path )
 
         #  Create route
-        New-PolarisWebRoute -Path $Path -Method $Method -ScriptBlock $Scriptblock
+        New-PolarisRoute -Path $Path -Method $Method -ScriptBlock $Scriptblock
 
         #  Define route
         $Method = 'POST'
         $Scriptblock = [scriptblock]::Create( $Path )
 
         #  Create route
-        New-PolarisWebRoute -Path $Path -Method $Method -ScriptBlock $Scriptblock
+        New-PolarisRoute -Path $Path -Method $Method -ScriptBlock $Scriptblock
 
         #  Test route
-        ( Get-PolarisWebRoute -Path $Path -Method $Method ).Scriptblock | Should Be $Path
+        ( Get-PolarisRoute -Path $Path -Method $Method ).Scriptblock | Should Be $Path
         }
 
     It "Should throw error if route for Path and Method exists" {
@@ -122,10 +122,10 @@
         $Scriptblock = [scriptblock]::Create( $Path )
 
         #  Create route
-        New-PolarisWebRoute -Path $Path -Method $Method -ScriptBlock $Scriptblock
+        New-PolarisRoute -Path $Path -Method $Method -ScriptBlock $Scriptblock
 
         #  Create route
-        { New-PolarisWebRoute -Path $Path -Method $Method -ScriptBlock $Scriptblock -ErrorAction Stop } |
+        { New-PolarisRoute -Path $Path -Method $Method -ScriptBlock $Scriptblock -ErrorAction Stop } |
             Should Throw
         }
 
@@ -140,16 +140,16 @@
         $Scriptblock = [scriptblock]::Create( $NewContent )
 
         #  Create route
-        New-PolarisWebRoute -Path $Path -Method $Method -ScriptBlock $Scriptblock -Force
+        New-PolarisRoute -Path $Path -Method $Method -ScriptBlock $Scriptblock -Force
 
         
         #  Test route
-        ( Get-PolarisWebRoute -Path $Path -Method $Method ).Scriptblock | Should Be $NewContent
+        ( Get-PolarisRoute -Path $Path -Method $Method ).Scriptblock | Should Be $NewContent
         }
 
     AfterAll {
 
         #  Clean up test routes
-        Remove-PolarisWebRoute
+        Remove-PolarisRoute
         }
     }

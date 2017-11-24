@@ -6,7 +6,7 @@
         Import-Module ..\Polaris.psd1
 
         #  Start with a clean slate
-        Remove-PolarisWebRoute
+        Remove-PolarisRoute
 
         #  Create test folders
         $GUID = [string][guid]::NewGuid()
@@ -41,11 +41,11 @@
     It "Should create static routes for all files" {
 
         #  Confirm expected routes created
-        $Routes = Get-PolarisWebRoute -Path $Paths -Method Get
+        $Routes = Get-PolarisRoute -Path $Paths -Method Get
         $Routes.Count | Should Be $Paths.Count
 
         #  Confirm no other routes created
-        $AllRoutes = Get-PolarisWebRoute
+        $AllRoutes = Get-PolarisRoute
         $AllRoutes.Count | Should Be $Paths.Count
         }
 
@@ -59,10 +59,10 @@
     It "Should throw error if route for file exists" {
 
         #  Start with a clean slate
-        Remove-PolarisWebRoute
+        Remove-PolarisRoute
 
         #  Create a route which will conflict with next command
-        New-PolarisWebRoute -Path $Paths[0] -Method GET -ScriptBlock {'Existing script'}
+        New-PolarisRoute -Path $Paths[0] -Method GET -ScriptBlock {'Existing script'}
 
         #  Create static routes
         { New-PolarisStaticRoute -RoutePath 'BaseRoot' -FolderPath $TestPath -ErrorAction Stop } |
@@ -72,27 +72,27 @@
     It "Should overwrite matching route with Force switch" {
 
         #  Start with a clean slate
-        Remove-PolarisWebRoute
+        Remove-PolarisRoute
 
         #  Create a route which will conflict with next command
-        New-PolarisWebRoute -Path $Paths[0] -Method GET -ScriptBlock {'Existing script'}
+        New-PolarisRoute -Path $Paths[0] -Method GET -ScriptBlock {'Existing script'}
 
         #  Create static routes
         New-PolarisStaticRoute -RoutePath 'BaseRoot' -FolderPath $TestPath -Force
 
         #  Confirm expected routes created
-        $Routes = Get-PolarisWebRoute -Path $Paths -Method Get
+        $Routes = Get-PolarisRoute -Path $Paths -Method Get
         $Routes.Count | Should Be 4
 
         #  Confirm conflicting route was overwritten
-        $NewRoute = Get-PolarisWebRoute $Paths[0] -Method GET
+        $NewRoute = Get-PolarisRoute $Paths[0] -Method GET
         $NewRoute.ScriptBlock.TrimStart().SubString( 0, 20 ) | Should be '$bytes = Get-Content'
         }
 
     AfterAll {
 
         #  Clean up test routes
-        Remove-PolarisWebRoute
+        Remove-PolarisRoute
 
         #  Stop Polaris
         Stop-Polaris

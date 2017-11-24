@@ -1,4 +1,4 @@
-﻿Describe "Remove-PolarisWebRoute" {
+﻿Describe "Remove-PolarisRoute" {
 
     BeforeAll {
         
@@ -29,27 +29,27 @@
             End
                 {
                 #  Get before state
-                $RoutesBefore = Get-PolarisWebRoute
+                $RoutesBefore = Get-PolarisRoute
 
                 If ( $Objects )
                     {
-                    $RoutesToDelete = $Objects | Get-PolarisWebRoute
+                    $RoutesToDelete = $Objects | Get-PolarisRoute
                     $RoutesExpectedAfter = $RoutesBefore.Count - $RoutesToDelete.Count
                     #  Remove
-                    $Objects | Remove-PolarisWebRoute
+                    $Objects | Remove-PolarisRoute
                     }
                 Else
                     {
-                    $RoutesToDelete = @( Get-PolarisWebRoute -Path $Path -Method $Method )
+                    $RoutesToDelete = @( Get-PolarisRoute -Path $Path -Method $Method )
                     $RoutesExpectedAfter = $RoutesBefore.Count - $RoutesToDelete.Count
 
                     #  Remove
-                    Remove-PolarisWebRoute -Path $Path -Method $Method
+                    Remove-PolarisRoute -Path $Path -Method $Method
                     }
 
                 #  Get after state
-                $DeletedRoutesRemaining = $RoutesToDelete | Get-PolarisWebRoute
-                $TotalRemainingRoutes   = Get-PolarisWebRoute
+                $DeletedRoutesRemaining = $RoutesToDelete | Get-PolarisRoute
+                $TotalRemainingRoutes   = Get-PolarisRoute
 
                 #  Test after state
                 $DeletedRoutesRemaining.Count | Should Be 0
@@ -58,26 +58,26 @@
             }
 
         #  Start with a clean slate
-        Remove-PolarisWebRoute
+        Remove-PolarisRoute
 
         #  Create some web routes to test against
-        New-PolarisWebRoute -Path 'Test0'  -Method GET  -ScriptBlock {}
-        New-PolarisWebRoute -Path 'Test0'  -Method POST -ScriptBlock {}
-        New-PolarisWebRoute -Path 'Test1'  -Method GET  -ScriptBlock {}
-        New-PolarisWebRoute -Path 'Test2'  -Method GET  -ScriptBlock {}
-        New-PolarisWebRoute -Path 'Test2'  -Method POST -ScriptBlock {}
-        New-PolarisWebRoute -Path 'Test3A' -Method PUT  -ScriptBlock {}
-        New-PolarisWebRoute -Path 'Test3B' -Method PUT  -ScriptBlock {}
-        New-PolarisWebRoute -Path 'Test3C' -Method GET  -ScriptBlock {}
-        New-PolarisWebRoute -Path 'Test4A' -Method GET  -ScriptBlock {}
-        New-PolarisWebRoute -Path 'Test4B' -Method GET  -ScriptBlock {}
-        New-PolarisWebRoute -Path 'Test5'  -Method GET  -ScriptBlock {}
-        New-PolarisWebRoute -Path 'Test5'  -Method POST -ScriptBlock {}
-        New-PolarisWebRoute -Path 'Test5'  -Method PUT  -ScriptBlock {}
-        New-PolarisWebRoute -Path 'Test6A' -Method GET  -ScriptBlock {}
-        New-PolarisWebRoute -Path 'Test6B' -Method GET  -ScriptBlock {}
-        New-PolarisWebRoute -Path 'Test7A' -Method GET  -ScriptBlock {}
-        New-PolarisWebRoute -Path 'Test7B' -Method GET  -ScriptBlock {}
+        New-PolarisRoute -Path 'Test0'  -Method GET  -ScriptBlock {}
+        New-PolarisRoute -Path 'Test0'  -Method POST -ScriptBlock {}
+        New-PolarisRoute -Path 'Test1'  -Method GET  -ScriptBlock {}
+        New-PolarisRoute -Path 'Test2'  -Method GET  -ScriptBlock {}
+        New-PolarisRoute -Path 'Test2'  -Method POST -ScriptBlock {}
+        New-PolarisRoute -Path 'Test3A' -Method PUT  -ScriptBlock {}
+        New-PolarisRoute -Path 'Test3B' -Method PUT  -ScriptBlock {}
+        New-PolarisRoute -Path 'Test3C' -Method GET  -ScriptBlock {}
+        New-PolarisRoute -Path 'Test4A' -Method GET  -ScriptBlock {}
+        New-PolarisRoute -Path 'Test4B' -Method GET  -ScriptBlock {}
+        New-PolarisRoute -Path 'Test5'  -Method GET  -ScriptBlock {}
+        New-PolarisRoute -Path 'Test5'  -Method POST -ScriptBlock {}
+        New-PolarisRoute -Path 'Test5'  -Method PUT  -ScriptBlock {}
+        New-PolarisRoute -Path 'Test6A' -Method GET  -ScriptBlock {}
+        New-PolarisRoute -Path 'Test6B' -Method GET  -ScriptBlock {}
+        New-PolarisRoute -Path 'Test7A' -Method GET  -ScriptBlock {}
+        New-PolarisRoute -Path 'Test7B' -Method GET  -ScriptBlock {}
         }
 
     It "Should delete route" {
@@ -109,12 +109,12 @@
         }
 
     It "Should accept Path and Method from pipeline variables" {
-        Get-PolarisWebRoute -Path 'Test7A', 'Test7B' | Test-RemoveRoute
+        Get-PolarisRoute -Path 'Test7A', 'Test7B' | Test-RemoveRoute
         }
 
     AfterAll {
 
         #  Clean up any test routes
-        Remove-PolarisWebRoute
+        Remove-PolarisRoute
         }
     }

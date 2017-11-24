@@ -13,7 +13,7 @@ function RouteExists ($Path, $Method) {
 }
 
 Describe "Test route creation" {
-    Context "Using New-PolarisWebRoute" {
+    Context "Using New-PolarisRoute" {
         It "with -Path '<Path>' -Method '<Method>' -ScriptPath '<ScriptPath>' -ScriptBlock '<ScriptBlock>'" `
             -TestCases @(
             @{ Path = '/test'; Method = 'GET'; ScriptPath = $null; ScriptBlock = $defaultScriptBlock }
@@ -27,9 +27,9 @@ Describe "Test route creation" {
         ) {
             param ($Path, $Method, $ScriptPath, $ScriptBlock)
             if ($ScriptPath) {
-                New-PolarisWebRoute -Path $Path -Method $Method -ScriptPath $ScriptPath
+                New-PolarisRoute -Path $Path -Method $Method -ScriptPath $ScriptPath
             } else {
-                New-PolarisWebRoute -Path $Path -Method $Method -ScriptBlock $ScriptBlock
+                New-PolarisRoute -Path $Path -Method $Method -ScriptBlock $ScriptBlock
             }
             RouteExists -Path $Path -Method $Method | Should Be $true
         }
@@ -118,17 +118,17 @@ Describe "Test route creation" {
         }
     }
 
-    Context "Using Get-PolarisWebRoute and Remove-PolarisWebRoute" {
+    Context "Using Get-PolarisRoute and Remove-PolarisRoute" {
         It "Will get the object with the routes" {
-            ( Get-PolarisWebRoute -Path "/test" -Method "GET" ).ScriptBlock |
+            ( Get-PolarisRoute -Path "/test" -Method "GET" ).ScriptBlock |
                 Should Be $defaultScriptBlock.ToString()
         }
         It "will remove the routes" {
-            Remove-PolarisWebRoute -Path "/test" -Method "GET"
-            (Get-PolarisWebRoute).Count | Should Be 0
+            Remove-PolarisRoute -Path "/test" -Method "GET"
+            (Get-PolarisRoute).Count | Should Be 0
         }
         BeforeEach {
-            New-PolarisWebRoute -Path "/test" -Method "GET" -ScriptBlock $defaultScriptBlock
+            New-PolarisRoute -Path "/test" -Method "GET" -ScriptBlock $defaultScriptBlock
         }
         AfterEach {
             $Global:Polaris = $null

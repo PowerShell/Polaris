@@ -11,7 +11,7 @@
         $Script | Out-File -FilePath $ScriptPath -NoNewline
 
         #  Start with a clean slate
-        Remove-PolarisWebRoute
+        Remove-PolarisRoute
         }
 
     Context "New-PolarisGetRoute" {
@@ -27,7 +27,7 @@
             New-PolarisGetRoute -Path $Path -ScriptBlock $Scriptblock
 
             #  Test route
-            ( Get-PolarisWebRoute -Path $Path -Method $Method ).Scriptblock | Should Be $Path
+            ( Get-PolarisRoute -Path $Path -Method $Method ).Scriptblock | Should Be $Path
             }
 
         It "Should create GET route with Scriptpath" {
@@ -40,7 +40,7 @@
             New-PolarisGetRoute -Path $Path -ScriptPath $ScriptPath
 
             #  Test route
-            ( Get-PolarisWebRoute -Path $Path -Method $Method ).Scriptblock | Should Be $Script
+            ( Get-PolarisRoute -Path $Path -Method $Method ).Scriptblock | Should Be $Script
             }
         }
 
@@ -57,7 +57,7 @@
             New-PolarisPostRoute -Path $Path -ScriptBlock $Scriptblock
 
             #  Test route
-            ( Get-PolarisWebRoute -Path $Path -Method $Method ).Scriptblock | Should Be $Path
+            ( Get-PolarisRoute -Path $Path -Method $Method ).Scriptblock | Should Be $Path
             }
 
         It "Should create POST route with Scriptpath" {
@@ -70,7 +70,7 @@
             New-PolarisPostRoute -Path $Path -ScriptPath $ScriptPath
 
             #  Test route
-            ( Get-PolarisWebRoute -Path $Path -Method $Method ).Scriptblock | Should Be $Script
+            ( Get-PolarisRoute -Path $Path -Method $Method ).Scriptblock | Should Be $Script
             }
         }
 
@@ -87,7 +87,7 @@
             New-PolarisPutRoute -Path $Path -ScriptBlock $Scriptblock
 
             #  Test route
-            ( Get-PolarisWebRoute -Path $Path -Method $Method ).Scriptblock | Should Be $Path
+            ( Get-PolarisRoute -Path $Path -Method $Method ).Scriptblock | Should Be $Path
             }
 
         It "Should create PUT route with Scriptpath" {
@@ -100,7 +100,7 @@
             New-PolarisPutRoute -Path $Path -ScriptPath $ScriptPath
 
             #  Test route
-            ( Get-PolarisWebRoute -Path $Path -Method $Method ).Scriptblock | Should Be $Script
+            ( Get-PolarisRoute -Path $Path -Method $Method ).Scriptblock | Should Be $Script
             }
         }
 
@@ -117,7 +117,7 @@
             New-PolarisDeleteRoute -Path $Path -ScriptBlock $Scriptblock
  
             #  Test route
-           ( Get-PolarisWebRoute -Path $Path -Method $Method ).Scriptblock | Should Be $Path
+           ( Get-PolarisRoute -Path $Path -Method $Method ).Scriptblock | Should Be $Path
             }
 
         It "Should create DELETE route with Scriptpath" {
@@ -130,13 +130,13 @@
             New-PolarisDeleteRoute -Path $Path -ScriptPath $ScriptPath
 
             #  Test route
-            ( Get-PolarisWebRoute -Path $Path -Method $Method ).Scriptblock | Should Be $Script
+            ( Get-PolarisRoute -Path $Path -Method $Method ).Scriptblock | Should Be $Script
             }
         }
 
     AfterAll {
 
         #  Clean up test routes
-        Remove-PolarisWebRoute
+        Remove-PolarisRoute
         }
     }

@@ -7,12 +7,12 @@ if(-not (Test-Path -Path ..\Polaris.psm1)) {
 Import-Module -Name ..\Polaris.psm1
 
 # Hello World passing in the Path, Method & ScriptBlock
-New-PolarisWebRoute -Path /helloworld -Method GET -ScriptBlock {
+New-PolarisRoute -Path /helloworld -Method GET -ScriptBlock {
     $response.Send('Hello World')
 }
 
 # Query Parameters are supported
-New-PolarisWebRoute -Path /hellome -Method GET -ScriptBlock {
+New-PolarisRoute -Path /hellome -Method GET -ScriptBlock {
     if ($request.QueryParameters['name']) {
         $response.Send('Hello ' + $request.QueryParameters['name'])
     } else {
@@ -42,7 +42,7 @@ New-PolarisPostRoute -Path /hello -ScriptBlock {
 }
 
 # Pass in script file
-New-PolarisWebRoute -Path /example -Method GET -ScriptPath .\script.ps1
+New-PolarisRoute -Path /example -Method GET -ScriptPath .\script.ps1
 
 # Also support static serving of a directory
 New-PolarisStaticRoute -FolderPath ./static -RoutePath /public
