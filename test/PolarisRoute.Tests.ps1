@@ -120,12 +120,8 @@ Describe "Test route creation" {
 
     Context "Using Get-PolarisWebRoute and Remove-PolarisWebRoute" {
         It "Will get the object with the routes" {
-<<<<<<< 28f5c5af85a0a38eecbeb2ec584e7d17b9c67547
-            ( Get-WebRoute -Path "/test" -Method "GET" ).ScriptBlock |
+            ( Get-PolarisWebRoute -Path "/test" -Method "GET" ).ScriptBlock |
                 Should Be $defaultScriptBlock.ToString()
-=======
-            (Get-PolarisWebRoute)["test"]["GET"] | Should Be $defaultScriptBlock.ToString()
->>>>>>> Add Cmdlet Prefixes
         }
         It "will remove the routes" {
             Remove-PolarisWebRoute -Path "/test" -Method "GET"
