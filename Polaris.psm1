@@ -443,8 +443,8 @@ function New-PolarisRouteMiddleware
     Remove-PolarisRouteMiddleware -Name ParamCheck*, ParamVerify*
     Removes any route middleware with names starting with ParamCheck or ParamVerify.
 .EXAMPLE
-    Get-RouteMiddelware | Remove-PolarisRouteMiddleware
-    Removes all reoute middleware.
+    Get-PolarisRouteMiddleware | Remove-PolarisRouteMiddleware
+    Removes all route middleware.
 #>
 function Remove-PolarisRouteMiddleware
 {
