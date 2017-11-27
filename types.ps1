@@ -1,5 +1,5 @@
 
-
+using namespace System.Collections
 using namespace System.Management.Automation
 using namespace System.Net
 using namespace System.Security.Principal
@@ -24,18 +24,25 @@ function Test-WindowsElevation {
 }
 
 
+function Invoke-SafeSplat($ScriptBlock, $Hash) {
+    $supportedParams = $ScriptBlock.Ast.ParamBlock.Parameters.Extent.Text -replace "\`$"
+    $params = @{}
+    $Hash.Keys | ? {$supportedParams -contains $_} | % {$params[$_] = $Hash[$_]}
+    return &$ScriptBlock @params
+}
+
+
 class PolarisServer {
 
     [ValidateRange(0, 65535)]
     [int]$Port
-    [string]$LogPath
     [PolarisRoute[]]$Routes = @()
     [int]$JobID
 
     [void] Start() {
         $isWindows = [Environment]::OSVersion.Platform -eq [PlatformID]::Win32NT
         $hostname = @{$true = "+"; $false = "localhost"}[-not $isWindows -or (Test-WindowsElevation)]
-        $listener = [Net.HttpListener]::new()
+        $listener = [HttpListener]::new()
         $listener.Prefixes.Add("http://$hostname`:$($this.Port)/")
         $listener.Start()
         while ($true) {
@@ -55,22 +62,32 @@ class PolarisServer {
         }
     }
 
-    [PolarisResponse] HandleRequest([HttpListenerRequest]$Request) {
-        $route = $this.Routes `
-            | Where-Object {$Request.HttpMethod -eq $_.Method -and $Request.Url.AbsolutePath -match $_.Path} `
-            | Select-Object -First 1
-        if ($route) {
+    [PolarisResponse] HandleRequest([HttpListenerRequest]$Request, [PolarisResponse]$Response) {
+        $matchedRoutes = [Queue]::new(($this.Routes | ? {$Request.HttpMethod -eq $_.Method -and $Request.Url.AbsolutePath -match $_.Path}))
+        if ($matchedRoutes) {
             try {
-                $Request.Url.AbsolutePath -match $route.Path
-                return &$route.Handler $Request $Matches
+                # process each matching route in order of definition
+                while ($matchedRoutes.Count) {
+                    $route = $matchedRoutes.Dequeue()
+                    # populate $Matches with regex matches from the URI path
+                    $Request.Url.AbsolutePath -match $route.Path
+                    $res = Invoke-SafeSplat `
+                        -ScriptBlock $route.Handler `
+                        -Hash @{Request = $Request; Response = $Response; Matches = $Matches}
+                    # break out of the middleware pipeline early if value is returned
+                    if ($res) {
+                        return $Response
+                    }
+                }
+                return $Response
             } catch {
                 return [PolarisResponse]::ServerError
             }
         } else {
-            return [PolarisResponse]::FileNotFound
+            # route not found (404)
+            return [PolarisResponse]::NotFound
         }
     }
-
 }
 
 
@@ -83,19 +100,19 @@ class PolarisResponse {
     [ValidatePattern(".+/.+")]
     [string]$ContentType
 
-    static [PolarisResponse]$Unauthorized = @{
+    static [PolarisResponse]$Forbidden = @{
         StatusCode = 403
-        Body = "Unauthorized"
+        Body = "Forbidden"
     }
 
-    static [PolarisResponse]$FileNotFound = @{
+    static [PolarisResponse]$NotFound = @{
         StatusCode = 404
-        Body = "File not found"
+        Body = "Not Found"
     }
 
     static [PolarisResponse]$ServerError = @{
         StatusCode = 500
-        Body = "An unknown server error occurred"
+        Body = "Server Error"
     }
 
 }
@@ -108,14 +125,5 @@ class PolarisRoute {
     [HttpMethod]$Method
     [ValidateNotNullOrEmpty()]
     [scriptblock]$Handler
-}
-
-
-class PolarisStaticRoute : PolarisRoute {
-    [bool]$AllowDirectoryBrowsing = $false
-    [string]$Root
-    [scriptblock]$Handler = {
-        Param()
-    }
 }
 

@@ -1,4 +1,58 @@
 ﻿
+
+$staticHandler = {
+    Param($Request, $Response)
+    $relativePath = $Request.Path -replace "^$VirtualRoot"
+    $absolutePath = "$PhysicalPath$relativePath"
+    if (Test-Path $absolutePath -PathType Leaf) {
+        $Response.Body = Get-Content $absolutePath
+    } elseif ($AllowDirectoryBrowsing) {
+        $files = Get-ChildItem $absolutePath `
+            | % {"<li><a href=""$relativePath$($_.Name)"">$($_.Name)</a></li>"}
+        $Response.Body = "
+            <h1>Index of $relativePath</h1>
+            <ol>
+                $files
+            </ol>
+        "
+    } else {
+        return [PolarisResponse]::Forbidden
+    }
+}
+
+
+<#
+.SYNOPSIS
+Determines if 
+
+.DESCRIPTION
+Long description
+
+.PARAMETER Handler
+Parameter description
+
+.EXAMPLE
+An example
+
+.NOTES
+General notes
+#>
+function Test-ValidHandler {
+    Param(
+        [Parameter(Mandatory)]
+        [ValidateNotNullOrEmpty()]
+        [scriptblock]$Handler
+    )
+
+    $params = $Handler.Ast.ParamBlock.Parameters.Extent.Text -replace "\`$"
+    $diffs = Compare $params ("Request", "Response", "Matches") `
+        | ? {$_.SideIndicator -eq "<="} `
+        | % {$_.InputObject}
+    return [bool]$diffs
+}
+
+
+
 <#
 .SYNOPSIS
 Registers a route with the server
@@ -40,6 +94,7 @@ function Add-Route {
         [Parameter(Mandatory, ParameterSetName="Properties")]
         [string]$Path,
         [Parameter(Mandatory, ParameterSetName="Properties")]
+        [ValidateScript( {Test-ValidHandler $_} )]
         [scriptblock]$Handler
     )
 
@@ -99,6 +154,7 @@ function Remove-Route {
         [Parameter(Mandatory, ParameterSetName="Properties")]
         [string]$Path,
         [Parameter(Mandatory, ParameterSetName="Properties")]
+        [ValidateScript( {Test-ValidHandler $_} )]
         [scriptblock]$Handler
     )
 
@@ -114,23 +170,43 @@ function Remove-Route {
 }
 
 
-function Add-Middleware {
-    throw "NYI"
-}
-
-
-function Remove-Middleware {
-    throw "NYI"
-}
-
-
 function Add-StaticRoute {
-    throw "NYI"
+    Param(
+        [Parameter(Mandatory)]
+        [PolarisServer]$Server,
+        [Parameter(Mandatory)]
+        [ValidateScript( {Test-Path $_} )]
+        [string]$PhysicalRoot,
+        [Parameter(Mandatory)]
+        [string]$VirtualRoot,
+        [switch]$AllowDirectoryBrowsing
+    )
+
+    Add-Route -Route @{
+        Method = "GET"
+        Path = "^$VirtualRoot"
+        Handler = $staticHandler.GetNewClosure()
+    }
 }
 
 
 function Remove-StaticRoute {
-    throw "NYI"
+    Param(
+        [Parameter(Mandatory)]
+        [PolarisServer]$Server,
+        [Parameter(Mandatory)]
+        [ValidateScript( {Test-Path $_} )]
+        [string]$PhysicalRoot,
+        [Parameter(Mandatory)]
+        [string]$VirtualRoot,
+        [switch]$AllowDirectoryBrowsing
+    )
+
+    Remove-Route -Route @{
+        Method  = "GET"
+        Path    = "^$VirtualRoot"
+        Handler = 
+    }
 }
 
 
