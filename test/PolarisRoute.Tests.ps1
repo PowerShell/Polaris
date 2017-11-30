@@ -13,7 +13,7 @@ function RouteExists ($Path, $Method) {
 }
 
 Describe "Test route creation" {
-    Context "Using New-WebRoute" {
+    Context "Using New-PolarisRoute" {
         It "with -Path '<Path>' -Method '<Method>' -ScriptPath '<ScriptPath>' -ScriptBlock '<ScriptBlock>'" `
             -TestCases @(
             @{ Path = '/test'; Method = 'GET'; ScriptPath = $null; ScriptBlock = $defaultScriptBlock }
@@ -27,15 +27,15 @@ Describe "Test route creation" {
         ) {
             param ($Path, $Method, $ScriptPath, $ScriptBlock)
             if ($ScriptPath) {
-                New-WebRoute -Path $Path -Method $Method -ScriptPath $ScriptPath
+                New-PolarisRoute -Path $Path -Method $Method -ScriptPath $ScriptPath
             } else {
-                New-WebRoute -Path $Path -Method $Method -ScriptBlock $ScriptBlock
+                New-PolarisRoute -Path $Path -Method $Method -ScriptBlock $ScriptBlock
             }
             RouteExists -Path $Path -Method $Method | Should Be $true
         }
     }
 
-    Context "Using New-GetRoute" {
+    Context "Using New-PolarisGetRoute" {
         It "with -Path '<Path>' -ScriptPath '<ScriptPath>' -ScriptBlock '<ScriptBlock>'" `
             -TestCases @(
             @{ Path = '/test'; ScriptPath = $defaultScriptPath; ScriptBlock = $null }
@@ -43,15 +43,15 @@ Describe "Test route creation" {
         ) {
             param ($Path, $ScriptPath, $ScriptBlock)
             if ($ScriptPath -ne $null -and $ScriptPath -ne '') {
-                New-GetRoute -Path $Path -ScriptPath $ScriptPath
+                New-PolarisGetRoute -Path $Path -ScriptPath $ScriptPath
             } else {
-                New-GetRoute -Path $Path -ScriptBlock $ScriptBlock
+                New-PolarisGetRoute -Path $Path -ScriptBlock $ScriptBlock
             }
             RouteExists -Path $Path -Method 'GET' | Should Be $true
         }
     }
 
-    Context "Using New-PostRoute" {
+    Context "Using New-PolarisPostRoute" {
         It "with -Path '<Path>' -ScriptPath '<ScriptPath>' -ScriptBlock '<ScriptBlock>'" `
             -TestCases @(
             @{ Path = '/test'; ScriptPath = $defaultScriptPath; ScriptBlock = $null }
@@ -59,15 +59,15 @@ Describe "Test route creation" {
         ) {
             param ($Path, $ScriptPath, $ScriptBlock)
             if ($ScriptPath) {
-                New-PostRoute -Path $Path -ScriptPath $ScriptPath
+                New-PolarisPostRoute -Path $Path -ScriptPath $ScriptPath
             } else {
-                New-PostRoute -Path $Path -ScriptBlock $ScriptBlock
+                New-PolarisPostRoute -Path $Path -ScriptBlock $ScriptBlock
             }
             RouteExists -Path $Path -Method 'POST' | Should Be $true
         }
     }
 
-    Context "Using New-PutRoute" {
+    Context "Using New-PolarisPutRoute" {
         It "with -Path '<Path>' -ScriptPath '<ScriptPath>' -ScriptBlock '<ScriptBlock>'" `
             -TestCases @(
             @{ Path = '/test'; ScriptPath = $defaultScriptPath; ScriptBlock = $null }
@@ -75,15 +75,15 @@ Describe "Test route creation" {
         ) {
             param ($Path, $ScriptPath, $ScriptBlock)
             if ($ScriptPath) {
-                New-PutRoute -Path $Path -ScriptPath $ScriptPath
+                New-PolarisPutRoute -Path $Path -ScriptPath $ScriptPath
             } else {
-                New-PutRoute -Path $Path -ScriptBlock $ScriptBlock
+                New-PolarisPutRoute -Path $Path -ScriptBlock $ScriptBlock
             }
             RouteExists -Path $Path -Method 'PUT' | Should Be $true
         }
     }
 
-    Context "Using New-DeleteRoute" {
+    Context "Using New-PolarisDeleteRoute" {
         It "with -Path '<Path>' -ScriptPath '<ScriptPath>' -ScriptBlock '<ScriptBlock>'" `
             -TestCases @(
             @{ Path = '/test'; ScriptPath = $defaultScriptPath; ScriptBlock = $null }
@@ -91,18 +91,18 @@ Describe "Test route creation" {
         ) {
             param ($Path, $ScriptPath, $ScriptBlock)
             if ($ScriptPath) {
-                New-DeleteRoute -Path $Path -ScriptPath $ScriptPath
+                New-PolarisDeleteRoute -Path $Path -ScriptPath $ScriptPath
             } else {
-                New-DeleteRoute -Path $Path -ScriptBlock $ScriptBlock
+                New-PolarisDeleteRoute -Path $Path -ScriptBlock $ScriptBlock
             }
             RouteExists -Path $Path -Method 'DELETE' | Should Be $true
         }
     }
 
-    Context "Using New-StaticRoute" {
+    Context "Using New-PolarisStaticRoute" {
         It "Will create a route for every file in a directory without the RoutePath param" {
 
-            New-StaticRoute -FolderPath $defaultStaticDirectory
+            New-PolarisStaticRoute -FolderPath $defaultStaticDirectory
 
             RouteExists -Path 'index.html' -Method 'GET' | Should Be $true
             RouteExists -Path 'test.png' -Method 'GET' | Should Be $true
@@ -110,7 +110,7 @@ Describe "Test route creation" {
         }
         It "Will create a route for every file in a directory with the RoutePath param" {
 
-            New-StaticRoute -RoutePath '/test' -FolderPath $defaultStaticDirectory
+            New-PolarisStaticRoute -RoutePath '/test' -FolderPath $defaultStaticDirectory
 
             RouteExists -Path 'test/index.html' -Method 'GET' | Should Be $true
             RouteExists -Path 'test/test.png' -Method 'GET' | Should Be $true
@@ -118,16 +118,17 @@ Describe "Test route creation" {
         }
     }
 
-    Context "Using Get-WebRoute and Remove-WebRoute" {
+    Context "Using Get-PolarisRoute and Remove-PolarisRoute" {
         It "Will get the object with the routes" {
-            (Get-WebRoute)["test"]["GET"] | Should Be $defaultScriptBlock.ToString()
+            ( Get-PolarisRoute -Path "/test" -Method "GET" ).ScriptBlock |
+                Should Be $defaultScriptBlock.ToString()
         }
         It "will remove the routes" {
-            Remove-WebRoute -Path "/test" -Method "GET"
-            (Get-WebRoute).Count | Should Be 0
+            Remove-PolarisRoute -Path "/test" -Method "GET"
+            (Get-PolarisRoute).Count | Should Be 0
         }
         BeforeEach {
-            New-WebRoute -Path "/test" -Method "GET" -ScriptBlock $defaultScriptBlock
+            New-PolarisRoute -Path "/test" -Method "GET" -ScriptBlock $defaultScriptBlock
         }
         AfterEach {
             Clear-Polaris
