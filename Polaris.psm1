@@ -6,15 +6,15 @@ else
 {
     Add-Type -Path "$PSScriptRoot/PolarisCore/bin/Debug/net451/Polaris.dll"
 }
-$global:Polaris = $null
+$script:Polaris = $null
 
 # Handles the removal of the module
 $ExecutionContext.SessionState.Module.OnRemove =
 {
-    If ( $global:Polaris )
+    If ( $script:Polaris )
     {
         Stop-Polaris -ErrorAction SilentlyContinue
-        Remove-Variable -Name Polaris -Scope global
+        Clear-Polaris
     }
 }.GetNewClosure()
 
@@ -99,14 +99,14 @@ function New-PolarisRoute
         {
             'ScriptBlock'
             {
-                $global:Polaris.AddRoute( $Path, $Method, [string]$ScriptBlock )
+                $script:Polaris.AddRoute( $Path, $Method, [string]$ScriptBlock )
             }
             'ScriptPath'
             {
                 if ( Test-Path -Path $ScriptPath )
                 {
                     $Script = Get-Content -Path $ScriptPath -Raw
-                    $global:Polaris.AddRoute( $Path, $Method, $Script )
+                    $script:Polaris.AddRoute( $Path, $Method, $Script )
                 }
                 else
                 {
@@ -169,13 +169,13 @@ function Remove-PolarisRoute
 
     process
     {
-        if ( $global:Polaris )
+        if ( $script:Polaris )
         {
             $WebRoutes = Get-PolarisRoute -Path $Path -Method $Method
             
             ForEach ( $Route in $WebRoutes )
             {
-                $global:Polaris.RemoveRoute( $Route.Path, $Route.Method )
+                $script:Polaris.RemoveRoute( $Route.Path, $Route.Method )
             }
         }
     }
@@ -228,11 +228,11 @@ function Get-PolarisRoute
     
     process
     {
-        if ( $global:Polaris )
+        if ( $script:Polaris )
         {
             $WebRoutes = [System.Collections.ArrayList]@()
 
-            ForEach ( $Route in $global:Polaris.ScriptBlockRoutes.GetEnumerator() )
+            ForEach ( $Route in $script:Polaris.ScriptBlockRoutes.GetEnumerator() )
             {
                 ForEach ( $RouteMethod in $Route.Value.GetEnumerator() )
                 {
@@ -400,14 +400,14 @@ function New-PolarisRouteMiddleware
         {
             'ScriptBlock'
             {
-                $global:Polaris.AddMiddleware( $Name, [string]$ScriptBlock )
+                $script:Polaris.AddMiddleware( $Name, [string]$ScriptBlock )
             }
             'ScriptPath'
             {
                 if ( Test-Path -Path $ScriptPath )
                 {
                     $Script = Get-Content -Path $ScriptPath -Raw
-                    $global:Polaris.AddMiddleware( $Name, $Script )
+                    $script:Polaris.AddMiddleware( $Name, $Script )
                 }
                 else
                 {
@@ -457,13 +457,13 @@ function Remove-PolarisRouteMiddleware
     
     process
     {
-        if ( $global:Polaris  )
+        if ( $script:Polaris  )
         {
             $Middleware = Get-PolarisRouteMiddleware -Name $Name
 
             ForEach ( $Ware in $MiddleWare )
             {
-                $global:Polaris.RemoveMiddleware( $Ware.Name )
+                $script:Polaris.RemoveMiddleware( $Ware.Name )
             }
         }
     }
@@ -498,11 +498,11 @@ function Get-PolarisRouteMiddleware
 
     process
     {
-        if ( $global:Polaris )
+        if ( $script:Polaris )
         {
             $Filter = [scriptblock]::Create( ( $Name.ForEach({ "`$_.Name   -like `"$_`"" }) -join ' -or ' ) )
 
-            return $global:Polaris.RouteMiddleware.Where( $Filter )
+            return $script:Polaris.RouteMiddleware.Where( $Filter )
         }
     }
 }
@@ -550,9 +550,9 @@ function Start-Polaris {
         New-PolarisRouteMiddleware -Name JsonBodyParser -ScriptBlock $JsonBodyParserMiddlerware
     }
 
-    $global:Polaris.Start( $Port, $MinRunspaces, $MaxRunspaces )
+    $script:Polaris.Start( $Port, $MinRunspaces, $MaxRunspaces )
     
-    return $global:Polaris
+    return $script:Polaris
 }
 
 <#
@@ -573,7 +573,7 @@ function Stop-Polaris
     [CmdletBinding()]
     param(
         [PolarisCore.Polaris]
-        $ServerContext = $global:Polaris )
+        $ServerContext = $script:Polaris )
 
     if ( $ServerContext )
     {
@@ -798,15 +798,46 @@ function Use-PolarisJsonBodyParserMiddleware {
     New-PolarisRouteMiddleware -Name JsonBodyParser -ScriptBlock $JsonBodyParserMiddlerware -Force
 }
 
+<#
+.SYNOPSIS
+Returns the internal instance of Polaris
+.DESCRIPTION
+Returns the instance of the Polaris .NET Standard object
+.EXAMPLE
+Get-Polaris
+.NOTES
+Should only be used for testing
+#>
+function Get-Polaris {
+    return $script:Polaris
+}
+
+
+<#
+.SYNOPSIS
+Clears the internal instance of Polaris
+.DESCRIPTION
+Clears the internal Polaris .NET Standard object.  The instance will be reinstantiated in other module calls.
+.EXAMPLE
+Clear-Polaris
+.NOTES
+Should only be used for testing
+#>
+function Clear-Polaris {
+    if ($script:Polaris) {
+        Remove-Variable -Name Polaris -Scope script
+    }
+}
+
 ##############################
 # INTERNAL
 ##############################
 
 function CreateNewPolarisIfNeeded ()
 {
-    if ( -not $global:Polaris )
+    if ( -not $script:Polaris )
     {
-        $global:Polaris = New-Object -TypeName PolarisCore.Polaris -ArgumentList @(
+        $script:Polaris = New-Object -TypeName PolarisCore.Polaris -ArgumentList @(
             [Action[string]]{ param($str) Write-Verbose "$str" } )
     }
 }
@@ -820,6 +851,8 @@ $JsonBodyParserMiddlerware =
 }
 
 Export-ModuleMember -Function `
+    Get-Polaris,
+    Clear-Polaris,
     New-PolarisRoute,
     Remove-PolarisRoute,
     Get-PolarisRoute,

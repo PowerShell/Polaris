@@ -28,7 +28,7 @@
         }
 
     It "Should default to get all routes" {
-        $ExpectedCount = $Global:Polaris.ScriptBlockRoutes.Values.Values.Count
+        $ExpectedCount = (Get-Polaris).ScriptBlockRoutes.Values.Values.Count
         $Routes = Get-PolarisRoute
         @( $Routes ).Count | Should Be $ExpectedCount
         }

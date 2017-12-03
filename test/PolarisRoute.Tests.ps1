@@ -9,7 +9,7 @@ $defaultScriptPath = './test.ps1';
 $defaultStaticDirectory = './static';
 
 function RouteExists ($Path, $Method) {
-    return $Global:Polaris.ScriptBlockRoutes[$Path.TrimEnd('/').TrimStart('/')][$Method] -ne $null
+    return (Get-Polaris).ScriptBlockRoutes[$Path.TrimEnd('/').TrimStart('/')][$Method] -ne $null
 }
 
 Describe "Test route creation" {
@@ -131,11 +131,11 @@ Describe "Test route creation" {
             New-PolarisRoute -Path "/test" -Method "GET" -ScriptBlock $defaultScriptBlock
         }
         AfterEach {
-            $Global:Polaris = $null
+            Clear-Polaris
         }
     }
 
     AfterEach {
-        $Global:Polaris = $null
+        Clear-Polaris
     }
 }

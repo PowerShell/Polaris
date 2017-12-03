@@ -27,7 +27,7 @@ Describe "Test webserver use" {
 Hello World"
 
             $result = Invoke-WebRequest -Uri "http://localhost:$Port/helloworld?PolarisLogs=true"
-            $result.Content | Should Be $expectedText
+            $result.Content -replace "`r" | Should Be ($expectedText -replace "`r")
             $result.StatusCode | Should Be 200
         }
 

@@ -24,7 +24,7 @@
         }
 
     It "Should default to get all middleware" {
-        $ExpectedCount = $Global:Polaris.RouteMiddleware.Count
+        $ExpectedCount = (Get-Polaris).RouteMiddleware.Count
 
         $Middleware = Get-PolarisRouteMiddleware
         @( $Middleware ).Count | Should Be $ExpectedCount

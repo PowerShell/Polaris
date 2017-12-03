@@ -27,14 +27,15 @@
             'BaseRoot/Sub1/File4.txt' )
 
         #  Add content to a file
-        $File1Uri = 'http://localhost:9999/BaseRoot/File1.txt'
+        $Port = Get-Random -Minimum 3000 -Maximum 4000
+        $File1Uri = "http://localhost:$Port/BaseRoot/File1.txt"
         $File1Content = 'File1Content'
         $File1Content | Out-File -FilePath $File1 -Encoding ascii -NoNewline
 
         ####  Create static routes
         New-PolarisStaticRoute -RoutePath 'BaseRoot' -FolderPath $TestPath
 
-        Start-Polaris -Port 9999
+        Start-Polaris -Port $Port
         }
 
 
