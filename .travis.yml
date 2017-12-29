@@ -16,7 +16,7 @@ script:
   - dotnet restore
   - dotnet build -f netstandard2.0
   - popd && pushd test
-  - sudo pwsh -c 'Install-Module Pester; Invoke-Pester -ExcludeTag VersionChecks -EnableExit'
+  - sudo pwsh ./build/travis.ps1
   - popd
 notifications:
   webhooks:
