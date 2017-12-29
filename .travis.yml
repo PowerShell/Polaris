@@ -15,9 +15,8 @@ script:
   - pushd PolarisCore
   - dotnet restore
   - dotnet build -f netstandard2.0
-  - popd && pushd test
-  - pwsh -c 'Invoke-Pester -ExcludeTag VersionChecks -EnableExit'
   - popd
+  - sudo pwsh ./build/travis.ps1
 notifications:
   webhooks:
     urls:
