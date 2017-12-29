@@ -1,14 +1,28 @@
 ﻿
+using namespace System.Collections
+using namespace System.Management.Automation
+using namespace System.Net
+using namespace System.Security.Principal
 
-$staticHandler = {
+function Test-WindowsElevation {
+    $currentPrincipal = [WindowsPrincipal]::new([WindowsIdentity]::GetCurrent())
+    return $currentPrincipal.IsInRole([WindowsBuiltInRole]::Administrator)
+}
+
+
+
+
+
+$StaticHandler = {
     Param($Request, $Response)
     $relativePath = $Request.Path -replace "^$VirtualRoot"
     $absolutePath = "$PhysicalPath$relativePath"
     if (Test-Path $absolutePath -PathType Leaf) {
-        $Response.Body = Get-Content $absolutePath
+        $Response.Body = Get-Content $absolutePath -Raw
     } elseif ($AllowDirectoryBrowsing) {
         $files = Get-ChildItem $absolutePath `
-            | % {"<li><a href=""$relativePath$($_.Name)"">$($_.Name)</a></li>"}
+            | Select -ExpandProperty "Name" `
+            | % {"<li><a href=`"$relativePath$_`">$_</a></li>"}
         $Response.Body = "
             <h1>Index of $relativePath</h1>
             <ol>
@@ -16,11 +30,94 @@ $staticHandler = {
             </ol>
         "
     } else {
-        return [PolarisResponse]::Forbidden
+        $Response.StatusCode = 403
+        $Response.Body = "Forbidden"
     }
 }
 
 
+function Receive-Request($Context, $Server) {
+    try {
+        # create default response object
+        $response = [PSCustomObject]@{
+            StatusCode  = 200
+            Body        = ""
+            ContentType = "text/plain"
+        }
+
+        # get matching middleware handlers
+        $matchedRoutes = $Server.Routes | ? {
+            $routeParams = $_.Handler.Ast.ParamBlock.Parameters.Extent.Text -replace "^\$"
+            if ($Context.Request.HttpMethod -ne $_.Method) {
+                $false
+            } elseif ("Matches" -in $routeParams) {
+                $Context.Request.Url.AbsolutePath -match $_.Path
+            } else {
+                $Context.Request.Url.AbsolutePath -like $_.Path
+            }
+        }
+
+        # apply handlers to request
+        if ($matchedRoutes) {
+            $pipeline = [System.Collections.Queue]::new($matchedRoutes)
+            try {
+                # process each matching route in order of definition
+                while ($pipeline.Count) {
+                    $route = $pipeline.Dequeue()
+
+                    # determine parameters supported by the handler
+                    $handlerParameters = @{}
+                    $supportedParameters = $route.Handler.Ast.ParamBlock.Parameters.Extent.Text -replace "^\$"
+                    if ("Matches" -in $supportedParameters) {
+                        $Request.Url.AbsolutePath -match $route.Path
+                        $handlerParameters["Matches"] = $Matches
+                    }
+                    if ("Request" -in $supportedParameters) {
+                        $handlerParameters["Request"] = $Context.Request
+                    }
+                    if ("Response" -in $supportedParameters) {
+                        $handlerParameters["Response"] = $response
+                    }
+
+                    # process the handler, break out of the pipeline if the handler returns
+                    if (&$route.Handler @handlerParameters) {
+                        break
+                    }
+                }
+            } catch {
+                # unexpected server error (500)
+                $response.StatusCode = 500
+                if ($Server.Debug) {
+                    $response.Body = (
+                        "Server Error:",
+                        $_,
+                        $_.Exception,
+                        $_.Exception.Message,
+                        $_.Exception.InnerException,
+                        $_.Exception.StackTrace
+                    ) -join "`n"
+                } else {
+                    $response.Body = "Server Error"
+                }
+            }
+        } else {
+            # route not found (404)
+            $response.StatusCode = 404
+            $response.Body = "File Not Found"
+        }
+
+        # send response
+        $byteResponse = $response.Body -as [char[]] -as [byte[]]
+        $Context.Response.StatusCode = $response.StatusCode
+        $Context.Response.ContentType = $response.ContentType
+        $Context.Response.ContentLength64 = $byteResponse.Length
+        $Context.Response.OutputStream.Write($byteResponse, 0, $byteResponse.Length)
+    } catch {
+        throw $_
+    } finally {
+        $Context.Response.OutputStream.Close()
+    }
+}
 <#
 .SYNOPSIS
 Determines if 
@@ -44,11 +141,11 @@ function Test-ValidHandler {
         [scriptblock]$Handler
     )
 
-    $params = $Handler.Ast.ParamBlock.Parameters.Extent.Text -replace "\`$"
-    $diffs = Compare $params ("Request", "Response", "Matches") `
+    $params = $Handler.Ast.ParamBlock.Parameters.Extent.Text -replace "\$"
+    $diffs = Compare $params ("Matches", "Request", "Response") `
         | ? {$_.SideIndicator -eq "<="} `
         | % {$_.InputObject}
-    return [bool]$diffs
+    return $diffs -as [bool]
 }
 
 
@@ -86,11 +183,11 @@ function Add-Route {
     Param(
         [Parameter(Mandatory, ParameterSetName="Object")]
         [Parameter(Mandatory, ParameterSetName="Properties")]
-        [PolarisServer]$Server,
+        $Server,
         [Parameter(Mandatory, ParameterSetName="Object")]
-        [PolarisRoute]$Route,
+        $Route,
         [Parameter(Mandatory, ParameterSetName="Properties")]
-        [HttpMethod]$Method,
+        $Method,
         [Parameter(Mandatory, ParameterSetName="Properties")]
         [string]$Path,
         [Parameter(Mandatory, ParameterSetName="Properties")]
@@ -99,9 +196,9 @@ function Add-Route {
     )
 
     if (-not $route) {
-        $route = [PolarisRoute]@{
-            Method = $Method
-            Path = $Path
+        $route = @{
+            Method  = $Method
+            Path    = $Path
             Handler = $Handler
         }
     }
@@ -146,11 +243,11 @@ function Remove-Route {
     Param(
         [Parameter(Mandatory, ParameterSetName="Object")]
         [Parameter(Mandatory, ParameterSetName="Properties")]
-        [PolarisServer]$Server,
+        $Server,
         [Parameter(Mandatory, ParameterSetName="Object")]
-        [PolarisRoute]$Route,
+        $Route,
         [Parameter(Mandatory, ParameterSetName="Properties")]
-        [HttpMethod]$Method,
+        $Method,
         [Parameter(Mandatory, ParameterSetName="Properties")]
         [string]$Path,
         [Parameter(Mandatory, ParameterSetName="Properties")]
@@ -159,9 +256,9 @@ function Remove-Route {
     )
 
     if (-not $route) {
-        $route = [PolarisRoute]@{
-            Method = $Method
-            Path = $Path
+        $route = @{
+            Method  = $Method
+            Path    = $Path
             Handler = $Handler
         }
     }
@@ -173,7 +270,7 @@ function Remove-Route {
 function Add-StaticRoute {
     Param(
         [Parameter(Mandatory)]
-        [PolarisServer]$Server,
+        $Server,
         [Parameter(Mandatory)]
         [ValidateScript( {Test-Path $_} )]
         [string]$PhysicalRoot,
@@ -183,31 +280,12 @@ function Add-StaticRoute {
     )
 
     Add-Route -Route @{
-        Method = "GET"
-        Path = "^$VirtualRoot"
+        Method  = "GET"
+        Path    = "$VirtualRoot/*"
         Handler = $staticHandler.GetNewClosure()
     }
 }
 
-
-function Remove-StaticRoute {
-    Param(
-        [Parameter(Mandatory)]
-        [PolarisServer]$Server,
-        [Parameter(Mandatory)]
-        [ValidateScript( {Test-Path $_} )]
-        [string]$PhysicalRoot,
-        [Parameter(Mandatory)]
-        [string]$VirtualRoot,
-        [switch]$AllowDirectoryBrowsing
-    )
-
-    Remove-Route -Route @{
-        Method  = "GET"
-        Path    = "^$VirtualRoot"
-        Handler = 
-    }
-}
 
 
 <#
@@ -226,12 +304,43 @@ Start-Server $PolarisServer
 function Start-Server {
     Param(
         [Parameter(Mandatory)]
-        [PolarisServer]$Server
+        $Server
     )
 
-    $Server.JobID = Start-Job `
-        -ScriptBlock {([PolarisServer]$using:server).Start()} `
-        -InitializationScript ([scriptblock]::create((Get-Content "$PSScriptRoot\types.ps1" -Raw)))
+    $ErrorActionPreference = "Stop"
+    $runspacePool = [RunspaceFactory]::CreateRunspacePool(1, $Server.MaxThreadCount)
+    $runspacePool.Open()
+
+    $listener = [System.Net.HttpListener]::new()
+    $listener.Prefixes.Add("http://localhost:$($Server.Port)/")
+    $listener.Start()
+    Write-Information "Listening on port $($Server.Port)"
+
+    while ($true) {
+        & {
+            # remove completed threads
+            $threads | ? {$_.IsCompleted} | % {$_.Dispose()}
+            $threads = @($threads | ? {-not $_.IsCompleted})
+    
+            # prepare thread
+            $thread = [powershell]::Create()
+            $thread.AddScript(${function:Receive-Request})
+            $thread.RunspacePool = $runspacePool
+    
+            # block until we receive a new request
+            $context = $listener.GetContext()
+
+            # process the request in a separate thread
+            $thread.AddArgument($context)
+            $thread.AddArgument($Server)
+            if ($Server.Debug) {
+                $thread.Invoke()
+            } else {
+                $thread.BeginInvoke()
+            }
+            $threads += $thread
+        } | Out-Null
+    }
 }
 
 
@@ -251,10 +360,11 @@ Stop-Server $PolarisServer
 function Stop-Server {
     Param(
         [Parameter(Mandatory)]
-        [PolarisServer]$Server
+        $Server
     )
 
     Stop-Job -Id $Server.JobID
     Remove-Job -Id $Server.JobID
+    $Server.JobId = $null
 }
 
