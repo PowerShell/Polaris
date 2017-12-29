@@ -8,7 +8,7 @@ namespace PolarisCore
     {
         public byte[] ByteResponse { get; set; } = new byte[0];
         public string ContentType { get; set; } = "text/plain";
-        public Dictionary<string, string> Headers { get; set; }
+        public System.Net.WebHeaderCollection Headers { get; set; } = new System.Net.WebHeaderCollection();
         public int StatusCode { get; set; } = 200;
 
         public void Send(string stringResponse) => ByteResponse = System.Text.Encoding.UTF8.GetBytes(stringResponse);
