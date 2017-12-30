@@ -18,6 +18,13 @@ Describe "Test webserver use" {
             $result.StatusCode | Should Be 200
         }
 
+
+        It "test /header router" {
+            $result = Invoke-WebRequest -Uri "http://localhost:$Port/header"
+            $result.Content | Should Be 'Header test'
+            $result.StatusCode | Should Be 200
+            $result.Headers['Location'] | Should be 'http://www.contoso.com/'
+        }
         It "test /helloworld route with log query param" {
             $expectedText = `
 "
