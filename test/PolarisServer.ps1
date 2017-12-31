@@ -1,3 +1,9 @@
+
+# Support Headers
+New-PolarisRoute -Path /header -Method "GET" -ScriptBlock {
+    $response.SetHeader('Location','http://www.contoso.com/');
+    $response.Send("Header test");
+}
 if(-not (Test-Path -Path ..\Polaris.psm1)) {
     Write-Error -Message "Cannot find Polaris.psm1"
     return
@@ -45,6 +51,12 @@ New-PolarisPostRoute -Path /error -ScriptBlock {
     Write-Host "asdf"
     $request.body.psobject.properties | ForEach-Object { $params[$_.Name] = $_.Value }
     $response.Send("this should not show up in response")
+}
+
+# Support Headers
+New-PolarisRoute -Path /header -Method "GET" -ScriptBlock {
+    $response.SetHeader('Location','http://www.contoso.com/');
+    $response.Send("Header test");
 }
 
 $Port = Get-Random -Minimum 8000 -Maximum 8999

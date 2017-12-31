@@ -251,10 +251,20 @@ namespace PolarisCore
 
         private static void Send(HttpListenerResponse rawResponse, PolarisResponse response)
         {
-            Send(rawResponse, response.ByteResponse, response.StatusCode, response.ContentType);
+            Send(rawResponse, response.ByteResponse, response.StatusCode, response.ContentType, response.Headers );
         }
 
-        private static void Send(HttpListenerResponse rawResponse, byte[] byteResponse, int statusCode, string contentType)
+        private static void Send(HttpListenerResponse rawResponse, byte[] byteResponse, int statusCode,string contentType, System.Net.WebHeaderCollection Headers)
+        {
+            rawResponse.StatusCode = statusCode;
+			rawResponse.Headers = Headers;
+            rawResponse.ContentType = contentType;
+            rawResponse.ContentLength64 = byteResponse.Length;
+            rawResponse.OutputStream.Write(byteResponse, 0, byteResponse.Length);
+            rawResponse.OutputStream.Close();
+        }        
+		
+		private static void Send(HttpListenerResponse rawResponse, byte[] byteResponse, int statusCode, string contentType)
         {
             rawResponse.StatusCode = statusCode;
             rawResponse.ContentType = contentType;
