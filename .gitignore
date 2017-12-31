@@ -301,3 +301,6 @@ __pycache__/
 
 # Pester output
 test/TestsResults.xml
+
+# Running a build can create a .dotnet directory in the project and we don't want to commit that
+.dotnet/
