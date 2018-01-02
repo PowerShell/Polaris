@@ -96,7 +96,7 @@ task Build Restore, {
     exec { & $script:dotnetExe build .\PolarisCore\Polaris.csproj -f netstandard2.0 }
 }
 
-task Test {
+task Test Build, {
     # TODO: Add tests
     if ($PSVersionTable.PSEdition -ne "Core") {
         Install-Module Pester -Force -Scope CurrentUser
