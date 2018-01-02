@@ -7,7 +7,7 @@ if ($PSVersionTable.PSEdition -ne "Core") {
     Add-Type -Assembly System.IO.Compression.FileSystem
 }
 
-task SetupDotNet -Before Restore, Build, Clean, Test {
+task SetupDotNet {
 
     $requiredSdkVersion = "2.0.0"
 
@@ -79,15 +79,15 @@ function NeedsRestore($rootPath) {
     return ($projectAssets -eq $null) -or ((Get-ChildItem $rootPath).Length -gt $projectAssets.Length)
 }
 
-task Restore -If { "Restore" -in $BuildTask -or (NeedsRestore(".\PolarisCore")) } -Before Clean, Build, Test {
+task Restore -If { "Restore" -in $BuildTask -or (NeedsRestore(".\PolarisCore")) } SetupDotNet, {
     exec { & $script:dotnetExe restore .\PolarisCore\Polaris.csproj }
 }
 
-task Clean {
+task Clean Restore, {
     exec { & $script:dotnetExe clean .\PolarisCore\Polaris.csproj }
 }
 
-task Build {
+task Build Restore, {
     if (!$script:IsUnix) {
         exec { & $script:dotnetExe build .\PolarisCore\Polaris.csproj -f net451 }
         Write-Host "" # Newline
@@ -96,7 +96,7 @@ task Build {
     exec { & $script:dotnetExe build .\PolarisCore\Polaris.csproj -f netstandard2.0 }
 }
 
-task Test {
+task Test Build, {
     # TODO: Add tests
     if ($PSVersionTable.PSEdition -ne "Core") {
         Install-Module Pester -Force -Scope CurrentUser
