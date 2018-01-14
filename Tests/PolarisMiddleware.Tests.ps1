@@ -23,14 +23,15 @@ Describe "Test middleware creation/usage" {
         It "Can use the body parameters in route scripts" {
             New-PolarisPostRoute -Path "/hello" -ScriptBlock {
                 if ($request.Body.Name) {
-                    $response.Send('Hello ' + $request.Body.Name);
-                } else {
-                    $response.Send('Hello World');
+                    $response.Send('Hello ' + $request.Body.Name)
+                }
+                else {
+                    $response.Send('Hello World')
                 }
             }
 
             $body = @{ Name = 'Atlas' } | ConvertTo-Json
-            (Invoke-RestMethod -Uri "http://localhost:$Port/hello" -Method POST -Body $body) | Should Be 'Hello Atlas';
+            (Invoke-RestMethod -Uri "http://localhost:$Port/hello" -Method POST -Body $body) | Should Be 'Hello Atlas'
         }
     }
     Context "Test adding a new middleware" {
@@ -39,18 +40,18 @@ Describe "Test middleware creation/usage" {
         }
         It "Manipulates the Request before the Route script gets it" {
             $body = @{ Name = 'Atlas' } | ConvertTo-Json
-            (Invoke-RestMethod -Uri "http://localhost:$Port/hello" -Method POST -Body $body) | Should Be 'Hello Manipulated';
+            (Invoke-RestMethod -Uri "http://localhost:$Port/hello" -Method POST -Body $body) | Should Be 'Hello Manipulated'
         }
         BeforeEach {
-            $app.RouteMiddleware.Count | Should Be 1;
+            $app.RouteMiddleware.Count | Should Be 1
             New-PolarisRouteMiddleware -Name TestMiddleware -ScriptBlock $defaultMiddleware
         }
         AfterEach {
             Remove-PolarisRouteMiddleware -Name TestMiddleware
-            $app.RouteMiddleware.Count | Should Be 1;
+            $app.RouteMiddleware.Count | Should Be 1
         }
     }
     AfterAll {
-        Stop-Polaris
+        Stop-Polaris -ServerContext $app
     }
 }

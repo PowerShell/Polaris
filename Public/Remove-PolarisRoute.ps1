@@ -1,92 +1,53 @@
 <#
 .SYNOPSIS
-    Add web route.
+    Removes the web route.
 .DESCRIPTION
-    Create web route for server to serve.
+    Removes the web route(s) matching the specified path(s) and method(s).
 .PARAMETER Path
-    Path (path/route/endpoint) of the web route to to be serviced.
+    Path(s) of the route(s) to remove.
+    Accepts multiple values and wildcards.
+    Accepts pipeline input.
+    Accepts pipeline input by property name.
+    Defaults to all paths (*).
 .PARAMETER Method
-    HTTP verb/method to be serviced.
-    Valid values are GET, POST, PUT, and DELETE
-.PARAMETER ScriptBlock
-    ScriptBlock that will be triggered when web route is called.
-.PARAMETER ScriptPath
-    Full path and name of script that will be triggered when web route is called.
-.PARAMETER Force
-    Use -Force to overwrite any existing web route for the same path and method.
+    Method(s) of the route(s) to remove.
+    Accepts pipeline input by property name.
+    Accepts multiple values and wildcards.
+    Defaults to all methods (*).
 .EXAMPLE
-    New-PolarisRoute -Path "helloworld" -Method "GET" -ScriptBlock { $response.Send( 'Hello World' ) }
-    To view results:
-    Start-Polaris
-    Start-Process http://localhost:8080/helloworld
+    Remove-PolarisRoute
+    Removes all existing web routes.
 .EXAMPLE
-    New-PolarisRoute -Path "helloworld" -Method "GET" -ScriptPath D:\Scripts\Example.ps1
-    To view results, assuming default port:
-    Start-Polaris
-    Start-Process http://localhost:8080/helloworld
+    Remove-PolarisRoute -Path 'helloworld' -Method GET
+    Removes the web route for method GET for path helloworld.
+.EXAMPLE
+    Remove-PolarisRoute -Path 'sub1/sub2/*'
+    Removes all web routes for all methods for paths starting with sub1/sub2/.
+.EXAMPLE
+    Remove-PolarisRoute -Path 'sub1/sub2/*' -Method GET, POST
+    Removes all web routes for GET and POST methods for paths starting with sub1/sub2/.
+.EXAMPLE
+    Get-PolarisRoute -Method Delete | Remove-Method
+    Removes all web routes for DELETE methods for all paths.
 #>
-function New-PolarisRoute {
+function Remove-PolarisRoute {
     [CmdletBinding()]
-    param(
-        [Parameter( Mandatory = $True, Position = 0 )]
-        [string]
-        $Path,
+    param (
+        [Parameter( ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True )]
+        [string[]]
+        $Path = '*',
 
-        [Parameter( Mandatory = $True, Position = 1 )]
-        [ValidateSet( 'GET', 'POST', 'PUT', 'DELETE' )]
-        [string]
-        $Method,
+        [Parameter( ValueFromPipelineByPropertyName = $True )]
+        [string[]]
+        $Method = '*' )
 
-        [Parameter( Mandatory = $True, Position = 2, ParameterSetName = 'ScriptBlock' )]
-        [scriptblock]
-        $ScriptBlock,
-
-        [Parameter( Mandatory = $True, ParameterSetName = 'ScriptPath' )]
-        [string]
-        $ScriptPath,
-        
-        [switch]
-        $Force )
-
-    $ExistingWebRoute = Get-PolarisRoute -Path $Path -Method $Method
-
-    if ( $ExistingWebRoute -and $Force ) {
-        Remove-PolarisRoute -Path $Path -Method $Method
-        $ExistingWebRoute = Get-PolarisRoute -Path $Path -Method $Method
-    }
-
-    if ( $ExistingWebRoute ) {
-        $PSCmdlet.WriteError( (
-                New-Object -TypeName System.Management.Automation.ErrorRecord -ArgumentList @(
-                    [System.Exception]'WebRoute already exists.'
-                    $Null
-                    [System.Management.Automation.ErrorCategory]::ResourceExists
-                    "$Path,$Method" ) ) )
-    }
-    else {
-        CreateNewPolarisIfNeeded
-
-        if ( -not $Path.StartsWith( '/' ) ) {
-            $Path = '/' + $Path
-        }
-
-        switch ( $PSCmdlet.ParameterSetName ) {
-            'ScriptBlock' {
-                $script:Polaris.AddRoute( $Path, $Method, [string]$ScriptBlock )
-            }
-            'ScriptPath' {
-                if ( Test-Path -Path $ScriptPath ) {
-                    $Script = Get-Content -Path $ScriptPath -Raw
-                    $script:Polaris.AddRoute( $Path, $Method, $Script )
-                }
-                else {
-                    $PSCmdlet.WriteError( (
-                            New-Object -TypeName System.Management.Automation.ErrorRecord -ArgumentList @(
-                                [System.Exception]'ScriptPath not found.'
-                                $Null
-                                [System.Management.Automation.ErrorCategory]::ObjectNotFound
-                                $ScriptPath ) ) )
-                }
+    process {
+        if ( $script:Polaris ) {
+            $WebRoutes = Get-PolarisRoute -Path $Path -Method $Method
+            
+            ForEach ( $Route in $WebRoutes ) {
+                $script:Polaris.RemoveRoute( $Route.Path, $Route.Method )
             }
         }
     }

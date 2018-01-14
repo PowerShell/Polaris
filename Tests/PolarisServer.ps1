@@ -1,16 +1,16 @@
 
 # Support Headers
 New-PolarisRoute -Path /header -Method "GET" -ScriptBlock {
-    $response.SetHeader('Location','http://www.contoso.com/');
-    $response.Send("Header test");
+    $response.SetHeader('Location', 'http://www.contoso.com/')
+    $response.Send("Header test")
 }
-if(-not (Test-Path -Path ..\Polaris.psm1)) {
+if (-not (Test-Path -Path $PSScriptRoot\..\Polaris.psm1)) {
     Write-Error -Message "Cannot find Polaris.psm1"
     return
 }
 
 # Import Polaris
-Import-Module -Name ..\Polaris.psm1
+Import-Module -Name $PSScriptRoot\..\Polaris.psm1
 
 # Hello World passing in the Path, Method & ScriptBlock
 New-PolarisRoute -Path /helloworld -Method GET -ScriptBlock {
@@ -23,7 +23,8 @@ New-PolarisRoute -Path /helloworld -Method GET -ScriptBlock {
 New-PolarisRoute -Path /hellome -Method GET -ScriptBlock {
     if ($Request.Query['name']) {
         $Response.Send('Hello ' + $Request.Query['name'])
-    } else {
+    }
+    else {
         $Response.Send('Hello World')
     }
 }
@@ -41,22 +42,16 @@ $sbWow = {
 New-PolarisPostRoute -Path /wow -ScriptBlock $sbWow
 
 # Pass in script file
-New-PolarisRoute -Path /example -Method GET -ScriptPath .\test.ps1
+New-PolarisRoute -Path /example -Method GET -ScriptPath $PSScriptRoot\test.ps1
 
 # Also support static serving of a directory
-New-PolarisStaticRoute -FolderPath ./static -RoutePath /public
+New-PolarisStaticRoute -FolderPath $PSScriptRoot/static -RoutePath /public
 
 New-PolarisPostRoute -Path /error -ScriptBlock {
     $params = @{}
     Write-Host "asdf"
     $request.body.psobject.properties | ForEach-Object { $params[$_.Name] = $_.Value }
     $response.Send("this should not show up in response")
-}
-
-# Support Headers
-New-PolarisRoute -Path /header -Method "GET" -ScriptBlock {
-    $response.SetHeader('Location','http://www.contoso.com/');
-    $response.Send("Header test");
 }
 
 $Port = Get-Random -Minimum 8000 -Maximum 8999

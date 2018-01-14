@@ -21,11 +21,13 @@ $JsonBodyParserMiddlerware =
 }
 
 #Get public and private function definition files.
+$Classes = @( Get-ChildItem -Path $PSScriptRoot\lib\*.ps1 -ErrorAction SilentlyContinue | where {$_.Name -ne "Polaris.Class.ps1"})
+$Classes += @( Get-ChildItem -Path $PSScriptRoot\lib\Polaris.Class.ps1 -ErrorAction SilentlyContinue )
 $Public = @( Get-ChildItem -Path $PSScriptRoot\Public\*.ps1 -ErrorAction SilentlyContinue )
 $Private = @( Get-ChildItem -Path $PSScriptRoot\Private\*.ps1 -ErrorAction SilentlyContinue )
 
 #Dot source the files
-Foreach ($import in @($Public + $Private)) {
+Foreach ($import in @($Public + $Private + $Classes)) {
     Try {
         . $import.fullname
     }

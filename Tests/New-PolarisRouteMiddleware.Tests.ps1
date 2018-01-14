@@ -3,16 +3,16 @@
     BeforeAll {
 
         #  Import module
-        Import-Module ..\Polaris.psd1
+        Import-Module $PSScriptRoot\..\Polaris.psd1
 
         #  Start with a clean slate
         Remove-PolarisRouteMiddleware
-        }
+    }
 
     It "Should create middleware" {
 
         #  Define middleware
-        $Name   = "TestMiddleware"
+        $Name = "TestMiddleware"
         $Scriptblock = [scriptblock]::Create( $Name )
 
         #  Create middleware
@@ -20,12 +20,12 @@
 
         #  Test middleware
         ( Get-PolarisRouteMiddleware -Name $Name ).Scriptblock | Should Be $Name
-        }
+    }
 
     It "Should create middleware with Scriptpath" {
 
         #  Define middleware
-        $Name   = "TestMiddlewareScriptPath"
+        $Name = "TestMiddlewareScriptPath"
         $ScriptPath = "TestDrive:\$Name.ps1"
 
         #  Create script file
@@ -36,23 +36,23 @@
 
         #  Test middleware
         ( Get-PolarisRouteMiddleware -Name $Name ).Scriptblock | Should Be $Name
-        }
+    }
 
     It "Should throw error if Scriptpath not found" {
 
         #  Define middleware
-        $Name   = "TestScriptPathNotFound"
+        $Name = "TestScriptPathNotFound"
         $ScriptPath = "TestDrive:\DOESNOTEXIST.ps1"
 
         #  Create middleware
         { New-PolarisRouteMiddleware -Name $Name -ScriptPath $ScriptPath -ErrorAction Stop } |
             Should Throw
-        }
+    }
 
     It "Should throw error if middleware exists" {
 
         #  Define middleware
-        $Name   = "TestExisting"
+        $Name = "TestExisting"
         $Scriptblock = [scriptblock]::Create( $Name )
 
         #  Create middleware
@@ -61,12 +61,12 @@
         #  Create middleware
         { New-PolarisRouteMiddleware -Name $Name -ScriptBlock $Scriptblock -ErrorAction Stop } |
             Should Throw
-        }
+    }
 
     It "Should overwrite middleware with Force switch" {
 
         #  Define middleware
-        $Name   = "TestExistingWithForce"
+        $Name = "TestExistingWithForce"
         $NewContent = "NewContent"
         $Scriptblock = [scriptblock]::Create( $NewContent )
 
@@ -75,11 +75,11 @@
 
         #  Test middleware
         ( Get-PolarisRouteMiddleware -Name $Name ).Scriptblock | Should Be $NewContent
-        }
+    }
 
     AfterAll {
 
         #  Clean up test middleware
         Remove-PolarisRouteMiddleware
-        }
     }
+}

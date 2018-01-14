@@ -14,7 +14,6 @@
 function Stop-Polaris {
     [CmdletBinding()]
     param(
-        [PolarisCore.Polaris]
         $ServerContext = $script:Polaris )
 
     if ( $ServerContext ) {

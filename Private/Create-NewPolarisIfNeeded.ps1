@@ -1,6 +1,6 @@
 function CreateNewPolarisIfNeeded () {
     if ( -not $script:Polaris ) {
-        $script:Polaris = New-Object -TypeName PolarisCore.Polaris -ArgumentList @(
+        $script:Polaris = [Polaris]::New(
             [Action[string]] { param($str) Write-Verbose "$str" } )
     }
 }

@@ -1,4 +1,4 @@
-// A task runner that invokes Pester to run all Pester tests under the
+/ A task runner that invokes Pester to run all Pester tests under the
 // current workspace folder.
 // NOTE: This Test task runner requires an updated version of Pester (>=4.0.3)
 // in order for the problemMatcher to find failed test information (message, line, file).
@@ -34,7 +34,7 @@
     "windows": {
         "options": {
             "shell": {
-                "executable": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+                "executable": "C:\\Windows\\system32\\WindowsPowerShell\\v1.0\\powershell.exe",
                 "args": [
                     "-NoProfile",
                     "-ExecutionPolicy",
@@ -68,20 +68,6 @@
     },
     "tasks": [
         {
-            "label": "Clean",
-            "type": "shell",
-            "command": "Invoke-PSake build.ps1 -taskList Clean"
-        },
-        {
-            "label": "Build",
-            "type": "shell",
-            "command": "Invoke-PSake build.ps1 -taskList Build",
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            }
-        },
-        {
             "label": "Test",
             "type": "shell",
             "command": "Invoke-Pester -PesterOption @{IncludeVSCodeMarker=$true}",
@@ -92,11 +78,6 @@
             "problemMatcher": [
                 "$pester"
             ]
-        },
-        {
-            "label": "Publish",
-            "type": "shell",
-            "command": "Invoke-PSake build.ps1 -taskList Publish"
         }
     ]
 }

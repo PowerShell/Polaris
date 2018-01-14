@@ -1,1 +1,1 @@
-Import-Module ..\Polaris.psm1
+Import-Module $PSScriptRoot\..\Polaris.psm1

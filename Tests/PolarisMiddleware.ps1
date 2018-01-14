@@ -1,7 +1,7 @@
-Import-Module ..\Polaris.psm1
+Import-Module $PSScriptRoot\..\Polaris.psm1
 
 New-PolarisRoute -Path /helloworld -Method GET -ScriptBlock {
-    $Response.Send('Hello World');
+    $Response.Send('Hello World')
 }
 
 $Port = Get-Random -Minimum 7000 -Maximum 7999
