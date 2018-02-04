@@ -19,7 +19,7 @@ Describe "Test webserver use" {
         }
 
 
-        It "test /header router" {
+        It "test /header route" {
             $result = Invoke-WebRequest -Uri "http://localhost:$Port/header"
             $result.Content | Should Be 'Header test'
             $result.StatusCode | Should Be 200
