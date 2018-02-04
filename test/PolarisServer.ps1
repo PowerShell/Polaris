@@ -1,9 +1,4 @@
 
-# Support Headers
-New-PolarisRoute -Path /header -Method "GET" -ScriptBlock {
-    $response.SetHeader('Location','http://www.contoso.com/');
-    $response.Send("Header test");
-}
 if(-not (Test-Path -Path ..\Polaris.psm1)) {
     Write-Error -Message "Cannot find Polaris.psm1"
     return
