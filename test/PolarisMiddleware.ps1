@@ -1,4 +1,4 @@
-Import-Module ..\Polaris.psm1
+Import-Module "$PSScriptRoot\..\Polaris.psd1"
 
 New-PolarisRoute -Path /helloworld -Method GET -ScriptBlock {
     $Response.Send('Hello World');

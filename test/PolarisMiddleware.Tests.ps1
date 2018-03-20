@@ -1,6 +1,4 @@
-$here = Split-Path -Parent $MyInvocation.MyCommand.Path
-$sut = (Split-Path -Leaf $MyInvocation.MyCommand.Path).Replace(".Tests.", ".")
-. "$here\$sut"
+. "$PSScriptRoot\PolarisMiddleware.ps1"
 
 $JsonBodyParserMiddlerware = {
     if ($Request.BodyString -ne $null) {

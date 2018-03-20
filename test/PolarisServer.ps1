@@ -1,18 +1,18 @@
-
-if(-not (Test-Path -Path ..\Polaris.psm1)) {
-    Write-Error -Message "Cannot find Polaris.psm1"
-    return
-}
-
 # Import Polaris
-Import-Module -Name ..\Polaris.psm1
+Import-Module -Name "$PSScriptRoot\..\Polaris.psd1"
+
+# Support Headers
+New-PolarisRoute -Path /header -Method "GET" -ScriptBlock {
+    $response.SetHeader('Location','http://www.contoso.com/');
+    $response.Send("Header test");
+} -Force
 
 # Hello World passing in the Path, Method & ScriptBlock
 New-PolarisRoute -Path /helloworld -Method GET -ScriptBlock {
     Write-Host "This is Write-Host"
     Write-Information "This is Write-Information" -Tags Tag0
     $Response.Send('Hello World')
-}
+} -Force
 
 # Hello World passing in the Path, Method & ScriptBlock
 New-PolarisRoute -Path /hellome -Method GET -ScriptBlock {
@@ -21,7 +21,7 @@ New-PolarisRoute -Path /hellome -Method GET -ScriptBlock {
     } else {
         $Response.Send('Hello World')
     }
-}
+} -Force
 
 $sbWow = {
     $json = @{
@@ -33,26 +33,26 @@ $sbWow = {
 }
 
 # Supports helper functions for Get, Post, Put, Delete
-New-PolarisPostRoute -Path /wow -ScriptBlock $sbWow
+New-PolarisPostRoute -Path /wow -ScriptBlock $sbWow -Force
 
 # Pass in script file
-New-PolarisRoute -Path /example -Method GET -ScriptPath .\test.ps1
+New-PolarisRoute -Path /example -Method GET -ScriptPath "$PSScriptRoot\test.ps1" -Force
 
 # Also support static serving of a directory
-New-PolarisStaticRoute -FolderPath ./static -RoutePath /public
+New-PolarisStaticRoute -FolderPath "$PSScriptRoot/static" -RoutePath /public -Force
 
 New-PolarisPostRoute -Path /error -ScriptBlock {
     $params = @{}
     Write-Host "asdf"
     $request.body.psobject.properties | ForEach-Object { $params[$_.Name] = $_.Value }
     $response.Send("this should not show up in response")
-}
+} -Force
 
 # Support Headers
 New-PolarisRoute -Path /header -Method "GET" -ScriptBlock {
-    $response.SetHeader('Location','http://www.contoso.com/');
-    $response.Send("Header test");
-}
+    $response.SetHeader('Location','http://www.contoso.com/')
+    $response.Send("Header test")
+} -Force
 
 $Port = Get-Random -Minimum 8000 -Maximum 8999
 

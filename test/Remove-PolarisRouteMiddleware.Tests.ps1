@@ -3,7 +3,7 @@
     BeforeAll {
 
         #  Import Module
-        Import-Module ..\Polaris.psd1
+        Import-Module "$PSScriptRoot\..\Polaris.psd1"
 
         #  Define test function to reduce redundancy
         function Test-RemoveMiddleware
