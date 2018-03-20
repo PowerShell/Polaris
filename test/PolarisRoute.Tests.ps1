@@ -1,12 +1,10 @@
-$here = Split-Path -Parent $MyInvocation.MyCommand.Path
-$sut = (Split-Path -Leaf $MyInvocation.MyCommand.Path).Replace(".Tests.", ".")
-. "$here\$sut"
+. "$PSScriptRoot\PolarisRoute.ps1"
 
 $defaultScriptBlock = {
     $response.Send("test script");
 }
-$defaultScriptPath = './test.ps1';
-$defaultStaticDirectory = './static';
+$defaultScriptPath = "$PSScriptRoot/test.ps1";
+$defaultStaticDirectory = "$PSScriptRoot/static";
 
 function RouteExists ($Path, $Method) {
     return (Get-Polaris).ScriptBlockRoutes[$Path.TrimEnd('/').TrimStart('/')][$Method] -ne $null

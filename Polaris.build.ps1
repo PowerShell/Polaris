@@ -43,7 +43,7 @@ task SetupDotNet {
 
         # Download the official installation script and run it
         $installScriptPath = "$([System.IO.Path]::GetTempPath())dotnet-install.$installScriptExt"
-        Invoke-WebRequest "https://raw.githubusercontent.com/dotnet/cli/master/scripts/obtain/dotnet-install.$installScriptExt" -OutFile $installScriptPath
+        Invoke-WebRequest "https://raw.githubusercontent.com/dotnet/cli/master/scripts/obtain/dotnet-install.$installScriptExt" -OutFile $installScriptPath -UseBasicParsing
         $env:DOTNET_INSTALL_DIR = "$PSScriptRoot/.dotnet"
 
         if (!$script:IsUnix) {
@@ -101,12 +101,13 @@ task Test Build, {
     if ($PSVersionTable.PSEdition -ne "Core") {
         Install-Module Pester -Force -Scope CurrentUser
     }
-    cd .\test
+    Push-Location "$PSScriptRoot\test"
     $res = Invoke-Pester -OutputFormat NUnitXml -OutputFile TestsResults.xml -PassThru;
     if ($env:APPVEYOR) {
         (New-Object System.Net.WebClient).UploadFile("https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\TestsResults.xml));
     }
     if ($res.FailedCount -gt 0) { throw "$($res.FailedCount) tests failed."}
+    Pop-Location
 }
 
 # The default task is to run the entire CI build
