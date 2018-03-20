@@ -1,3 +1,7 @@
+image:
+- Visual Studio 2015
+- Ubuntu
+
 build: off
 
 # Version number
@@ -19,18 +23,23 @@ pull_requests:
   do_not_increment_build_number: true
 
 # Install NuGet to interact with the PowerShell Gallery
-install:
-- ps: mkdir C:\temp
-- ps: (New-Object System.Net.WebClient).DownloadFile("https://github.com/PowerShell/PowerShell/releases/download/v6.0.0-beta.8/PowerShell-6.0.0-beta.8-win-x64.msi", "C:\temp\powershell6.msi")
-- C:\temp\powershell6.msi /quiet
-- pushd C:\projects\polaris\PolarisCore
-- dotnet restore
-- dotnet build -f net451
+# install:
+# - ps: mkdir C:\temp
+# - ps: (New-Object System.Net.WebClient).DownloadFile("https://github.com/PowerShell/PowerShell/releases/download/v6.0.0-beta.8/PowerShell-6.0.0-beta.8-win-x64.msi", "C:\temp\powershell6.msi")
+# - C:\temp\powershell6.msi /quiet
+# - pushd C:\projects\polaris\PolarisCore
+# - dotnet restore
+# - dotnet build -f net451
 # Invoke Pester to run all of the unit tests, then save the results into XML in order to populate the AppVeyor tests section
 # If any of the tests fail, consider the pipeline failed
 test_script:
   - ps: |
         Install-Module InvokeBuild
+        Install-Module Pester
+        Invoke-Build
+  - pwsh: |
+        Install-Module InvokeBuild
+        Install-Module Pester
         Invoke-Build
 
 notifications:

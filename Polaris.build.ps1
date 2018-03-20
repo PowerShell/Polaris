@@ -97,10 +97,6 @@ task Build Restore, {
 }
 
 task Test Build, {
-    # TODO: Add tests
-    if ($PSVersionTable.PSEdition -ne "Core") {
-        Install-Module Pester -Force -Scope CurrentUser
-    }
     Push-Location "$PSScriptRoot\test"
     $res = Invoke-Pester -OutputFormat NUnitXml -OutputFile TestsResults.xml -PassThru;
     if ($env:APPVEYOR) {
