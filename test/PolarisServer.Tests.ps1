@@ -14,8 +14,7 @@ Describe "Test webserver use" {
             $result.StatusCode | Should Be 200
         }
 
-
-        It "test /header router" {
+        It "test /header route" {
             $result = Invoke-WebRequest -Uri "http://localhost:$Port/header" -UseBasicParsing
             $result.Content | Should Be 'Header test'
             $result.StatusCode | Should Be 200

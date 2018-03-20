@@ -13,8 +13,8 @@ New-PolarisRoute -Path /helloworld -Method GET -ScriptBlock {
 
 # Query Parameters are supported
 New-PolarisRoute -Path /hellome -Method GET -ScriptBlock {
-    if ($request.QueryParameters['name']) {
-        $response.Send('Hello ' + $request.QueryParameters['name'])
+    if ($request.Query['name']) {
+        $response.Send('Hello ' + $request.Query['name'])
     } else {
         $response.Send('Hello World')
     }
