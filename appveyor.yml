@@ -34,12 +34,12 @@ pull_requests:
 # If any of the tests fail, consider the pipeline failed
 test_script:
   - ps: |
-        Install-Module InvokeBuild -Scope CurrentUser
-        Install-Module Pester -Scope CurrentUser
+        Install-Module InvokeBuild -Scope CurrentUser -Force
+        Install-Module Pester -Scope CurrentUser -Force
         Invoke-Build
   - pwsh: |
-        Install-Module InvokeBuild -Scope CurrentUser
-        Install-Module Pester -Scope CurrentUser
+        Install-Module InvokeBuild -Scope CurrentUser -Force
+        Install-Module Pester -Scope CurrentUser -Force
         Invoke-Build
 
 notifications:
