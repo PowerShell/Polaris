@@ -37,10 +37,6 @@ test_script:
         Install-Module InvokeBuild -Scope CurrentUser -Force
         Install-Module Pester -Scope CurrentUser -Force
         Invoke-Build
-  - pwsh: |
-        Install-Module InvokeBuild -Scope CurrentUser -Force
-        Install-Module Pester -Scope CurrentUser -Force
-        Invoke-Build
 
 notifications:
   - provider: Webhook
