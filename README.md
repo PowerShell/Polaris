@@ -30,7 +30,8 @@ Polaris' differentiation is that it is cross-platform and uses the .NET HttpList
 ## Getting Started
 
 ### Prereqs
-* [.NET Standard 2.0 SDK](https://www.microsoft.com/net/download/core) or .NET Framework 4.5.1
+* [.NET Standard 2.0 SDK](https://www.microsoft.com/net/download/core)
+* If you're on Windows, you'll also need the [.NET Framework 4.5.1 Developer Pack](https://www.microsoft.com/en-us/download/details.aspx?id=40772)
 * [PowerShell](https://github.com/powershell/powershell)
 
 ### Steps
