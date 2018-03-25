@@ -33,11 +33,11 @@ Polaris' differentiation is that it is cross-platform and uses the .NET HttpList
 * [.NET Standard 2.0 SDK](https://www.microsoft.com/net/download/core)
 * If you're on Windows, you'll also need the [.NET Framework 4.5.1 Developer Pack](https://www.microsoft.com/en-us/download/details.aspx?id=40772)
 * [PowerShell](https://github.com/powershell/powershell)
+* InvokeBuild (`Install-Module InvokeBuild`)
 
 ### Steps
 1. Clone or download the zip of the repo
 1. Open [PowerShell](https://github.com/powershell/powershell)
-1. run `Install-Module InvokeBuild`
 1. run `Invoke-Build Build`
 
 At this point, you can now run `Import-Module ./Polaris.psm1` to start using Polaris! Checkout [the wiki](https://github.com/PowerShell/Polaris/wiki) for more usage!
