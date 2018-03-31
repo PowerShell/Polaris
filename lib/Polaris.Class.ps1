@@ -202,19 +202,19 @@ class Polaris {
                         # Handle logs
                         if ($request.Query -and $request.Query[$syncHash.Polaris.GetLogsString]) {
                             $syncHash.Polaris.Log(($request.Query[$syncHash.Polaris.GetLogsString] | ConvertTo-Json -Depth 3 | Out-String))
-                            $informationBody = "\n"
+                            $informationBody = "`n"
                             for ([int] $i = 0; $i -lt $PowerShellInstance.Streams.Information.Count; $i++) {
                                 foreach ($tag in $PowerShellInstance.Streams.Information[$i].Tags) {
                                     $informationBody += "[" + $tag + "]"
                                 }
 
-                                $informationBody += $PowerShellInstance.Streams.Information[$i].MessageData.ToString() + "\n"
+                                $informationBody += $PowerShellInstance.Streams.Information[$i].MessageData.ToString() + "`n"
                             }
-                            $informationBody += "\n"
+                            $informationBody += "`n"
 
                             # Set response to the logs and the actual response (could be errors)
                             $logBytes = [System.Text.Encoding]::UTF8.GetBytes($informationBody)
-                            $bytes = [byte]($logBytes.Length + $response.ByteResponse.Length)
+                            $bytes = [byte[]]::new($logBytes.Length + $response.ByteResponse.Length)
                             $logBytes.CopyTo($bytes, 0)
                             $response.ByteResponse.CopyTo($bytes, $logBytes.Length)
                             $response.ByteResponse = $bytes
