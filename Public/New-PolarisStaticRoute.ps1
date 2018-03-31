@@ -104,7 +104,7 @@ function New-PolarisStaticRoute {
 "@
             $Files = (Get-ChildItem "$Path")
             foreach ($File in $Files) {
-                $FileURL = ($File.FullName -replace [regex]::Escape($Root), "" ) -replace "\\", "/"
+                $FileURL = $RoutePath + ($File.FullName -replace [regex]::Escape($Root), "" ) -replace "\\", "/"
                 if (!$File.Length) { $FileLength = "[dir]" } else { $FileLength = $File.Length }
                 @"
         <tr>
