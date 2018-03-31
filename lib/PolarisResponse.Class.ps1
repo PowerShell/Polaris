@@ -32,6 +32,6 @@ class PolarisResponse {
     }
     
     static [string] GetContentType([string] $path) {
-        return [System.Web.MimeMapping]::GetMimeMapping($path)
+        return [Polaris.MimeTypes]::GetMimeType($path)
     }
 }

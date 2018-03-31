@@ -135,7 +135,7 @@ function New-PolarisStaticRoute {
             }
             else {
                 $Content = [System.IO.File]::ReadAllBytes($FullPath)
-                $response.ContentType = [System.Web.MimeMapping]::GetMimeMapping($FullPath)
+                $response.ContentType = [Polaris.MimeTypes]::GetMimeType($FullPath)
                 $Response.SendBytes($Content)
             }
         }
