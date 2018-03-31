@@ -1,9 +1,4 @@
 
-# Support Headers
-New-PolarisRoute -Path /header -Method "GET" -ScriptBlock {
-    $response.SetHeader('Location', 'http://www.contoso.com/')
-    $response.Send("Header test")
-}
 if (-not (Test-Path -Path $PSScriptRoot\..\Polaris.psm1)) {
     Write-Error -Message "Cannot find Polaris.psm1"
     return
@@ -11,6 +6,12 @@ if (-not (Test-Path -Path $PSScriptRoot\..\Polaris.psm1)) {
 
 # Import Polaris
 Import-Module -Name $PSScriptRoot\..\Polaris.psm1
+
+# Support Headers
+New-PolarisRoute -Path /header -Method "GET" -ScriptBlock {
+    $response.SetHeader('Location', 'http://www.contoso.com/')
+    $response.Send("Header test")
+}
 
 # Hello World passing in the Path, Method & ScriptBlock
 New-PolarisRoute -Path /helloworld -Method GET -ScriptBlock {
