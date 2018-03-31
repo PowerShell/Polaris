@@ -2,53 +2,26 @@ class PolarisRequest {
     
     [object] $Body
     [string] $BodyString
+    [System.Collections.Specialized.NameValueCollection] $Query
+    [string[]] $AcceptTypes
+    [System.Net.CookieCollection] $Cookies
+    [System.Collections.Specialized.NameValueCollection] $Headers
+    [string] $Method
+    [uri] $Url
+    [string] $UserAgent
 
     hidden [System.Net.HttpListenerRequest] $RawRequest
 
     PolarisRequest([System.Net.HttpListenerRequest] $rawRequest) {
         $this.RawRequest = $rawRequest
         $this.BodyString = [System.IO.StreamReader]::new($rawRequest.InputStream).ReadToEnd()
-        $this | Add-Member -MemberType ScriptProperty -Name AcceptTypes -Value `
-        {
-            # Get
-            return $this.RawRequest.AcceptTypes; 
-        }
-
-        $this | Add-Member -MemberType ScriptProperty -Name Cookies -Value `
-        {
-            # Get
-            return $this.RawRequest.Cookies
-        }
-
-        $this | Add-Member -MemberType ScriptProperty -Name Headers -Value `
-        { 
-            # Get 
-            return $this.RawRequest.Headers 
-        }
-
-        $this | Add-Member -MemberType ScriptProperty -Name Method -Value `
-        {
-            # Get
-            return $this.RawRequest.HttpMethod
-        }
-
-        $this | Add-Member -MemberType ScriptProperty -Name Query -Value `
-        {
-            # Get
-            return [System.Collections.Specialized.NameValueCollection]($this.RawRequest.QueryString)
-        }
-
-        $this | Add-Member -MemberType ScriptProperty -Name Url -Value `
-        {
-            # Get
-            return $this.RawRequest.Url
-        }
-
-        $this | Add-Member -MemberType ScriptProperty -Name UserAgent -Value `
-        {
-            # Get
-            return $this.RawRequest.UserAgent
-        }
+        $this.AcceptTypes = $this.RawRequest.AcceptTypes
+        $this.Cookies = $this.RawRequest.Cookies
+        $this.Headers = $this.RawRequest.Headers 
+        $this.Method = $this.RawRequest.HttpMethod
+        $this.Query = $this.RawRequest.QueryString
+        $this.Url = $this.RawRequest.Url
+        $this.UserAgent = $this.RawRequest.UserAgent
     }
 }
 
