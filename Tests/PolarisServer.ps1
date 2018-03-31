@@ -48,10 +48,10 @@ New-PolarisRoute -Path /example -Method GET -ScriptPath $PSScriptRoot\test.ps1
 # Also support static serving of a directory
 New-PolarisStaticRoute -FolderPath $PSScriptRoot/static -RoutePath /public
 
-New-PolarisPostRoute -Path /error -ScriptBlock {
+New-PolarisGetRoute -Path /error -ScriptBlock {
     $params = @{}
     Write-Host "asdf"
-    $request.body.psobject.properties | ForEach-Object { $params[$_.Name] = $_.Value }
+    throw "Error"
     $response.Send("this should not show up in response")
 }
 

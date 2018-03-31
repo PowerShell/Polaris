@@ -113,6 +113,8 @@ class Polaris {
     [void] Stop() {
         $this.StopServer = $true
         $this.PowerShellPool.Close()
+        $this.Listener.Close()
+        $this.Listener.Dispose()
         $this.Log("Server Stopped.")
     }
 
@@ -170,34 +172,44 @@ class Polaris {
                         $syncHash.Polaris.Log("Request Method: $($rawRequest.HttpMethod)")
                         try {
                             $PowerShellInstance.AddScript($syncHash.Polaris.ScriptBlockRoutes[$route][$rawRequest.HttpMethod])
+                            $syncHash.Polaris.Log("Executing: $($syncHash.Polaris.ScriptBlockRoutes[$route][$rawRequest.HttpMethod])")
                         }
                         catch {
-                            $FirstMatchingRoute = $syncHash.Polaris.ScriptBlockRoutes.where( {$route -match $_.Key})[0]
-                            $Script = $syncHash.Polaris.ScriptBlockRoutes[$FirstMatchingRoute.Keys[0]][$rawRequest.HttpMethod]
-                            $PowerShellInstance.AddScript($Script) 
+                            $FirstMatchingRoute = $syncHash.Polaris.ScriptBlockRoutes.keys.where( {$route -match $_})[0]
+                            $Script = $syncHash.Polaris.ScriptBlockRoutes[$FirstMatchingRoute][$rawRequest.HttpMethod]
+                            $PowerShellInstance.AddScript($Script)
+                            $syncHash.Polaris.Log("Executing: $Script")
                         }
-                        $PowerShellInstance.Invoke()
-                        # Handle errors
-                        if ($PowerShellInstance.InvocationStateInfo.State -eq [System.Management.Automation.PSInvocationState]::Failed) {
-                            $syncHash.Polaris.Log($PowerShellInstance.InvocationStateInfo.Reason.ToString())
-                            $response.Send($PowerShellInstance.InvocationStateInfo.Reason.ToString())
-                            $response.SetStatusCode(500)
+
+
+                        try {
+                            $PowerShellInstance.Invoke()
                         }
-                        elseif ($PowerShellInstance.Streams.Error.Count) {
-                            $errorsBody = "\n"
-                            if ($PowerShellInstance.Streams.Error.Count) {
-                                for ([int] $i = 0; $i -lt $PowerShellInstance.Streams.Error.Count; $i++) {
-                                    $errorsBody += "[" + $i + "]:\n"
-                                    $errorsBody += $PowerShellInstance.Streams.Error[$i].Exception.ToString()
-                                    $errorsBody += $PowerShellInstance.Streams.Error[$i].InvocationInfo.PositionMessage + "\n\n"
-                                }
+                        catch {
+                            # Handle errors
+                            if ($PowerShellInstance.InvocationStateInfo.State -eq [System.Management.Automation.PSInvocationState]::Failed) {
+                                $syncHash.Polaris.Log($PowerShellInstance.InvocationStateInfo.Reason.ToString())
+                                $response.Send($PowerShellInstance.InvocationStateInfo.Reason.ToString())
+                                $response.SetStatusCode(500)
                             }
+                            elseif ($PowerShellInstance.Streams.Error.Count) {
+                                $errorsBody = "`n"
+                                if ($PowerShellInstance.Streams.Error.Count) {
+                                    for ([int] $i = 0; $i -lt $PowerShellInstance.Streams.Error.Count; $i++) {
+                                        $errorsBody += "[" + $i + "]:`n"
+                                        $errorsBody += $PowerShellInstance.Streams.Error[$i].Exception.ToString()
+                                        $errorsBody += $PowerShellInstance.Streams.Error[$i].InvocationInfo.PositionMessage + "`n`n"
+                                    }
+                                }
                             
-                            $response.Send($errorsBody)
-                            $syncHash.Polaris.Log(($PowerShellInstance | ConvertTo-Json -Depth 3 | Out-String))
-                            $response.SetStatusCode(500)
+                                $response.Send($errorsBody)
+                                $syncHash.Polaris.Log(($PowerShellInstance | ConvertTo-Json -Depth 3 | Out-String))
+                                $response.SetStatusCode(500)
+                            }
                         }
-                      
+                        
+                        
+                        $syncHash.Polaris.Log("Invocation Info: $($PowerShellInstance.InvocationStateInfo.State)")
                         $syncHash.Polaris.Log(($PowerShellInstance.Streams | ConvertTo-Json -Depth 3 | Out-String))
                         # Handle logs
                         if ($request.Query -and $request.Query[$syncHash.Polaris.GetLogsString]) {
