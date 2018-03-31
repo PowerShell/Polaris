@@ -166,47 +166,50 @@ class Polaris {
                         }
                         $syncHash.Polaris.Log("Parsed Route: $Route")
                         $syncHash.Polaris.Log("Request Method: $($rawRequest.HttpMethod)")
-                        try {
-                            $PowerShellInstance.AddScript($syncHash.Polaris.ScriptBlockRoutes[$route][$rawRequest.HttpMethod])
-                            $syncHash.Polaris.Log("Executing: $($syncHash.Polaris.ScriptBlockRoutes[$route][$rawRequest.HttpMethod])")
-                        }
-                        catch {
-                            $FirstMatchingRoute = $syncHash.Polaris.ScriptBlockRoutes.keys.where( {$route -match $_})[0]
-                            $Script = $syncHash.Polaris.ScriptBlockRoutes[$FirstMatchingRoute][$rawRequest.HttpMethod]
-                            $PowerShellInstance.AddScript($Script)
-                            $syncHash.Polaris.Log("Executing: $Script")
+                        $Routes = $syncHash.Polaris.ScriptBlockRoutes
+                        $MatchingRoute = $Routes.keys.where( {$route -match $_})[0]
+     
+                        if ($MatchingRoute) {
+                            $MatchingMethod = $Routes[$MatchingRoute].Keys -contains $request.Method
                         }
 
-
-                        try {
-                            $PowerShellInstance.Invoke()
-                        }
-                        catch {
-                            # Handle errors
-                            if ($PowerShellInstance.InvocationStateInfo.State -eq [System.Management.Automation.PSInvocationState]::Failed) {
-                                $syncHash.Polaris.Log($PowerShellInstance.InvocationStateInfo.Reason.ToString())
-                                $response.Send($PowerShellInstance.InvocationStateInfo.Reason.ToString())
-                                $response.SetStatusCode(500)
+                        if ($MatchingRoute -and $MatchingMethod) {
+                            try {
+                                $PowerShellInstance.AddScript($Routes[$MatchingRoute][$request.Method])
+                                $PowerShellInstance.Invoke()
                             }
-                            elseif ($PowerShellInstance.Streams.Error.Count) {
-                                $errorsBody = "`n"
-                                if ($PowerShellInstance.Streams.Error.Count) {
-                                    for ([int] $i = 0; $i -lt $PowerShellInstance.Streams.Error.Count; $i++) {
-                                        $errorsBody += "[" + $i + "]:`n"
-                                        $errorsBody += $PowerShellInstance.Streams.Error[$i].Exception.ToString()
-                                        $errorsBody += $PowerShellInstance.Streams.Error[$i].InvocationInfo.PositionMessage + "`n`n"
-                                    }
+                            catch {
+                                # Handle errors
+                                if ($PowerShellInstance.InvocationStateInfo.State -eq [System.Management.Automation.PSInvocationState]::Failed) {
+                                    $syncHash.Polaris.Log($PowerShellInstance.InvocationStateInfo.Reason.ToString())
+                                    $response.Send($PowerShellInstance.InvocationStateInfo.Reason.ToString())
+                                    $response.SetStatusCode(500)
                                 }
+                                elseif ($PowerShellInstance.Streams.Error.Count) {
+                                    $errorsBody = "`n"
+                                    if ($PowerShellInstance.Streams.Error.Count) {
+                                        for ([int] $i = 0; $i -lt $PowerShellInstance.Streams.Error.Count; $i++) {
+                                            $errorsBody += "[" + $i + "]:`n"
+                                            $errorsBody += $PowerShellInstance.Streams.Error[$i].Exception.ToString()
+                                            $errorsBody += $PowerShellInstance.Streams.Error[$i].InvocationInfo.PositionMessage + "`n`n"
+                                        }
+                                    }
                             
-                                $response.Send($errorsBody)
-                                $syncHash.Polaris.Log(($PowerShellInstance | ConvertTo-Json -Depth 3 | Out-String))
-                                $response.SetStatusCode(500)
+                                    $response.Send($errorsBody)
+                                    $syncHash.Polaris.Log(($PowerShellInstance | ConvertTo-Json -Depth 3 | Out-String))
+                                    $response.SetStatusCode(500)
+                                }
                             }
                         }
+                        elseif ($MatchingRoute) {
+                            $response.Send("Method not allowed")
+                            $response.SetStatusCode(405)
+                        }
+                        else {
+                            $response.send("Not found")
+                            $response.SetStatusCode(404)
+                        }
                         
-                        
-                        $syncHash.Polaris.Log("Invocation Info: $($PowerShellInstance.InvocationStateInfo.State)")
-                        $syncHash.Polaris.Log(($PowerShellInstance.Streams | ConvertTo-Json -Depth 3 | Out-String))
                         # Handle logs
                         if ($request.Query -and $request.Query[$syncHash.Polaris.GetLogsString]) {
                             $syncHash.Polaris.Log(($request.Query[$syncHash.Polaris.GetLogsString] | ConvertTo-Json -Depth 3 | Out-String))
@@ -234,12 +237,6 @@ class Polaris {
                         $rawResponse.OutputStream.Write($response.byteResponse, 0, $response.byteResponse.Length);
                         $rawResponse.OutputStream.Close();
                             
-                    }
-                    catch [System.Collections.Generic.KeyNotFoundException] {
-               
-                        ($syncHash.Polaris.GetType())::Send($rawResponse, [System.Text.Encoding]::UTF8.GetBytes("Not Found"), 404, "text/plain; charset=UTF-8")
-                        $syncHash.Polaris.Log("404 Not Found")
-                
                     }
                     catch {
                         $syncHash.Polaris.Log(($_ | out-string))

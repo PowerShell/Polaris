@@ -55,6 +55,24 @@ Hello World"
             $result.wow | Should Be $true
         }
 
+        It "test GET to /wow route" {
+            try {
+                Invoke-RestMethod -Uri "http://localhost:$Port/wow" -Method GET
+            }
+            catch {
+                $_.Exception.Response.StatusCode.value__ | Should Be 405
+            }
+        }
+
+        It "test GET to /IDontExist route" {
+            try {
+                Invoke-RestMethod -Uri "http://localhost:$Port/IDontExist" -Method POST
+            }
+            catch {
+                $_.Exception.Response.StatusCode.value__ | Should Be 404
+            }
+        }
+
         It "test /example route" {
             $result = Invoke-WebRequest -Uri "http://localhost:$Port/example" -UseBasicParsing
             $result.Content | Should Be 'test file'
@@ -75,6 +93,10 @@ Hello World"
         }
 
         It "test /error route that returns 500" {
+            { Invoke-WebRequest -Uri "http://localhost:$Port/error" -UseBasicParsing } | Should Throw
+        }
+
+        It "test POST to /error route that returns 500" {
             { Invoke-WebRequest -Uri "http://localhost:$Port/error" -UseBasicParsing } | Should Throw
         }
 
