@@ -89,8 +89,6 @@ class Polaris {
         1..$maxRunspaces | foreach {
 
             $newRunspace = [runspacefactory]::CreateRunspace()
-            $newRunspace.ApartmentState = "STA"
-            $newRunspace.ThreadOptions = "ReuseThread"
             $newRunspace.Open()
             $newRunspace.SessionStateProxy.SetVariable("syncHash", $syncHash)
 
@@ -157,8 +155,6 @@ class Polaris {
                         $PowerShellInstance.AddParameter("res", $response)
 
                         $newRunspace = [runspacefactory]::CreateRunspace()
-                        $newRunspace.ApartmentState = "STA"
-                        $newRunspace.ThreadOptions = "ReuseThread"
                         $newRunspace.Open()
                         $newRunspace.SessionStateProxy.SetVariable("syncHash", $syncHash)
 
