@@ -1,0 +1,15 @@
+
+# Created by https://www.gitignore.io/api/powershell
+
+### PowerShell ###
+# Exclude packaged modules
+*.zip
+
+# Exclude .NET assemblies from source
+*.dll
+
+
+# End of https://www.gitignore.io/api/powershell
+
+# Pester output
+test/TestsResults.xml
