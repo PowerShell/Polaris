@@ -75,37 +75,9 @@ class Polaris {
     ) {
         $this.StopServer = $false
 
-        $this.PowerShellPool = [RunspaceFactory]::CreateRunspacePool($minRunspaces, $maxRunspaces)
-        $this.PowerShellPool.Open()
         $this.Listener = $this.InitListener($port)
 
-        $syncHash = [hashtable]::Synchronized(@{})
-        $syncHash.Listener = $this.Listener
-        $syncHash.Runspaces = @()
-        $syncHash.Polaris = $this
-
-        $this.PowerShellPool
-
-        1..$maxRunspaces | foreach {
-
-            $newRunspace = [runspacefactory]::CreateRunspace()
-            $newRunspace.ApartmentState = "STA"
-            $newRunspace.ThreadOptions = "ReuseThread"
-            $newRunspace.Open()
-            $newRunspace.SessionStateProxy.SetVariable("syncHash", $syncHash)
-
-            $PowerShell = [powershell]::Create()
-            $PowerShell.Runspace = $newRunspace
-
-            $Classes = @( Get-ChildItem -Path $PSScriptRoot\*.ps1 -ErrorAction SilentlyContinue | where {$_.Name -ne "Polaris.Class.ps1"})
-            $Classes += @( Get-ChildItem -Path $PSScriptRoot\Polaris.Class.ps1 -ErrorAction SilentlyContinue )
-            $Classes | foreach {
-                $PowerShell.AddScript(". $($_.FullName)")
-            }
-            $PowerShell.AddScript($this.ListenerLoop())
-            $PowerShell.BeginInvoke() | Out-Null
-            $syncHash.Runspaces += $newRunspace
-        }
+        $this.ListenerLoop()
 
         $this.Log("App listening on Port: " + $port + "!")
     }
@@ -116,134 +88,128 @@ class Polaris {
         $this.Log("Server Stopped.")
     }
 
-    [scriptblock]ListenerLoop() {
-        return ( {
-                while (-not $syncHash.Polaris.StopServer) {
-                    [System.Net.HttpListenerContext] $context = $null
-                    try {
-                        $context = $syncHash.Listener.GetContext()
-                    }
-                    catch [System.ObjectDisposedException] {
-                        throw "Object disposed"
-                    }
-                    catch {
-                    }
+    [void] ListenerLoop() {
 
-                    if ($synchash.Polaris.StopServer -or $context -eq $null) {
-                        if ($syncHash.ListenerListener -ne $null) {
-                            $SyncHash.Listener.Close()
-                        }
-                        break
-                    }
+        $PolarisCore = [Polaris.PolarisCore]::new()
+        $PolarisCore.Start($this.Listener)
+        Register-ObjectEvent -InputObject $PolarisCore -EventName "myEvent" -Action {
+            param(
+                [System.Net.HttpListenerContext]$context
+            )
 
-                    [System.Net.HttpListenerRequest] $rawRequest = $context.Request
-                    [System.Net.HttpListenerResponse] $rawResponse = $context.Response
-
-                    $syncHash.Polaris.Log("request came in: " + $rawRequest.HttpMethod + " " + $rawRequest.RawUrl)
-
-                    [PolarisRequest] $request = [PolarisRequest]::new($rawRequest)
-                    [PolarisResponse] $response = [PolarisResponse]::new()
-
-                    
-                    [string] $route = $rawRequest.Url.AbsolutePath.TrimEnd('/').TrimStart('/')
-                    [PowerShell] $PowerShellInstance = [PowerShell]::Create()
-                    $PowerShellInstance.RunspacePool = $syncHash.Polaris.PowerShellPool
-                    try {
-                        # Set up PowerShell instance by making request and response global
-                        $PowerShellInstance.AddScript([PolarisHelperScripts]::InitializeRequestAndResponseScript()) | Out-Null
-                        $PowerShellInstance.AddParameter("req", $request)
-                        $PowerShellInstance.AddParameter("res", $response)
-
-                        $newRunspace = [runspacefactory]::CreateRunspace()
-                        $newRunspace.ApartmentState = "STA"
-                        $newRunspace.ThreadOptions = "ReuseThread"
-                        $newRunspace.Open()
-                        $newRunspace.SessionStateProxy.SetVariable("syncHash", $syncHash)
-
-                        $PowerShellInstance.Runspace = $newRunspace
-
-                        # Run middleware in the order in which it was added
-                        foreach ($middleware in $syncHash.Polaris.RouteMiddleware) {
-                            $PowerShellInstance.AddScript($middleware.ScriptBlock)
-                        }
-                        $syncHash.Polaris.Log("Parsed Route: $Route")
-                        $syncHash.Polaris.Log("Request Method: $($rawRequest.HttpMethod)")
-                        try {
-                            $PowerShellInstance.AddScript($syncHash.Polaris.ScriptBlockRoutes[$route][$rawRequest.HttpMethod])
-                        }
-                        catch {
-                            $FirstMatchingRoute = $syncHash.Polaris.ScriptBlockRoutes.where( {$route -match $_.Key})[0]
-                            $Script = $syncHash.Polaris.ScriptBlockRoutes[$FirstMatchingRoute.Keys[0]][$rawRequest.HttpMethod]
-                            $PowerShellInstance.AddScript($Script) 
-                        }
-                        $PowerShellInstance.Invoke()
-                        # Handle errors
-                        if ($PowerShellInstance.InvocationStateInfo.State -eq [System.Management.Automation.PSInvocationState]::Failed) {
-                            $syncHash.Polaris.Log($PowerShellInstance.InvocationStateInfo.Reason.ToString())
-                            $response.Send($PowerShellInstance.InvocationStateInfo.Reason.ToString())
-                            $response.SetStatusCode(500)
-                        }
-                        elseif ($PowerShellInstance.Streams.Error.Count) {
-                            $errorsBody = "\n"
-                            if ($PowerShellInstance.Streams.Error.Count) {
-                                for ([int] $i = 0; $i -lt $PowerShellInstance.Streams.Error.Count; $i++) {
-                                    $errorsBody += "[" + $i + "]:\n"
-                                    $errorsBody += $PowerShellInstance.Streams.Error[$i].Exception.ToString()
-                                    $errorsBody += $PowerShellInstance.Streams.Error[$i].InvocationInfo.PositionMessage + "\n\n"
-                                }
-                            }
-                            
-                            $response.Send($errorsBody)
-                            $syncHash.Polaris.Log(($PowerShellInstance | ConvertTo-Json -Depth 3 | Out-String))
-                            $response.SetStatusCode(500)
-                        }
-                      
-                        $syncHash.Polaris.Log(($PowerShellInstance.Streams | ConvertTo-Json -Depth 3 | Out-String))
-                        # Handle logs
-                        if ($request.Query -and $request.Query[$syncHash.Polaris.GetLogsString]) {
-                            $syncHash.Polaris.Log(($request.Query[$syncHash.Polaris.GetLogsString] | ConvertTo-Json -Depth 3 | Out-String))
-                            $informationBody = "`n"
-                            for ([int] $i = 0; $i -lt $PowerShellInstance.Streams.Information.Count; $i++) {
-                                foreach ($tag in $PowerShellInstance.Streams.Information[$i].Tags) {
-                                    $informationBody += "[" + $tag + "]"
-                                }
-
-                                $informationBody += $PowerShellInstance.Streams.Information[$i].MessageData.ToString() + "`n"
-                            }
-                            $informationBody += "`n"
-
-                            # Set response to the logs and the actual response (could be errors)
-                            $logBytes = [System.Text.Encoding]::UTF8.GetBytes($informationBody)
-                            $bytes = [byte[]]::new($logBytes.Length + $response.ByteResponse.Length)
-                            $logBytes.CopyTo($bytes, 0)
-                            $response.ByteResponse.CopyTo($bytes, $logBytes.Length)
-                            $response.ByteResponse = $bytes
-                        }
-                        $rawResponse.StatusCode = $response.statusCode;
-                        $rawResponse.Headers = $response.Headers;
-                        $rawResponse.ContentType = $response.contentType;
-                        $rawResponse.ContentLength64 = $response.byteResponse.Length;
-                        $rawResponse.OutputStream.Write($response.byteResponse, 0, $response.byteResponse.Length);
-                        $rawResponse.OutputStream.Close();
-                            
-                    }
-                    catch [System.Collections.Generic.KeyNotFoundException] {
-               
-                        ($syncHash.Polaris.GetType())::Send($rawResponse, [System.Text.Encoding]::UTF8.GetBytes("Not Found"), 404, "text/plain; charset=UTF-8")
-                        $syncHash.Polaris.Log("404 Not Found")
-                
-                    }
-                    catch {
-                        $syncHash.Polaris.Log(($_ | out-string))
-                        $syncHash.Polaris.Log(($PowerShellInstance.Commands | Format-List * | Out-String))
-                        $response.SetStatusCode(500)
-                        $response.Send($_)
-                        $response.Close()
-                        throw $_
-                    }
-        
+            if ($this.StopServer -or $context -eq $null) {
+                if ($this.Listener -ne $null) {
+                    $this.Listener.Close()
                 }
-            })
+                break
+            }
+
+            [System.Net.HttpListenerRequest] $rawRequest = $context.Request
+            [System.Net.HttpListenerResponse] $rawResponse = $context.Response
+
+            $this.Log("request came in: " + $rawRequest.HttpMethod + " " + $rawRequest.RawUrl)
+
+            [PolarisRequest] $request = [PolarisRequest]::new($rawRequest)
+            [PolarisResponse] $response = [PolarisResponse]::new()
+
+            [string] $route = $rawRequest.Url.AbsolutePath.TrimEnd('/').TrimStart('/')
+            [PowerShell] $PowerShellInstance = [PowerShell]::Create()
+            $PowerShellInstance.RunspacePool = $this.PowerShellPool
+            try {
+                # Set up PowerShell instance by making request and response global
+                $PowerShellInstance.AddScript([PolarisHelperScripts]::InitializeRequestAndResponseScript()) | Out-Null
+                $PowerShellInstance.AddParameter("req", $request)
+                $PowerShellInstance.AddParameter("res", $response)
+
+                $newRunspace = [runspacefactory]::CreateRunspace()
+                $newRunspace.ApartmentState = "STA"
+                $newRunspace.ThreadOptions = "ReuseThread"
+                $newRunspace.Open()
+                $newRunspace.SessionStateProxy.SetVariable("syncHash", $syncHash)
+
+                $PowerShellInstance.Runspace = $newRunspace
+
+                # Run middleware in the order in which it was added
+                foreach ($middleware in $this.RouteMiddleware) {
+                    $PowerShellInstance.AddScript($middleware.ScriptBlock)
+                }
+                $Polaris.Log("Parsed Route: $Route")
+                $Polaris.Log("Request Method: $($rawRequest.HttpMethod)")
+                try {
+                    $PowerShellInstance.AddScript($this.ScriptBlockRoutes[$route][$rawRequest.HttpMethod])
+                }
+                catch {
+                    $FirstMatchingRoute = $this.ScriptBlockRoutes.where( {$route -match $_.Key})[0]
+                    $Polaris.Log("First Matching Route Keys: $( $FirstMatchingRoute.Keys)")
+                    $Script = $this.ScriptBlockRoutes[$FirstMatchingRoute.Keys[0]][$rawRequest.HttpMethod]
+                    $PowerShellInstance.AddScript($Script) 
+                }
+                $PowerShellInstance.Invoke()
+                # Handle errors
+                if ($PowerShellInstance.InvocationStateInfo.State -eq [System.Management.Automation.PSInvocationState]::Failed) {
+                    $this.Log($PowerShellInstance.InvocationStateInfo.Reason.ToString())
+                    $response.Send($PowerShellInstance.InvocationStateInfo.Reason.ToString())
+                    $response.SetStatusCode(500)
+                }
+                elseif ($PowerShellInstance.Streams.Error.Count) {
+                    $errorsBody = "\n"
+                    if ($PowerShellInstance.Streams.Error.Count) {
+                        for ([int] $i = 0; $i -lt $PowerShellInstance.Streams.Error.Count; $i++) {
+                            $errorsBody += "[" + $i + "]:\n"
+                            $errorsBody += $PowerShellInstance.Streams.Error[$i].Exception.ToString()
+                            $errorsBody += $PowerShellInstance.Streams.Error[$i].InvocationInfo.PositionMessage + "\n\n"
+                        }
+                    }
+                    
+                    $response.Send($errorsBody)
+                    $this.Log(($PowerShellInstance | ConvertTo-Json -Depth 3 | Out-String))
+                    $response.SetStatusCode(500)
+                }
+                
+                $this.Log(($PowerShellInstance.Streams | ConvertTo-Json -Depth 3 | Out-String))
+                # Handle logs
+                if ($request.Query -and $request.Query[$this.GetLogsString]) {
+                    $this.Log(($request.Query[$this.GetLogsString] | ConvertTo-Json -Depth 3 | Out-String))
+                    $informationBody = "`n"
+                    for ([int] $i = 0; $i -lt $PowerShellInstance.Streams.Information.Count; $i++) {
+                        foreach ($tag in $PowerShellInstance.Streams.Information[$i].Tags) {
+                            $informationBody += "[" + $tag + "]"
+                        }
+
+                        $informationBody += $PowerShellInstance.Streams.Information[$i].MessageData.ToString() + "`n"
+                    }
+                    $informationBody += "`n"
+
+                    # Set response to the logs and the actual response (could be errors)
+                    $logBytes = [System.Text.Encoding]::UTF8.GetBytes($informationBody)
+                    $bytes = [byte[]]::new($logBytes.Length + $response.ByteResponse.Length)
+                    $logBytes.CopyTo($bytes, 0)
+                    $response.ByteResponse.CopyTo($bytes, $logBytes.Length)
+                    $response.ByteResponse = $bytes
+                }
+                $rawResponse.StatusCode = $response.statusCode;
+                $rawResponse.Headers = $response.Headers;
+                $rawResponse.ContentType = $response.contentType;
+                $rawResponse.ContentLength64 = $response.byteResponse.Length;
+                $rawResponse.OutputStream.Write($response.byteResponse, 0, $response.byteResponse.Length);
+                $rawResponse.OutputStream.Close();
+                    
+            }
+            catch [System.Collections.Generic.KeyNotFoundException] {
+        
+                ($this.GetType())::Send($rawResponse, [System.Text.Encoding]::UTF8.GetBytes("Not Found"), 404, "text/plain; charset=UTF-8")
+                $syncHash.Polaris.Log("404 Not Found")
+        
+            }
+            catch {
+                $this.Log(($_ | out-string))
+                $syncHash.Polaris.Log(($PowerShellInstance.Commands | Format-List * | Out-String))
+                $response.SetStatusCode(500)
+                $response.Send($_)
+                $response.Close()
+                throw $_
+            }
+        }
     }
     
 

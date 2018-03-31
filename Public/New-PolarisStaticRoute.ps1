@@ -48,7 +48,7 @@ function New-PolarisStaticRoute {
 
     $FolderPath = (Get-Item -Path $FolderPath).FullName
 
-    $ScriptBlockString = "New-PSDrive -Name PolarisStaticFileServer -PSProvider FileSystem -Root '$FolderPath' -Scope Global"
+    New-PSDrive -Name PolarisStaticFileServer -PSProvider FileSystem -Root "$FolderPath" -Scope Global
     $ScriptBlockString += @"
 
     `$RoutePath = '$RoutePath'
