@@ -56,7 +56,7 @@
     It "Should create routes that serve files" {
 
         #  Confirm file can be downloaded
-        $Download = Invoke-WebRequest -Uri $File1Uri -TimeoutSec 10
+        $Download = Invoke-WebRequest -Uri $File1Uri -TimeoutSec 10 -UseBasicParsing
         $Download.Content | Should be $File1Content
     }
 
