@@ -1,17 +1,11 @@
-﻿
-$script:Polaris = $null
+﻿$script:Polaris = $null
 
 # Handles the removal of the module
 $ExecutionContext.SessionState.Module.OnRemove =
 {
-    If ( $script:Polaris ) {
-        Stop-Polaris -ErrorAction SilentlyContinue
-        Clear-Polaris
-    }
+    Stop-Polaris -ErrorAction SilentlyContinue
+    Clear-Polaris
 }.GetNewClosure()
-
-
-
 
 $JsonBodyParserMiddlerware =
 {
@@ -20,19 +14,17 @@ $JsonBodyParserMiddlerware =
     }
 }
 
-$PolarisCore = Get-Content $PSScriptRoot\lib\MimeTypes.cs -Raw
-
-if (-not ([System.Management.Automation.PSTypeName]'Polaris.MimeTypes').Type) {
-    Add-Type -TypeDefinition $PolarisCore
-}
-
-#Get public and private function definition files.
+# Classes used in Polaris.Class.Ps1 need to be loaded before it
 $Classes = @( Get-ChildItem -Path $PSScriptRoot\lib\*.ps1 -ErrorAction SilentlyContinue | where {$_.Name -ne "Polaris.Class.ps1"})
 $Classes += @( Get-ChildItem -Path $PSScriptRoot\lib\Polaris.Class.ps1 -ErrorAction SilentlyContinue )
+
+$script:ClassDefinitions = $Classes | Get-Content -Raw | Out-String
+
+# Get public and private function definition files.
 $Public = @( Get-ChildItem -Path $PSScriptRoot\Public\*.ps1 -ErrorAction SilentlyContinue )
 $Private = @( Get-ChildItem -Path $PSScriptRoot\Private\*.ps1 -ErrorAction SilentlyContinue )
 
-#Dot source the files
+# Dot source the files
 Foreach ($import in @($Public + $Private + $Classes)) {
     Try {
         . $import.fullname

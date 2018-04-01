@@ -8,6 +8,7 @@ class Polaris {
     hidden [System.Management.Automation.Runspaces.RunspacePool]$PowerShellPool = [RunspaceFactory]::CreateRunspacePool()
     hidden [bool]$StopServer = $False
     [string]$getLogsString = "PolarisLogs"
+    [string] $ClassDefinitions = $script:ClassDefinitions
 
 
     [Void] AddRoute(
@@ -15,7 +16,7 @@ class Polaris {
         [string]$method,
         [string]$scriptBlock
     ) {
-        if ($scriptBlock -eq $null) {
+        if ($null -eq $scriptBlock) {
             throw [ArgumentNullException]::new("scriptBlock")
         }
 
@@ -31,10 +32,10 @@ class Polaris {
         [string]$path, 
         [string]$method
     ) {
-        if ($path -eq $null) {
+        if ($null -eq $path) {
             throw [ArgumentNullException]::new("path")
         }
-        if ($method -eq $null) {
+        if ($null -eq $method) {
             throw [ArgumentNullException]::new("method")
         }
 
@@ -49,7 +50,7 @@ class Polaris {
         [string]$name,
         [string]$scriptBlock
     ) {
-        if ($scriptBlock -eq $null) {
+        if ($null -eq $scriptBlock) {
             throw [ArgumentNullException]::new("scriptBlock")
         }
         $this.RouteMiddleWare.Add
@@ -60,7 +61,7 @@ class Polaris {
     }
 
     RemoveMiddleware([string]$name) {
-        if ($name -eq $null) {
+        if ($null -eq $name) {
             throw [ArgumentNullException]::new("name")
         }
         $this.RouteMiddleware.RemoveAll(
@@ -127,10 +128,11 @@ class Polaris {
                         throw "Object disposed"
                     }
                     catch {
+                        throw $_
                     }
 
-                    if ($synchash.Polaris.StopServer -or $context -eq $null) {
-                        if ($syncHash.ListenerListener -ne $null) {
+                    if ($synchash.Polaris.StopServer -or $null -eq $context) {
+                        if ($null -ne $syncHash.Listener) {
                             $SyncHash.Listener.Close()
                         }
                         break
@@ -151,8 +153,12 @@ class Polaris {
                     try {
                         # Set up PowerShell instance by making request and response global
                         $PowerShellInstance.AddScript([PolarisHelperScripts]::InitializeRequestAndResponseScript()) | Out-Null
+
                         $PowerShellInstance.AddParameter("req", $request)
                         $PowerShellInstance.AddParameter("res", $response)
+
+                        # Add Class definitions
+                        $PowerShellInstance.AddScript($syncHash.Polaris.ClassDefinitions) | Out-Null
 
                         $newRunspace = [runspacefactory]::CreateRunspace()
                         $newRunspace.Open()

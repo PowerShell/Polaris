@@ -1,5 +1,3 @@
-[System.Reflection.Assembly]::LoadWithPartialName("System.Web")
-
 class PolarisResponse {
     [byte[]] $ByteResponse = [byte]0
     [string] $ContentType = "text/plain"
@@ -32,6 +30,6 @@ class PolarisResponse {
     }
     
     static [string] GetContentType([string] $path) {
-        return [Polaris.MimeTypes]::GetMimeType($path)
+        return [MimeTypes]::GetMimeType($path)
     }
 }
