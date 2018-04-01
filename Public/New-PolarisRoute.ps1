@@ -7,7 +7,7 @@
     Path (path/route/endpoint) of the web route to to be serviced.
 .PARAMETER Method
     HTTP verb/method to be serviced.
-    Valid values are GET, POST, PUT, and DELETE
+    Valid values are GET, HEAD, POST, PUT, DELETE, CONNECT, OPTIONS, TRACE
 .PARAMETER ScriptBlock
     ScriptBlock that will be triggered when web route is called.
 .PARAMETER ScriptPath
@@ -33,7 +33,7 @@ function New-PolarisRoute {
         $Path,
 
         [Parameter( Mandatory = $True, Position = 1 )]
-        [ValidateSet( 'GET', 'POST', 'PUT', 'DELETE' )]
+        [ValidateSet( 'GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'TRACE' )]
         [string]
         $Method,
 
