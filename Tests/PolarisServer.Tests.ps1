@@ -82,10 +82,9 @@ Hello World"
         It "test /public/index.html static route" {
             $expectedHtml = `
                 '<div>hello world</div>
-
-<img src="test.png" alt="yay" />
-<img src="test.png" alt="yay" />
-<img src="test1.png" alt="yay" />'
+                <img src="test.png" alt="yay" />
+                <img src="test.png" alt="yay" />
+                <img src="test1.png" alt="yay" />'
 
             $result = Invoke-WebRequest -Uri "http://localhost:$Port/public/index.html" -UseBasicParsing
             $result.Content | Should Be $expectedHtml
