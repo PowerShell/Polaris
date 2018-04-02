@@ -45,12 +45,13 @@ function New-PolarisRouteMiddleware {
         [Polaris]
         $Polaris = $script:Polaris
     )
+    # Checking if middleware already exists
+    $ExistingMiddleWare = Get-PolarisRouteMiddleware -Name $Name -Polaris $Polaris
 
-    $ExistingMiddleWare = Get-PolarisRouteMiddleware -Name $Name
-
+    # If Force option is specified remove the existing middleware
     if ( $ExistingMiddleWare -and $Force ) {
-        Remove-PolarisRouteMiddleware -Name $Name
-        $ExistingMiddleWare = Get-PolarisRouteMiddleware -Name $Name
+        Remove-PolarisRouteMiddleware -Name $Name -Polaris $Polaris
+        $ExistingMiddleWare = Get-PolarisRouteMiddleware -Name $Name -Polaris $Polaris
     }
 
     if ( $ExistingMiddleWare ) {
@@ -66,12 +67,12 @@ function New-PolarisRouteMiddleware {
 
         switch ( $PSCmdlet.ParameterSetName ) {
             'ScriptBlock' {
-                $script:Polaris.AddMiddleware( $Name, [string]$ScriptBlock )
+                $Polaris.AddMiddleware( $Name, [string]$ScriptBlock )
             }
             'ScriptPath' {
                 if ( Test-Path -Path $ScriptPath ) {
                     $Script = Get-Content -Path $ScriptPath -Raw
-                    $script:Polaris.AddMiddleware( $Name, $Script )
+                    $Polaris.AddMiddleware( $Name, $Script )
                 }
                 else {
                     $PSCmdlet.WriteError( (
