@@ -32,10 +32,10 @@ function Get-PolarisRouteMiddleware {
     )
 
     process {
-        if ( $script:Polaris ) {
+        if ( $Polaris ) {
             $Filter = [scriptblock]::Create( ( $Name.ForEach( { "`$_.Name   -like `"$_`"" }) -join ' -or ' ) )
 
-            return $script:Polaris.RouteMiddleware.Where( $Filter )
+            return $Polaris.RouteMiddleware.Where( $Filter )
         }
     }
 }

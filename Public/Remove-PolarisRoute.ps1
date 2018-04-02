@@ -50,11 +50,11 @@ function Remove-PolarisRoute {
     )
 
     process {
-        if ( $script:Polaris ) {
+        if ( $Polaris ) {
             $WebRoutes = Get-PolarisRoute -Path $Path -Method $Method
             
             ForEach ( $Route in $WebRoutes ) {
-                $script:Polaris.RemoveRoute( $Route.Path, $Route.Method )
+                $Polaris.RemoveRoute( $Route.Path, $Route.Method )
             }
         }
     }

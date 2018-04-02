@@ -50,10 +50,10 @@ function Get-PolarisRoute {
     )
     
     process {
-        if ( $script:Polaris ) {
+        if ( $Polaris ) {
             $WebRoutes = [System.Collections.ArrayList]@()
 
-            ForEach ( $Route in $script:Polaris.ScriptBlockRoutes.GetEnumerator() ) {
+            ForEach ( $Route in $Polaris.ScriptBlockRoutes.GetEnumerator() ) {
                 ForEach ( $RouteMethod in $Route.Value.GetEnumerator() ) {
                     $Null = $WebRoutes.Add( [pscustomobject]@{ Path = $Route.Key; Method = $RouteMethod.Key; Scriptblock = $RouteMethod.Value } )
                 }
