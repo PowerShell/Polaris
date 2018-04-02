@@ -80,6 +80,10 @@ class Polaris {
         $this.PowerShellPool.Open()
         $this.Listener = $this.InitListener($port)
 
+        # Writing data back and forth between the main thread and other runspaces is achieved using a runspace
+        # See samples:
+        # - https://learn-powershell.net/2012/10/14/powershell-and-wpf-writing-data-to-a-ui-from-a-different-runspace/
+        # - https://foxdeploy.com/2016/05/17/part-v-powershell-guis-responsive-apps-with-progress-bars/
         $syncHash = [hashtable]::Synchronized(@{})
         $syncHash.Listener = $this.Listener
         $syncHash.Runspaces = @()
