@@ -48,7 +48,7 @@ function New-PolarisStaticRoute {
     }
     
     CreateNewPolarisIfNeeded
-    if( -not $Polaris){
+    if ( -not $Polaris) {
         $Polaris = $script:Polaris
     }
     
@@ -58,115 +58,54 @@ function New-PolarisStaticRoute {
 
     $FolderPath = (Get-Item -Path $FolderPath).FullName
 
-    $ScriptBlockString = "New-PSDrive -Name PolarisStaticFileServer -PSProvider FileSystem -Root '$FolderPath' -Scope Global"
-    $ScriptBlockString += @"
+    # Builds a script for serving content from the given folder that includes an HTML browser for the folder
+    $ScriptBlockString = @"
+    New-PSDrive -Name PolarisStaticFileServer -PSProvider FileSystem -Root '$FolderPath' -Scope Global
 
     `$RoutePath = '$RoutePath'
-"@
 
-    $ScriptBlockString += @'
+    $(Get-Content $PSScriptRoot\..\Private\New-DirectoryBrowser.ps1 | Out-String)
 
-        function Get-DirectoryContent {
+    `$Content = ""
 
-            <#
-            .SYNOPSIS
-             
-                Function to get directory content
-            .EXAMPLE
-             
-                Get-DirectoryContent -Path "C:\" -HeaderName "poshserver.net" -RequestURL "http://poshserver.net" -SubfolderName "/"
-                
-        #>
-        
-            [CmdletBinding(SupportsShouldProcess = $true)]
-            param (
-        
-                [Parameter(
-                    Mandatory = $true,
-                    HelpMessage = 'Directory Path')]
-                [string]$Path,
-        
-                [Parameter(
-                    Mandatory = $false,
-                    HelpMessage = 'Header Name')]
-                [string]$HeaderName,
+    `$localPath = (`$request.Url.LocalPath -replace `$RoutePath, "") -replace "/","\"
+    try {
+        `$RequestedItem = Get-Item -LiteralPath "PolarisStaticFileServer:`$localPath" -Force -ErrorAction Stop
+        `$FullPath = `$RequestedItem.FullName
+        if (`$RequestedItem.Attributes -match "Directory") {
+            
+            `$Content = Get-DirectoryContent -Path `$FullPath ``
+                            -HeaderName "Polaris Static File Server" ``
+                            -SubfolderName `$localPath ``
+                            -Root "`$((get-psdrive PolarisStaticFileServer).Root)"
 
-                [Parameter(
-                    Mandatory = $false,
-                    HelpMessage = 'Subfolder Name')]
-                [string]$SubfolderName,
-        
-                [string]$Root
-            )
-        
-            @"
-        <html>
-        <head>
-        <title>$($HeaderName)</title>
-        </head>
-        <body>
-        <h1>$($HeaderName) - $($SubfolderName)</h1>
-        <hr>
-"@
-            @"
-        <a href="./../">[To Parent Directory]</a><br><br>
-        <table cellpadding="5">
-"@
-            $Files = (Get-ChildItem "$Path")
-            foreach ($File in $Files) {
-                $FileURL = $RoutePath + ($File.FullName -replace [regex]::Escape($Root), "" ) -replace "\\", "/"
-                if (!$File.Length) { $FileLength = "[dir]" } else { $FileLength = $File.Length }
-                @"
-        <tr>
-        <td align="right">$($File.LastWriteTime)</td>
-        <td align="right">$($FileLength)</td>
-        <td align="left"><a href="$($FileURL)">$($File.Name)</a></td>
-        </tr>
-"@
-            }
-            @"
-        </table>
-        <hr>
-        </body>
-        </html>
-"@
+            `$response.ContentType = "text/html"
+            `$Response.Send(`$Content)
         }
+        else {
+            `$Content = [System.IO.File]::ReadAllBytes(`$FullPath)
+            `$response.ContentType = [PolarisResponse]::GetContentType(`$FullPath)
+            `$Response.SendBytes(`$Content)
+        }
+    }
+    catch [System.UnauthorizedAccessException] {
+        `$response.StatusCode = 401
+        `$response.ContentType = "text/html"
+        `$Content = "<h1>401 - Unauthorized</h1>"
+        `$response.Send(`$Content)
+    }
+    catch [System.Management.Automation.ItemNotFoundException] {
+        `$response.StatusCode = 404
+        `$response.ContentType = "text/html"
+        `$Content = "<h1>404 - Page not found `$localPath</h1>"
+        `$Content += Get-DirectoryContent -Path PolarisStaticFileServer:\ -HeaderName "Polaris Static File Server" -SubfolderName "\" -Root "PolarisStaticFileServer:\"
+        `$response.Send(`$Content);
+    }
+    catch {
+        Throw `$_
+    }
 
-        $Content = ""
-
-        $localPath = ($request.Url.LocalPath -replace $RoutePath, "") -replace "/","\"
-        try {
-            $RequestedItem = Get-Item -LiteralPath "PolarisStaticFileServer:$localPath" -Force -ErrorAction Stop
-            $FullPath = $RequestedItem.FullName
-            if ($RequestedItem.Attributes -match "Directory") {
-                $Content = Get-DirectoryContent -Path $FullPath -HeaderName "Polaris Static File Server" -SubfolderName $localPath -Root "$((get-psdrive PolarisStaticFileServer).Root)"
-                $response.ContentType = "text/html"
-                $Response.Send($Content)
-            }
-            else {
-                $Content = [System.IO.File]::ReadAllBytes($FullPath)
-                $response.ContentType = [PolarisResponse]::GetContentType($FullPath)
-                $Response.SendBytes($Content)
-            }
-        }
-        catch [System.UnauthorizedAccessException] {
-            $response.StatusCode = 401
-            $response.ContentType = "text/html"
-            $Content = "<h1>401 - Unauthorized</h1>"
-            $response.Send($Content)
-        }
-        catch [System.Management.Automation.ItemNotFoundException] {
-            $response.StatusCode = 404
-            $response.ContentType = "text/html"
-            $Content = "<h1>404 - Page not found $localPath</h1>"
-            $Content += Get-DirectoryContent -Path PolarisStaticFileServer:\ -HeaderName "Polaris Static File Server" -SubfolderName "\" -Root "PolarisStaticFileServer:\"
-            $response.Send($Content);
-        }
-        catch {
-            Throw $_
-        }
-
-'@
+"@
 
     $ScriptBlock = [scriptblock]::Create($ScriptBlockString)
 
