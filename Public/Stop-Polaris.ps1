@@ -6,6 +6,9 @@
 .PARAMETER ServerContext
     Polaris instance to stop.
     Defaults to the global instance.
+.PARAMETER Polaris
+    A Polaris object
+    Defaults to the script scoped Polaris
 .EXAMPLE
     Stop-Polaris
 .EXAMPLE
@@ -14,7 +17,8 @@
 function Stop-Polaris {
     [CmdletBinding()]
     param(
-        $ServerContext = $script:Polaris )
+        $ServerContext = $script:Polaris
+    )
 
     if ( $ServerContext ) {
         $ServerContext.Stop()

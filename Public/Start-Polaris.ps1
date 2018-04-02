@@ -14,6 +14,9 @@
     Defaults to 1.
 .PARAMETER UseJsonBodyParserMiddleware
     When present, JSONBodyParser middleware will be created, if needed.
+.PARAMETER Polaris
+    A Polaris object
+    Defaults to the script scoped Polaris
 .EXAMPLE
     Start-Polaris
 .EXAMPLE
@@ -32,7 +35,11 @@ function Start-Polaris {
         $MaxRunspaces = 1,
 
         [switch]
-        $UseJsonBodyParserMiddleware = $False )
+        $UseJsonBodyParserMiddleware = $False,
+
+        [Polaris]
+        $Polaris = $script:Polaris
+    )
 
     CreateNewPolarisIfNeeded
 
@@ -40,7 +47,7 @@ function Start-Polaris {
         New-PolarisRouteMiddleware -Name JsonBodyParser -ScriptBlock $JsonBodyParserMiddlerware
     }
 
-    $script:Polaris.Start( $Port, $MinRunspaces, $MaxRunspaces )
+    $Polaris.Start( $Port, $MinRunspaces, $MaxRunspaces )
     
-    return $script:Polaris
+    return $Polaris
 }

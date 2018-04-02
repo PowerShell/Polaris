@@ -14,6 +14,9 @@
     Accepts pipeline input by property name.
     Accepts multiple values and wildcards.
     Defaults to all methods (*).
+.PARAMETER Polaris
+    A Polaris object
+    Defaults to the script scoped Polaris
 .EXAMPLE
     Get-PolarisRoute
     Gets all web routes.
@@ -40,7 +43,11 @@ function Get-PolarisRoute {
 
         [Parameter( ValueFromPipelineByPropertyName = $True )]
         [string[]]
-        $Method = '*' )
+        $Method = '*',
+
+        [Polaris]
+        $Polaris = $script:Polaris
+    )
     
     process {
         if ( $script:Polaris ) {

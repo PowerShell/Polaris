@@ -9,6 +9,9 @@
     Accepts pipeline input by property name.
     Accepts multiple values and wildcards.
     Defaults to all names (*).
+.PARAMETER Polaris
+    A Polaris object
+    Defaults to the script scoped Polaris
 .EXAMPLE
     Get-PolarisRouteMiddleware
 .EXAMPLE
@@ -22,7 +25,11 @@ function Get-PolarisRouteMiddleware {
         [Parameter( ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True )]
         [string[]]
-        $Name = '*' )
+        $Name = '*',
+
+        [Polaris]
+        $Polaris = $script:Polaris
+    )
 
     process {
         if ( $script:Polaris ) {

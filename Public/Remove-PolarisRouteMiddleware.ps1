@@ -9,6 +9,9 @@
     Accepts pipeline input.
     Accepts pipeline input by property name.
     Defaults to all names (*).
+.PARAMETER Polaris
+    A Polaris object
+    Defaults to the script scoped Polaris
 .EXAMPLE
     Remove-PolarisRouteMiddleware -Name JsonBodyParser
 .EXAMPLE
@@ -27,14 +30,18 @@ function Remove-PolarisRouteMiddleware {
         [Parameter( ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True )]
         [string[]]
-        $Name = '*' )
+        $Name = '*',
+
+        [Polaris]
+        $Polaris = $script:Polaris
+    )
     
     process {
-        if ( $script:Polaris  ) {
+        if ( $Polaris  ) {
             $Middleware = Get-PolarisRouteMiddleware -Name $Name
 
             ForEach ( $Ware in $MiddleWare ) {
-                $script:Polaris.RemoveMiddleware( $Ware.Name )
+                $Polaris.RemoveMiddleware( $Ware.Name )
             }
         }
     }

@@ -12,6 +12,9 @@
     Full path and name to script to run when middleware is triggered.
 .PARAMETER Force
     Use -Force to overwrite any existing middleware with the same name.
+.PARAMETER Polaris
+    A Polaris object
+    Defaults to the script scoped Polaris
 .EXAMPLE
 $JsonBodyParserMiddlerware =
 {
@@ -37,7 +40,11 @@ function New-PolarisRouteMiddleware {
         $ScriptPath,
         
         [switch]
-        $Force )
+        $Force,
+
+        [Polaris]
+        $Polaris = $script:Polaris
+    )
 
     $ExistingMiddleWare = Get-PolarisRouteMiddleware -Name $Name
 

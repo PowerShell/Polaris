@@ -10,6 +10,9 @@
     Full path and name of the folder to serve.
 .PARAMETER Force
     Use -Force to overwrite existing web route(s) for the same paths.
+.PARAMETER Polaris
+    A Polaris object
+    Defaults to the script scoped Polaris
 .EXAMPLE
     New-PolarisStaticRoute -RoutePath 'public' -Path D:\FolderShares\public
     Creates web routes for GET method for each file recursively within D:\FolderShares\public
@@ -33,7 +36,11 @@ function New-PolarisStaticRoute {
         $FolderPath,
         
         [switch]
-        $Force )
+        $Force,
+
+        [Polaris]
+        $Polaris = $script:Polaris
+    )
     
     $ErrorAction = $PSBoundParameters["ErrorAction"]
     If ( -not $ErrorAction ) {

@@ -11,6 +11,9 @@
     Full path and name of script that will be triggered when web route is called.
 .PARAMETER Force
     Use -Force to overwrite any existing web route for the same path and method.
+.PARAMETER Polaris
+    A Polaris object
+    Defaults to the script scoped Polaris
 .EXAMPLE
     New-PolarisGetRoute -Path "helloworld" -ScriptBlock { $response.Send( 'Hello World' ) }
     To view results, assuming default port:
@@ -38,7 +41,11 @@ function New-PolarisPutRoute {
         $ScriptPath,
         
         [switch]
-        $Force )
+        $Force,
+
+        [Polaris]
+        $Polaris = $script:Polaris
+    )
 
     switch ( $PSCmdlet.ParameterSetName ) {
         'ScriptBlock' { New-PolarisRoute -Path $Path -Method "PUT" -ScriptBlock $ScriptBlock -Force:$Force }
