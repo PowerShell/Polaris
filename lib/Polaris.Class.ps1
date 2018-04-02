@@ -100,11 +100,9 @@ class Polaris {
             $PowerShell = [powershell]::Create()
             $PowerShell.Runspace = $newRunspace
 
-            $Classes = @( Get-ChildItem -Path $PSScriptRoot\*.ps1 -ErrorAction SilentlyContinue | where {$_.Name -ne "Polaris.Class.ps1"})
-            $Classes += @( Get-ChildItem -Path $PSScriptRoot\Polaris.Class.ps1 -ErrorAction SilentlyContinue )
-            $Classes | foreach {
-                $PowerShell.AddScript(". $($_.FullName)")
-            }
+            # Add Class definitions
+            $PowerShell.AddScript($this.ClassDefinitions + "`r`n`r`n") | Out-Null
+            
             $PowerShell.AddScript($this.ListenerLoop())
             $PowerShell.BeginInvoke() | Out-Null
             $syncHash.Runspaces += $newRunspace
@@ -240,7 +238,8 @@ class Polaris {
                             $response.ByteResponse.CopyTo($bytes, $logBytes.Length)
                             $response.ByteResponse = $bytes
                         }
-                        [Polaris]::Send($rawResponse, $response)                      
+                        [Polaris]::Send($rawResponse, $response)
+                            
                     }
                     catch {
                         $syncHash.Polaris.Log(($_ | out-string))
