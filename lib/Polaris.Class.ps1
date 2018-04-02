@@ -240,13 +240,7 @@ class Polaris {
                             $response.ByteResponse.CopyTo($bytes, $logBytes.Length)
                             $response.ByteResponse = $bytes
                         }
-                        $rawResponse.StatusCode = $response.statusCode;
-                        $rawResponse.Headers = $response.Headers;
-                        $rawResponse.ContentType = $response.contentType;
-                        $rawResponse.ContentLength64 = $response.byteResponse.Length;
-                        $rawResponse.OutputStream.Write($response.byteResponse, 0, $response.byteResponse.Length);
-                        $rawResponse.OutputStream.Close();
-                            
+                        [Polaris]::Send($rawResponse, $response)                      
                     }
                     catch {
                         $syncHash.Polaris.Log(($_ | out-string))
@@ -317,8 +311,8 @@ class Polaris {
             $this.Logger($logString)
         }
         catch {
-            [Console]::WriteLine($_.Message)
-            [Console]::WriteLine($logString)
+            Write-Host $_.Message
+            Write-Host $logString
         }
     }
 
