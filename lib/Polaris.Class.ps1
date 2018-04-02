@@ -158,7 +158,7 @@ class Polaris {
                         $PowerShellInstance.AddParameter("res", $response)
 
                         # Add Class definitions
-                        $PowerShellInstance.AddScript($syncHash.Polaris.ClassDefinitions) | Out-Null
+                        $PowerShellInstance.AddScript($syncHash.Polaris.ClassDefinitions + "`r`n`r`n") | Out-Null
 
                         $newRunspace = [runspacefactory]::CreateRunspace()
                         $newRunspace.Open()

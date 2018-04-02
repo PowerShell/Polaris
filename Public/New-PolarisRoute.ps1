@@ -51,7 +51,6 @@ function New-PolarisRoute {
         [switch]
         $Force,
 
-        [Polaris]
         $Polaris = $script:Polaris
     )
 
@@ -72,6 +71,9 @@ function New-PolarisRoute {
     }
     else {
         CreateNewPolarisIfNeeded
+        if( -not $Polaris){
+            $Polaris = $script:Polaris
+        }
 
         if ( -not $Path.StartsWith( '/' ) ) {
             $Path = '/' + $Path

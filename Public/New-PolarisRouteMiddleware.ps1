@@ -42,7 +42,7 @@ function New-PolarisRouteMiddleware {
         [switch]
         $Force,
 
-        [Polaris]
+        
         $Polaris = $script:Polaris
     )
     # Checking if middleware already exists
@@ -64,6 +64,9 @@ function New-PolarisRouteMiddleware {
     }
     else {
         CreateNewPolarisIfNeeded
+        if( -not $Polaris){
+            $Polaris = $script:Polaris
+        }
 
         switch ( $PSCmdlet.ParameterSetName ) {
             'ScriptBlock' {

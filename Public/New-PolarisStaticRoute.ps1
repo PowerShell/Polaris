@@ -38,7 +38,7 @@ function New-PolarisStaticRoute {
         [switch]
         $Force,
 
-        [Polaris]
+        
         $Polaris = $script:Polaris
     )
     
@@ -48,6 +48,9 @@ function New-PolarisStaticRoute {
     }
     
     CreateNewPolarisIfNeeded
+    if( -not $Polaris){
+        $Polaris = $script:Polaris
+    }
     
     if ( -not ( Test-Path -Path $FolderPath ) ) {
         Write-Error -Exception FileNotFoundException -Message "Folder does not exist at path $FolderPath"

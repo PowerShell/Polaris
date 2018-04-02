@@ -43,7 +43,7 @@ function New-PolarisDeleteRoute {
         [switch]
         $Force,
 
-        [Polaris]
+        
         $Polaris = $script:Polaris
     )
 

@@ -27,7 +27,7 @@ function Get-PolarisRouteMiddleware {
         [string[]]
         $Name = '*',
 
-        [Polaris]
+        
         $Polaris = $script:Polaris
     )
 

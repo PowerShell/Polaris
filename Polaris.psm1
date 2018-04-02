@@ -34,6 +34,8 @@ Foreach ($import in @($Public + $Private + $Classes)) {
     }
 }
 
+CreateNewPolarisIfNeeded
+
 # Here I might...
 # Read in or create an initial config file and variable
 # Export Public functions ($Public.BaseName) for WIP modules

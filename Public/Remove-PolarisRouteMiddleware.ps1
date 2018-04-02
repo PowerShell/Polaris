@@ -32,7 +32,7 @@ function Remove-PolarisRouteMiddleware {
         [string[]]
         $Name = '*',
 
-        [Polaris]
+        
         $Polaris = $script:Polaris
     )
     

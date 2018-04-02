@@ -45,7 +45,7 @@ function Remove-PolarisRoute {
         [string[]]
         $Method = '*',
 
-        [Polaris]
+        
         $Polaris = $script:Polaris
     )
 

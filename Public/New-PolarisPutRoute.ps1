@@ -43,7 +43,7 @@ function New-PolarisPutRoute {
         [switch]
         $Force,
 
-        [Polaris]
+        
         $Polaris = $script:Polaris
     )
 
