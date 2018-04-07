@@ -16,9 +16,9 @@ If you encounter an error during usage of Polaris, there are some basic details 
 ### Fixing an issue
 Fixing issues also does not require a lot of administrative work. The basic steps are:
 1. Leave a comment to tell us that you are working on it
-2. Fork our repository, and base your changes off of the 'develop' branch. Please create a new branch from develop which contains your changes. How you call it? We don't care.
+2. Fork our repository, and base your changes off of the **master** branch. Please create a new branch from **master** which contains your changes. How you call it? We don't care.
 3. Fix the issue! No biggie...
-4. Make sure you have pushed your commits to your new branch and then create a pull request
+4. Make sure you have pushed your commits to your new branch and then create a pull request back to the Polaris **master** branch
 5. Sit back and wait for us to take credit for your code - just kidding. All the fame and glory is yours.
 
 ## Reviews
