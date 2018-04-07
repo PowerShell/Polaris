@@ -6,10 +6,11 @@ if(-not (Test-Path -Path ..\Polaris.psm1)) {
 # Import Polaris
 Import-Module -Name ..\Polaris.psm1
 
+$Hey = "What what!"
 # Hello World passing in the Path, Method & ScriptBlock
 New-PolarisRoute -Path /helloworld -Method GET -ScriptBlock {
-    $response.Send('Hello World')
-}
+    $response.Send($Hey)
+} -Force
 
 # Query Parameters are supported
 New-PolarisRoute -Path /hellome -Method GET -ScriptBlock {
@@ -51,4 +52,6 @@ New-PolarisStaticRoute -FolderPath ./static -RoutePath /public
 $app = Start-Polaris -Port 8082 -MinRunspaces 1 -MaxRunspaces 5 -UseJsonBodyParserMiddleware -Verbose # all params are optional
 
 # Stop the server
-#Stop-Polaris
+Start-Job -ScriptBlock { Invoke-RestMethod -Uri "http://localhost:8082/helloworld" }
+
+Start-Sleep -Milliseconds 300

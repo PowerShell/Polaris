@@ -70,12 +70,12 @@ function New-PolarisRouteMiddleware {
 
         switch ( $PSCmdlet.ParameterSetName ) {
             'ScriptBlock' {
-                $Polaris.AddMiddleware( $Name, [string]$ScriptBlock )
+                $Polaris.AddMiddleware( $Name, $ScriptBlock )
             }
             'ScriptPath' {
                 if ( Test-Path -Path $ScriptPath ) {
                     $Script = Get-Content -Path $ScriptPath -Raw
-                    $Polaris.AddMiddleware( $Name, $Script )
+                    $Polaris.AddMiddleware( $Name, [scriptblock]::Create($Script) )
                 }
                 else {
                     $PSCmdlet.WriteError( (
