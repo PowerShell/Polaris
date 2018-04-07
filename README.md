@@ -22,7 +22,8 @@ New-PolarisGetRoute -Path "/helloworld" -ScriptBlock {
 Start-Polaris
 ```
 
-### Why yet another web framework for PowerShell? 
+### Why yet another web framework for PowerShell?
+
 There have been a great list of [other](https://github.com/StartAutomating/Pipeworks) [micro](https://github.com/toenuff/flancy) [web](https://github.com/Jaykul/NancyPS/) [frameworks](https://github.com/toenuff/PshOdata) [written](https://github.com/straightdave/presley) [over](https://github.com/cofonseca/WebListener) [the](https://github.com/DataBooster/PS-WebApi) [years](https://github.com/ChristopherGLewis/PowerShellWebServers) (Thanks @jaykul for the list!).
 
 Polaris' differentiation is that it is cross-platform and uses the .NET HttpListener class.
@@ -30,16 +31,15 @@ Polaris' differentiation is that it is cross-platform and uses the .NET HttpList
 ## Getting Started
 
 ### Prereqs
-* [.NET Standard 2.0 SDK](https://www.microsoft.com/net/download/core) or .NET Framework 4.5.1
+
 * [PowerShell](https://github.com/powershell/powershell)
 
 ### Steps
-1. Clone or download the zip of the repo
-1. Open [PowerShell](https://github.com/powershell/powershell)
-1. run `Install-Module InvokeBuild`
-1. run `Invoke-Build Build`
 
-At this point, you can now run `Import-Module ./Polaris.psm1` to start using Polaris! Checkout [the wiki](https://github.com/PowerShell/Polaris/wiki) for more usage!
+1.  Clone or download the zip of the repo
+1.  Open [PowerShell](https://github.com/powershell/powershell)
+
+At this point, you can now run `Import-Module ./Polaris.psd1` to start using Polaris! Checkout [the wiki](https://github.com/PowerShell/Polaris/wiki) for more usage!
 
 You can also run all the Pester tests by running `Invoke-Pester` in the `test` directory. You may need the [fork of Pester that supports PowerShell](https://github.com/powershell/psl-pester).
 
@@ -77,8 +77,8 @@ Polaris is licensed under the MIT License.
 ## Code of Conduct
 
 This project has adopted the [Microsoft Open Source Code of Conduct][conduct-code].
-For more information see the [Code of Conduct FAQ][conduct-FAQ] or contact [opencode@microsoft.com][conduct-email] with any additional questions or comments.
+For more information see the [Code of Conduct FAQ][conduct-faq] or contact [opencode@microsoft.com][conduct-email] with any additional questions or comments.
 
 [conduct-code]: http://opensource.microsoft.com/codeofconduct/
-[conduct-FAQ]: http://opensource.microsoft.com/codeofconduct/faq/
+[conduct-faq]: http://opensource.microsoft.com/codeofconduct/faq/
 [conduct-email]: mailto:opencode@microsoft.com
