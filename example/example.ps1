@@ -6,10 +6,11 @@ if(-not (Test-Path -Path ..\Polaris.psm1)) {
 # Import Polaris
 Import-Module -Name ..\Polaris.psm1
 
+$Hey = "What what!"
 # Hello World passing in the Path, Method & ScriptBlock
 New-PolarisRoute -Path /helloworld -Method GET -ScriptBlock {
-    $response.Send('Hello World')
-}
+    $response.Send($Hey)
+} -Force
 
 # Query Parameters are supported
 New-PolarisRoute -Path /hellome -Method GET -ScriptBlock {

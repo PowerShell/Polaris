@@ -14,6 +14,8 @@ $JsonBodyParserMiddlerware =
     }
 }
 
+Add-Type -Path $PSScriptRoot\lib\Polaris.AsyncHelper.cs
+
 # Classes used in Polaris.Class.Ps1 need to be loaded before it
 $Classes = @( Get-ChildItem -Path $PSScriptRoot\lib\*.ps1 -ErrorAction SilentlyContinue | where {$_.Name -ne "Polaris.Class.ps1"})
 $Classes += @( Get-ChildItem -Path $PSScriptRoot\lib\Polaris.Class.ps1 -ErrorAction SilentlyContinue )

@@ -81,12 +81,12 @@ function New-PolarisRoute {
 
         switch ( $PSCmdlet.ParameterSetName ) {
             'ScriptBlock' {
-                $Polaris.AddRoute( $Path, $Method, [string]$ScriptBlock )
+                $Polaris.AddRoute( $Path, $Method, $ScriptBlock )
             }
             'ScriptPath' {
                 if ( Test-Path -Path $ScriptPath ) {
                     $Script = Get-Content -Path $ScriptPath -Raw
-                    $Polaris.AddRoute( $Path, $Method, $Script )
+                    $Polaris.AddRoute( $Path, $Method, [scriptblock]::Create($Script) )
                 }
                 else {
                     $PSCmdlet.WriteError( (

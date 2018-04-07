@@ -1,7 +1,7 @@
 class PolarisMiddleWare {
     
     [string]$Name
-    [string]$ScriptBlock
+    [scriptblock]$ScriptBlock
     
     PolarisMiddleWare() {}
     
