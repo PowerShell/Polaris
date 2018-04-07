@@ -52,6 +52,4 @@ New-PolarisStaticRoute -FolderPath ./static -RoutePath /public
 $app = Start-Polaris -Port 8082 -MinRunspaces 1 -MaxRunspaces 5 -UseJsonBodyParserMiddleware -Verbose # all params are optional
 
 # Stop the server
-Start-Job -ScriptBlock { Invoke-RestMethod -Uri "http://localhost:8082/helloworld" }
-
-Start-Sleep -Milliseconds 300
+#Stop-Polaris
