@@ -14,20 +14,12 @@ $JsonBodyParserMiddlerware =
     }
 }
 
-Add-Type -Path $PSScriptRoot\lib\Polaris.AsyncHelper.cs
-
-# Classes used in Polaris.Class.Ps1 need to be loaded before it
-$Classes = @( Get-ChildItem -Path $PSScriptRoot\lib\*.ps1 -ErrorAction SilentlyContinue | where {$_.Name -ne "Polaris.Class.ps1"})
-$Classes += @( Get-ChildItem -Path $PSScriptRoot\lib\Polaris.Class.ps1 -ErrorAction SilentlyContinue )
-
-$script:ClassDefinitions = $Classes | Get-Content -Raw | Out-String
-
 # Get public and private function definition files.
 $Public = @( Get-ChildItem -Path $PSScriptRoot\Public\*.ps1 -ErrorAction SilentlyContinue )
 $Private = @( Get-ChildItem -Path $PSScriptRoot\Private\*.ps1 -ErrorAction SilentlyContinue )
 
 # Dot source the files
-Foreach ($import in @($Public + $Private + $Classes)) {
+Foreach ($import in @($Public + $Private)) {
     Try {
         . $import.fullname
     }
