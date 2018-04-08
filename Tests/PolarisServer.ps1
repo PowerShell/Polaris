@@ -1,11 +1,11 @@
 
-if (-not (Test-Path -Path $PSScriptRoot\..\Polaris.psm1)) {
-    Write-Error -Message "Cannot find Polaris.psm1"
+if (-not (Test-Path -Path $PSScriptRoot\..\Polaris.psd1)) {
+    Write-Error -Message "Cannot find Polaris.psd1"
     return
 }
 
 # Import Polaris
-Import-Module -Name $PSScriptRoot\..\Polaris.psm1
+Import-Module -Name $PSScriptRoot\..\Polaris.psd1
 
 # Support Headers
 New-PolarisRoute -Path /header -Method "GET" -ScriptBlock {
