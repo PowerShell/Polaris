@@ -23,7 +23,9 @@ function New-DirectoryBrowser {
             HelpMessage = 'Subfolder Name')]
         [string]$SubfolderName,
 
-        [string]$Root
+        [string]$Root,
+
+        [string]$RoutePath
     )
 
     @"
@@ -41,7 +43,7 @@ function New-DirectoryBrowser {
 "@
     $Files = (Get-ChildItem "$Path")
     foreach ($File in $Files) {
-        $FileURL = $RoutePath + ($File.FullName -replace [regex]::Escape($Root), "" ) -replace "\\", "/"
+        $FileURL = "/" + $RoutePath + ($File.FullName -replace [regex]::Escape($Root), "" ) -replace "\\", "/"
         if (!$File.Length) { $FileLength = "[dir]" } else { $FileLength = $File.Length }
         @"
 <tr>
