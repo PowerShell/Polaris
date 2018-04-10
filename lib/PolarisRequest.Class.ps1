@@ -9,6 +9,7 @@ class PolarisRequest {
     [string] $Method
     [uri] $Url
     [string] $UserAgent
+    [string] $ClientIP
 
     hidden [System.Net.HttpListenerRequest] $RawRequest
 
@@ -22,6 +23,7 @@ class PolarisRequest {
         $this.Query = $this.RawRequest.QueryString
         $this.Url = $this.RawRequest.Url
         $this.UserAgent = $this.RawRequest.UserAgent
+        $this.ClientIP = $this.RawRequest.RemoteEndPoint.Address
     }
 }
 
