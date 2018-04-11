@@ -52,7 +52,7 @@ New-PolarisStaticRoute -FolderPath ./static -RoutePath /public -EnableDirectoryB
 $app = Start-Polaris -Port 8082 -MinRunspaces 1 -MaxRunspaces 5 -UseJsonBodyParserMiddleware -Verbose # all params are optional
 
 while($app.Listener.IsListening){
-    Wait-Event Polaris.AsyncHelper.ContextReceived
+    Wait-Event callbackcomplete
 }
 
 # Stop the server

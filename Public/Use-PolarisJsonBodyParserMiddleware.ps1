@@ -13,5 +13,5 @@ function Use-PolarisJsonBodyParserMiddleware {
     [CmdletBinding()]
     param()
 
-    New-PolarisRouteMiddleware -Name JsonBodyParser -ScriptBlock $JsonBodyParserMiddlerware -Force
+    New-PolarisRouteMiddleware -Name JsonBodyParser -ScriptBlock $JsonBodyParserMiddleware -Force
 }

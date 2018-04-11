@@ -9,17 +9,16 @@ class Polaris {
     hidden [bool]$StopServer = $False
     [string]$getLogsString = "PolarisLogs"
     [string] $ClassDefinitions = $script:ClassDefinitions
-    [scriptblock] $ContextHandler = {
+    $ContextHandler = (New-ScriptBlockCallback -Callback {
 
         param(
-            [System.Net.HttpListenerContext]
-            $context
+            [System.IAsyncResult]
+            $AsyncResult
         ) 
 
-        [Polaris]$Polaris = $Event.MessageData['Polaris']
-        if ($request.Query -and $request.Query[$Polaris.GetLogsString]){
-            start-transcri
-        }
+        [Polaris]$Polaris = $AsyncResult.AsyncState
+        $context = $Polaris.Listener.EndGetContext($AsyncResult)
+        
 
         if ($Polaris.StopServer -or $null -eq $context) {
             if ($null -ne $Polaris.Listener) {
@@ -27,6 +26,8 @@ class Polaris {
             }
             break
         }
+
+        $Polaris.Listener.BeginGetContext($Polaris.ContextHandler, $Polaris)
 
         [System.Net.HttpListenerRequest] $rawRequest = $context.Request
         [System.Net.HttpListenerResponse] $rawResponse = $context.Response
@@ -90,7 +91,7 @@ class Polaris {
             $response.Close()
             throw $_
         }
-    }
+    })
 
 
     [Void] AddRoute(
@@ -161,6 +162,7 @@ class Polaris {
         $this.PowerShellPool.SetMaxRunspaces($maxRunspaces)
         $this.PowerShellPool.Open()
         $this.InitListener($port)
+        $this.Listener.BeginGetContext($this.ContextHandler, $this)
         $this.Log("App listening on Port: " + $port + "!")
     }
 
@@ -175,27 +177,19 @@ class Polaris {
     [void] InitListener([int] $port) {
         $this.Port = $port
 
-        $AsyncHelper = [Polaris.AsyncHelper]::new()
-        
-        $Job = Register-ObjectEvent -InputObject $AsyncHelper `
-                        -EventName myEvent `
-                        -Action $this.ContextHandler `
-                        -MessageData @{
-                            'Polaris' = $this
-                        }
+        $this.Listener = [System.Net.HttpListener]::new()
 
         # If user is on a non-windows system or windows as administrator
         if ([system.environment]::OSVersion.Platform -ne [System.PlatformID]::Win32NT -or
             ([System.Environment]::OSVersion.Platform -eq [System.PlatformID]::Win32NT -and
                 ([System.Security.Principal.WindowsPrincipal]::new([System.Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([System.Security.Principal.WindowsBuiltInRole]::Administrator))) {
-                    $AsyncHelper.Listener.Prefixes.Add("http://+:" + $this.Port + "/")
+                    $this.Listener.Prefixes.Add("http://+:" + $this.Port + "/")
         }
         else {
-            $AsyncHelper.Listener.Prefixes.Add("http://localhost:" + $this.Port + "/")
+            $this.Listener.Prefixes.Add("http://localhost:" + $this.Port + "/")
         }
 
-        $AsyncHelper.Start()
-        $this.Listener = $AsyncHelper.Listener
+        $this.Listener.Start()
     }
 
     static [void] Send([System.Net.HttpListenerResponse]$rawResponse, [PolarisResponse]$response) {

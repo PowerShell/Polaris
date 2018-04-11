@@ -16,7 +16,7 @@
     A Polaris object
     Defaults to the script scoped Polaris
 .EXAMPLE
-$JsonBodyParserMiddlerware =
+$JsonBodyParserMiddleware =
 {
     if ($Request.BodyString -ne $null) {
         $Request.Body = $Request.BodyString | ConvertFrom-Json

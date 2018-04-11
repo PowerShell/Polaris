@@ -7,7 +7,7 @@ $ExecutionContext.SessionState.Module.OnRemove =
     Clear-Polaris
 }.GetNewClosure()
 
-$JsonBodyParserMiddlerware =
+$JsonBodyParserMiddleware =
 {
     if ( $Request.BodyString -ne $Null ) {
         $Request.Body = $Request.BodyString | ConvertFrom-Json
