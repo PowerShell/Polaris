@@ -3,7 +3,7 @@
     BeforeAll {
         
         #  Import module
-        Import-Module $PSScriptRoot\..\Polaris.psd1
+        Import-Module $PSScriptRoot\..\..\Polaris.psd1
 
         #  Create test script
         $ScriptPath = 'TestDrive:\TestScript.ps1'

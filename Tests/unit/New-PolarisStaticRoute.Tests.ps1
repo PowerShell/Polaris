@@ -3,7 +3,7 @@
     BeforeAll {
 
         #  Import module
-        Import-Module $PSScriptRoot\..\Polaris.psd1
+        Import-Module $PSScriptRoot\..\..\Polaris.psd1
 
         #  Start with a clean slate
         Remove-PolarisRoute
@@ -51,13 +51,6 @@
         $AllRoutes = @()
         $AllRoutes += Get-PolarisRoute
         $AllRoutes.Count | Should Be 1
-    }
-
-    It "Should create routes that serve files" {
-
-        #  Confirm file can be downloaded
-        $Download = Invoke-WebRequest -Uri $File1Uri -TimeoutSec 10 -UseBasicParsing
-        $Download.Content | Should be $File1Content
     }
 
     It "Should throw error if route for file exists" {

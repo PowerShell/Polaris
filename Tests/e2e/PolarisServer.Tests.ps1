@@ -1,10 +1,75 @@
-$here = Split-Path -Parent $MyInvocation.MyCommand.Path
-$sut = (Split-Path -Leaf $MyInvocation.MyCommand.Path).Replace(".Tests.", ".")
-. "$here\$sut"
+Describe "Test webserver use (E2E)" {
 
-$IsUnix = $PSVersionTable.Platform -eq "Unix"
+    BeforeAll {
+        
+        $Port = Get-Random -Minimum 8000 -Maximum 8999
+        $IsUnix = $PSVersionTable.Platform -eq "Unix"
 
-Describe "Test webserver use" {
+        Start-Job -ScriptBlock {
+            # Import Polaris
+            Import-Module -Name $using:PSScriptRoot\..\..\Polaris.psd1
+
+            # Support Headers
+            New-PolarisRoute -Path /header -Method "GET" -ScriptBlock {
+                $response.SetHeader('Location', 'http://www.contoso.com/')
+                $response.Send("Header test")
+            }
+
+            # Hello World passing in the Path, Method & ScriptBlock
+            New-PolarisRoute -Path /helloworld -Method GET -ScriptBlock {
+                Write-Host "This is Write-Host"
+                Write-Information "This is Write-Information" -Tags Tag0
+                $Response.Send('Hello World')
+            }
+
+            # Hello World passing in the Path, Method & ScriptBlock
+            New-PolarisRoute -Path /hellome -Method GET -ScriptBlock {
+                if ($Request.Query['name']) {
+                    $Response.Send('Hello ' + $Request.Query['name'])
+                }
+                else {
+                    $Response.Send('Hello World')
+                }
+            }
+
+            $sbWow = {
+                $json = @{
+                    wow = $true
+                }
+
+                # .Json helper function that sets content type
+                $response.Json(($json | ConvertTo-Json))
+            }
+
+            # Supports helper functions for Get, Post, Put, Delete
+            New-PolarisPostRoute -Path /wow -ScriptBlock $sbWow
+
+            # Pass in script file
+            New-PolarisRoute -Path /example -Method GET -ScriptPath $using:PSScriptRoot\test.ps1
+
+            # Also support static serving of a directory
+            New-PolarisStaticRoute -FolderPath $using:PSScriptRoot/static -RoutePath /public
+
+            New-PolarisGetRoute -Path /error -ScriptBlock {
+                $params = @{}
+                Write-Host "asdf"
+                throw "Error"
+                $response.Send("this should not show up in response")
+            }
+
+            # Start the app
+            $Polaris = Start-Polaris -Port $using:Port -MinRunspaces 1 -MaxRunspaces 5 # all params are optional
+
+            # Keeping the job running while the tests are running
+            while($Polaris.Listener.IsListening){
+                Wait-Event callbackeventbridge.callbackcomplete
+            }
+        }
+
+        # Giving server job time to start up
+        Start-Sleep -seconds 2
+    }
+
     Context "Test different route responses" {
         It "test /helloworld route" {
             $result = Invoke-WebRequest -Uri "http://localhost:$Port/helloworld" -UseBasicParsing
@@ -100,7 +165,7 @@ Hello World"
         }
 
         AfterAll {
-            Stop-Polaris
+            Get-Job | Stop-Job | Remove-Job
         }
     }
 

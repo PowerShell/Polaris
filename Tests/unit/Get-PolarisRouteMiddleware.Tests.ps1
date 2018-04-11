@@ -3,7 +3,7 @@
     BeforeAll {
         
         #  Import module
-        Import-Module $PSScriptRoot\..\Polaris.psd1
+        Import-Module $PSScriptRoot\..\..\Polaris.psd1
 
         #  Start with a clean slate
         Remove-PolarisRouteMiddleware

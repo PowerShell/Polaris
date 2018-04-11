@@ -1,18 +1,17 @@
-$here = Split-Path -Parent $MyInvocation.MyCommand.Path
-$sut = (Split-Path -Leaf $MyInvocation.MyCommand.Path).Replace(".Tests.", ".")
-. "$here\$sut"
-
-$defaultScriptBlock = {
-    $response.Send("test script")
-}
-$defaultScriptPath = "$PSScriptRoot/test.ps1"
-$defaultStaticDirectory = "$PSScriptRoot/static"
-
-function RouteExists ($Path, $Method) {
-    return (Get-Polaris).ScriptBlockRoutes[$Path.TrimEnd('/').TrimStart('/')][$Method] -ne $null
-}
-
 Describe "Test route creation" {
+    BeforeAll {
+        Import-Module $PSScriptRoot\..\..\Polaris.psd1
+
+        $defaultScriptBlock = {
+            $response.Send("test script")
+        }
+        $defaultScriptPath = "$PSScriptRoot/test.ps1"
+        $defaultStaticDirectory = "$PSScriptRoot/static"
+
+        function RouteExists ($Path, $Method) {
+            return (Get-Polaris).ScriptBlockRoutes[$Path.TrimEnd('/').TrimStart('/')][$Method] -ne $null
+        }
+    }
     Context "Using New-PolarisRoute" {
         It "with -Path '<Path>' -Method '<Method>' -ScriptPath '<ScriptPath>' -ScriptBlock '<ScriptBlock>'" `
             -TestCases @(
