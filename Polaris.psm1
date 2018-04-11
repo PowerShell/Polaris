@@ -7,13 +7,6 @@ $ExecutionContext.SessionState.Module.OnRemove =
     Clear-Polaris
 }.GetNewClosure()
 
-$JsonBodyParserMiddleware =
-{
-    if ( $Request.BodyString -ne $Null ) {
-        $Request.Body = $Request.BodyString | ConvertFrom-Json
-    }
-}
-
 # Get public and private function definition files.
 $Public = @( Get-ChildItem -Path $PSScriptRoot\Public\*.ps1 -ErrorAction SilentlyContinue )
 $Private = @( Get-ChildItem -Path $PSScriptRoot\Private\*.ps1 -ErrorAction SilentlyContinue )

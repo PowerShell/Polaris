@@ -11,7 +11,13 @@
 #>
 function Use-PolarisJsonBodyParserMiddleware {
     [CmdletBinding()]
-    param()
+    param(
+        $Polaris
+    )
 
-    New-PolarisRouteMiddleware -Name JsonBodyParser -ScriptBlock $JsonBodyParserMiddleware -Force
+    New-PolarisRouteMiddleware -Name JsonBodyParser -ScriptBlock {
+        if ( $Request.BodyString -ne $Null ) {
+            $Request.Body = $Request.BodyString | ConvertFrom-Json
+        }
+    } -Force -Polaris $Polaris
 }
