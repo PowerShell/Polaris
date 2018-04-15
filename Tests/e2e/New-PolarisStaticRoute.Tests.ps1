@@ -52,7 +52,7 @@
         }
 
         # Giving server job time to start up
-        Start-Sleep -seconds 2
+        Start-Sleep -seconds 5
     }
 
     It "Should create routes that serve files" {
