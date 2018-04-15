@@ -5,93 +5,121 @@ class Polaris {
     [System.Collections.Generic.Dictionary[string, [System.Collections.Generic.Dictionary[string, scriptblock]]]]$ScriptBlockRoutes = [System.Collections.Generic.Dictionary[string, [System.Collections.Generic.Dictionary[string, scriptblock]]]]::new()
     hidden [Action[string]]$Logger
     hidden [System.Net.HttpListener]$Listener
-    hidden [System.Management.Automation.Runspaces.RunspacePool]$PowerShellPool = [RunspaceFactory]::CreateRunspacePool()
     hidden [bool]$StopServer = $False
     [string]$getLogsString = "PolarisLogs"
     [string] $ClassDefinitions = $script:ClassDefinitions
     $ContextHandler = (New-ScriptBlockCallback -Callback {
 
-        param(
-            [System.IAsyncResult]
-            $AsyncResult
-        ) 
+            param(
+                [System.IAsyncResult]
+                $AsyncResult
+            ) 
 
-        [Polaris]$Polaris = $AsyncResult.AsyncState
-        $context = $Polaris.Listener.EndGetContext($AsyncResult)
+            [Polaris]$Polaris = $AsyncResult.AsyncState
+            $context = $Polaris.Listener.EndGetContext($AsyncResult)
         
 
-        if ($Polaris.StopServer -or $null -eq $context) {
-            if ($null -ne $Polaris.Listener) {
-                $Polaris.Listener.Close()
+            if ($Polaris.StopServer -or $null -eq $context) {
+                if ($null -ne $Polaris.Listener) {
+                    $Polaris.Listener.Close()
+                }
+                break
             }
-            break
-        }
 
-        $Polaris.Listener.BeginGetContext($Polaris.ContextHandler, $Polaris)
+            $Polaris.Listener.BeginGetContext($Polaris.ContextHandler, $Polaris)
 
-        [System.Net.HttpListenerRequest] $rawRequest = $context.Request
-        [System.Net.HttpListenerResponse] $rawResponse = $context.Response
+            [System.Net.HttpListenerRequest] $rawRequest = $context.Request
+            [System.Net.HttpListenerResponse] $rawResponse = $context.Response
 
-        $Polaris.Log("request came in: " + $rawRequest.HttpMethod + " " + $rawRequest.RawUrl)
+            $Polaris.Log("request came in: " + $rawRequest.HttpMethod + " " + $rawRequest.RawUrl)
 
-        [PolarisRequest] $request = [PolarisRequest]::new($rawRequest)
-        [PolarisResponse] $response = [PolarisResponse]::new()
+            [PolarisRequest] $request = [PolarisRequest]::new($rawRequest)
+            [PolarisResponse] $response = [PolarisResponse]::new()
 
             
-        [string] $route = $rawRequest.Url.AbsolutePath.TrimEnd('/').TrimStart('/')
+            [string] $route = $rawRequest.Url.AbsolutePath.TrimEnd('/').TrimStart('/')
 
-        try {
+            try {
 
-            # Run middleware in the order in which it was added
-            foreach ($middleware in $Polaris.RouteMiddleware) {
-                $middleware.ScriptBlock.Invoke()
-            }
-            $Polaris.Log("Parsed Route: $Route")
-            $Polaris.Log("Request Method: $($rawRequest.HttpMethod)")
-            $Routes = $Polaris.ScriptBlockRoutes
-            $MatchingRoute = $Routes.keys.where( {$route -match $_})[0]
-            $MatchingMethod = $false
-
-            if ($MatchingRoute) {
-                $MatchingMethod = $Routes[$MatchingRoute].Keys -contains $request.Method
-            }
-
-            if ($MatchingRoute -and $MatchingMethod) {
-                try {
+                # Run middleware in the order in which it was added
+                foreach ($middleware in $Polaris.RouteMiddleware) {
                     $ScriptBlock = [scriptblock]::Create(
                         "param(`$request,`$Response)`r`n" +
-                            $Routes[$MatchingRoute][$request.Method].ToString()
+                        $middleware.ScriptBlock.ToString()
                     )
-                    $ScriptBlock.Invoke(@($request,$response))
+                    
+                    Invoke-Command -ScriptBlock $ScriptBlock `
+                        -ArgumentList @($Request, $Response)
                 }
-                catch {
-                    $errorsBody += $_.Exception.ToString()
-                    $errorsBody += $_.InvocationInfo.PositionMessage + "`n`n"
-                    $response.Send($errorsBody)
-                    $Polaris.Log(($PowerShellInstance | ConvertTo-Json -Depth 3 | Out-String))
-                    $response.SetStatusCode(500)
+
+                $Polaris.Log("Parsed Route: $Route")
+                $Polaris.Log("Request Method: $($rawRequest.HttpMethod)")
+                $Routes = $Polaris.ScriptBlockRoutes
+                $MatchingRoute = $Routes.keys.where( {$route -match $_})[0]
+                $MatchingMethod = $false
+
+                if ($MatchingRoute) {
+                    $MatchingMethod = $Routes[$MatchingRoute].Keys -contains $request.Method
                 }
-            }
-            elseif ($MatchingRoute) {
-                $response.Send("Method not allowed")
-                $response.SetStatusCode(405)
-            }
-            else {
-                $response.send("Not found")
-                $response.SetStatusCode(404)
-            }
+
+                if ($MatchingRoute -and $MatchingMethod) {
+                    try {
+                        $ScriptBlock = [scriptblock]::Create( 
+                            "param(`$request,`$Response)`r`n" +
+                            $Routes[$MatchingRoute][$request.Method].ToString()
+                        )
+                    
+                        Invoke-Command -ScriptBlock $ScriptBlock `
+                            -ArgumentList @($request, $response) `
+                            -InformationVariable InformationVariable
+                    }
+                    catch {
+                        $errorsBody += $_.Exception.ToString()
+                        $errorsBody += $_.InvocationInfo.PositionMessage + "`n`n"
+                        $response.Send($errorsBody)
+                        $Polaris.Log(($PowerShellInstance | ConvertTo-Json -Depth 3 | Out-String))
+                        $response.SetStatusCode(500)
+                    }
+                }
+                elseif ($MatchingRoute) {
+                    $response.Send("Method not allowed")
+                    $response.SetStatusCode(405)
+                }
+                else {
+                    $response.send("Not found")
+                    $response.SetStatusCode(404)
+                }
             
-            [Polaris]::Send($rawResponse, $response)
+                # Handle logs
+                if ($request.Query -and $request.Query[$Polaris.GetLogsString]) {
+                    $informationBody = "`n"
+                    for ([int] $i = 0; $i -lt $InformationVariable.Count; $i++) {
+                        foreach ($tag in $InformationVariable[$i].Tags) {
+                            $informationBody += "[" + $tag + "]"
+                        }
+
+                        $informationBody += $InformationVariable[$i].MessageData.ToString() + "`n"
+                    }
+                    $informationBody += "`n"
+
+                    # Set response to the logs and the actual response (could be errors)
+                    $logBytes = [System.Text.Encoding]::UTF8.GetBytes($informationBody)
+                    $bytes = [byte[]]::new($logBytes.Length + $response.ByteResponse.Length)
+                    $logBytes.CopyTo($bytes, 0)
+                    $response.ByteResponse.CopyTo($bytes, $logBytes.Length)
+                    $response.ByteResponse = $bytes
+                }
+                [Polaris]::Send($rawResponse, $response)
                 
-        }
-        catch {
-            $Polaris.Log(($_ | out-string))
-            $response.SetStatusCode(500)
-            $response.Send($_)
-            $response.Close()
-            throw $_
-        }
-    })
+            }
+            catch {
+                $Polaris.Log(($_ | out-string))
+                $response.SetStatusCode(500)
+                $response.Send($_)
+                $response.Close()
+                throw $_
+            }
+        })
 
 
     [Void] AddRoute(
@@ -136,7 +164,6 @@ class Polaris {
         if ($null -eq $scriptBlock) {
             throw [ArgumentNullException]::new("scriptBlock")
         }
-        $this.RouteMiddleWare.Add
         $this.RouteMiddleware.Add([PolarisMiddleware]@{
                 'Name'        = $name
                 'ScriptBlock' = $scriptBlock
@@ -153,14 +180,9 @@ class Polaris {
     }
 
     [Void] Start(
-        [int]$port = 3000,  
-        [int]$minRunspaces = 1,
-        [int]$maxRunspaces = 1
+        [int]$port = 3000
     ) {
         $this.StopServer = $false
-        $this.PowerShellPool.SetMinRunspaces($minRunspaces)
-        $this.PowerShellPool.SetMaxRunspaces($maxRunspaces)
-        $this.PowerShellPool.Open()
         $this.InitListener($port)
         $this.Listener.BeginGetContext($this.ContextHandler, $this)
         $this.Log("App listening on Port: " + $port + "!")
@@ -168,7 +190,6 @@ class Polaris {
 
     [void] Stop() {
         $this.StopServer = $true
-        $this.PowerShellPool.Close()
         $this.Listener.Close()
         $this.Listener.Dispose()
         $this.Log("Server Stopped.")
@@ -183,7 +204,7 @@ class Polaris {
         if ([system.environment]::OSVersion.Platform -ne [System.PlatformID]::Win32NT -or
             ([System.Environment]::OSVersion.Platform -eq [System.PlatformID]::Win32NT -and
                 ([System.Security.Principal.WindowsPrincipal]::new([System.Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([System.Security.Principal.WindowsBuiltInRole]::Administrator))) {
-                    $this.Listener.Prefixes.Add("http://+:" + $this.Port + "/")
+            $this.Listener.Prefixes.Add("http://+:" + $this.Port + "/")
         }
         else {
             $this.Listener.Prefixes.Add("http://localhost:" + $this.Port + "/")
@@ -237,9 +258,10 @@ class Polaris {
     Polaris(
         [Action[string]]$Logger
     ) {
-        if($Logger){
+        if ($Logger) {
             $this.Logger = $Logger
-        } else {
+        }
+        else {
             $this.Logger = {
                 param($LogItem)
                 Write-Host $LogItem

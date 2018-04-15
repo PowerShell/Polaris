@@ -5,8 +5,8 @@ Describe "Test route creation" {
         $defaultScriptBlock = {
             $response.Send("test script")
         }
-        $defaultScriptPath = "$PSScriptRoot/test.ps1"
-        $defaultStaticDirectory = "$PSScriptRoot/static"
+        $defaultScriptPath = "$PSScriptRoot/../resources/test.ps1"
+        $defaultStaticDirectory = "$PSScriptRoot/../resources/static"
 
         function RouteExists ($Path, $Method) {
             return (Get-Polaris).ScriptBlockRoutes[$Path.TrimEnd('/').TrimStart('/')][$Method] -ne $null

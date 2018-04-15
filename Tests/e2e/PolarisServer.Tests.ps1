@@ -45,10 +45,10 @@ Describe "Test webserver use (E2E)" {
             New-PolarisPostRoute -Path /wow -ScriptBlock $sbWow
 
             # Pass in script file
-            New-PolarisRoute -Path /example -Method GET -ScriptPath $using:PSScriptRoot\test.ps1
+            New-PolarisRoute -Path /example -Method GET -ScriptPath $using:PSScriptRoot\..\resources\test.ps1
 
             # Also support static serving of a directory
-            New-PolarisStaticRoute -FolderPath $using:PSScriptRoot/static -RoutePath /public
+            New-PolarisStaticRoute -FolderPath $using:PSScriptRoot/../resources/static -RoutePath /public
 
             New-PolarisGetRoute -Path /error -ScriptBlock {
                 $params = @{}
@@ -61,18 +61,18 @@ Describe "Test webserver use (E2E)" {
             $Polaris = Start-Polaris -Port $using:Port -MinRunspaces 1 -MaxRunspaces 5 # all params are optional
 
             # Keeping the job running while the tests are running
-            while($Polaris.Listener.IsListening){
+            while ($Polaris.Listener.IsListening) {
                 Wait-Event callbackeventbridge.callbackcomplete
             }
         }
 
         # Giving server job time to start up
-        Start-Sleep -seconds 2
+        Start-Sleep -seconds 5
     }
 
     Context "Test different route responses" {
         It "test /helloworld route" {
-            $result = Invoke-WebRequest -Uri "http://localhost:$Port/helloworld" -UseBasicParsing
+            $result = Invoke-WebRequest -Uri "http://localhost:$Port/helloworld" -UseBasicParsing -TimeoutSec 2
             $result.Content | Should Be 'Hello World'
             $result.StatusCode | Should Be 200
         }
@@ -167,23 +167,5 @@ Hello World"
         AfterAll {
             Get-Job | Stop-Job | Remove-Job
         }
-    }
-
-    Context "Test starting and stopping of the server" {
-        BeforeAll {
-            if (-not $IsUnix) {
-                Stop-Polaris
-                Start-Polaris -Port 9998
-    
-                $result = Invoke-WebRequest -Uri "http://localhost:9998/helloworld" -UseBasicParsing
-                $result.StatusCode | Should Be 200
-            }
-        }
-
-        It "Can properly shut down the server" {
-            Stop-Polaris
-
-            { Invoke-WebRequest -Uri "http://localhost:9998/helloworld" -UseBasicParsing } | Should Throw
-        } -Skip:$IsUnix
     }
 }

@@ -23,4 +23,6 @@ function Stop-Polaris {
     if ( $ServerContext ) {
         $ServerContext.Stop()
     }
+
+    Get-PSDrive PolarisStaticFileServer* | Remove-PSDrive
 }

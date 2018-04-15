@@ -49,6 +49,17 @@
       "script": "invoke-pester",
       "cwd": "${workspaceRoot}",
       "createTemporaryIntegratedConsole": true
+    },
+    {
+      "type": "PowerShell",
+      "request": "launch",
+      "name": "PowerShell Launch Current Pester Test File in Temporary Console",
+      "script": "invoke-pester",
+      "args": [
+        "-Script ${file}"
+      ],
+      "cwd": "${workspaceRoot}",
+      "createTemporaryIntegratedConsole": true
     }
   ]
 }

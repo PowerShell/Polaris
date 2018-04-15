@@ -43,7 +43,7 @@
             $Polaris = Start-Polaris -Port $using:Port
 
             # Keeping the job running while the tests are running
-            while($Polaris.Listener.IsListening){
+            while ($Polaris.Listener.IsListening) {
                 Wait-Event callbackeventbridge.callbackcomplete
             }
         }
@@ -55,7 +55,7 @@
     It "Should create routes that serve files" {
 
         #  Confirm file can be downloaded
-        $Download = Invoke-WebRequest -Uri $File1Uri -TimeoutSec 10 -UseBasicParsing
+        $Download = Invoke-WebRequest -Uri $File1Uri -UseBasicParsing
         $Download.Content | Should be $File1Content
     }
 

@@ -84,7 +84,7 @@
 
         #  Confirm conflicting route was overwritten
         $NewRoute = Get-PolarisRoute "$RootPath" -Method GET
-        $NewRoute.ScriptBlock.TrimStart().SubString( 0, 20 ) | Should be 'New-PSDrive -Name Po'
+        $NewRoute.ScriptBlock.toString().TrimStart().SubString( 0, 20 ) | Should be "`$RoutePath = 'BaseRo"
     }
 
     AfterAll {

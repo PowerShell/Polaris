@@ -50,9 +50,10 @@ function Start-Polaris {
         Use-PolarisJsonBodyParserMiddleware -Polaris $Polaris
     }
 
-    try{
-        $Polaris.Start( $Port, $MinRunspaces, $MaxRunspaces )
-    } catch {
+    try {
+        $Polaris.Start( $Port )
+    }
+    catch {
         throw $_
     }
     

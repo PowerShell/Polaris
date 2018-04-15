@@ -64,12 +64,14 @@ function New-PolarisRouteMiddleware {
     }
     else {
         CreateNewPolarisIfNeeded
-        if( -not $Polaris){
+        if ( -not $Polaris) {
             $Polaris = $script:Polaris
         }
 
         switch ( $PSCmdlet.ParameterSetName ) {
             'ScriptBlock' {
+                $ScriptBlock = $ScriptBlock
+
                 $Polaris.AddMiddleware( $Name, $ScriptBlock )
             }
             'ScriptPath' {

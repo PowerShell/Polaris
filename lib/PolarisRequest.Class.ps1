@@ -10,7 +10,7 @@ class PolarisRequest {
     [uri] $Url
     [string] $UserAgent
 
-    hidden [System.Net.HttpListenerRequest] $RawRequest
+   [System.Net.HttpListenerRequest] $RawRequest
 
     PolarisRequest([System.Net.HttpListenerRequest] $rawRequest) {
         $this.RawRequest = $rawRequest

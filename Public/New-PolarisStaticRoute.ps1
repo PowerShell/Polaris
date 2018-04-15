@@ -59,7 +59,10 @@ function New-PolarisStaticRoute {
         Write-Error -Exception FileNotFoundException -Message "Folder does not exist at path $FolderPath"
     }
 
-    New-PSDrive -Name PolarisStaticFileServer -PSProvider FileSystem -Root $FolderPath -Scope Global
+    $NewDrive = (New-PSDrive -Name "PolarisStaticFileServer$([guid]::NewGuid().guid)" `
+            -PSProvider FileSystem `
+            -Root $FolderPath `
+            -Scope Global).Name
     
     $ScriptBlock = {
         $Content = ""
@@ -67,22 +70,23 @@ function New-PolarisStaticRoute {
         $localPath = ($request.Url.LocalPath -replace $RoutePath, "")
         Write-Debug "Parsed local path: $localPath" 
         try {
-            $RequestedItem = Get-Item -LiteralPath "PolarisStaticFileServer:$localPath" -Force -ErrorAction Stop
+            $RequestedItem = Get-Item -LiteralPath "$NewDrive`:$localPath" -Force -ErrorAction Stop
             Write-Debug "Requested Item: $RequestedItem"
              
             $FullPath = $RequestedItem.FullName
             if ($RequestedItem.Attributes -match "Directory") {
 
-                if($EnableDirectoryBrowser) {
+                if ($EnableDirectoryBrowser) {
                     $Content = New-DirectoryBrowser -Path $FullPath `
-                                -HeaderName "Polaris Static File Server" `
-                                -SubfolderName $localPath `
-                                -Root "$((get-psdrive PolarisStaticFileServer).Root)" `
-                                -RoutePath $RoutePath
+                        -HeaderName "Polaris Static File Server" `
+                        -SubfolderName $localPath `
+                        -Root "$((get-psdrive $NewDrive).Root)" `
+                        -RoutePath $RoutePath
 
                     $response.ContentType = "text/html"
                     $Response.Send($Content)
-                } else {
+                }
+                else {
                     throw [System.Management.Automation.ItemNotFoundException]'file not found'
                 }
             }
@@ -112,8 +116,9 @@ function New-PolarisStaticRoute {
     # Inserting variables into scriptblock as hardcoded
     $ScriptBlock = [scriptblock]::Create(
         "`$RoutePath = '$($RoutePath.TrimStart("/"))'`r`n" +
-            "`$EnableDirectoryBrowser = `$$EnableDirectoryBrowser`r`n" +
-            $ScriptBlock.ToString())
+        "`$EnableDirectoryBrowser = `$$EnableDirectoryBrowser`r`n" +
+        "`$NewDrive = '$NewDrive'`r`n" +
+        $ScriptBlock.ToString())
 
     New-PolarisRoute -Path $RoutePath -Method GET -ScriptBlock $ScriptBlock -Force:$Force -ErrorAction:$ErrorAction
 }
