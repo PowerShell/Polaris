@@ -61,9 +61,9 @@ function Get-PolarisRoute {
 
             $Filter = [scriptblock]::Create( (
                     '( ' + 
-                    ( $Path.ForEach( {   "`$_.Path   -like `"$($_.TrimStart('/'))`"" } ) -join ' -or ' ) + 
+                    ( $Path.ForEach( {   "`$_.Path   -like `"/$($_.TrimStart("/"))`"" } ) -join ' -or ' ) + 
                     ' ) -and ( ' +
-                    ( $Method.ForEach( { "`$_.Method -like `"$($_.TrimStart('/'))`"" } ) -join ' -or ' ) +
+                    ( $Method.ForEach( { "`$_.Method -like `"$($_)`"" } ) -join ' -or ' ) +
                     ' )' ) )
 
             $WebRoutes = $WebRoutes.Where( $Filter )

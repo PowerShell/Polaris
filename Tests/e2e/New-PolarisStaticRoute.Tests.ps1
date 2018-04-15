@@ -40,6 +40,9 @@
             ####  Create static routes
             New-PolarisStaticRoute -RoutePath $using:RootPath -FolderPath $using:TestPath
 
+            ####  Create a static route at the root
+            New-PolarisStaticRoute -RoutePath "/" -FolderPath $using:TestPath
+
             $Polaris = Start-Polaris -Port $using:Port
 
             # Keeping the job running while the tests are running
@@ -56,6 +59,13 @@
 
         #  Confirm file can be downloaded
         $Download = Invoke-WebRequest -Uri $File1Uri -UseBasicParsing
+        $Download.Content | Should be $File1Content
+    }
+
+    It "Should create routes that serve files when / is used as the base" {
+
+        #  Confirm file can be downloaded
+        $Download = Invoke-WebRequest -Uri "http://localhost:$Port/File1.txt" -UseBasicParsing
         $Download.Content | Should be $File1Content
     }
 

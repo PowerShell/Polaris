@@ -8,23 +8,23 @@
         Remove-PolarisRoute
 
         #  Create test route to test against
-        New-PolarisRoute -Path 'Test0'  -Method GET  -ScriptBlock {}
-        New-PolarisRoute -Path 'Test0'  -Method POST -ScriptBlock {}
-        New-PolarisRoute -Path 'Test1'  -Method GET  -ScriptBlock {}
-        New-PolarisRoute -Path 'Test2'  -Method GET  -ScriptBlock {}
-        New-PolarisRoute -Path 'Test2'  -Method POST -ScriptBlock {}
-        New-PolarisRoute -Path 'Test3A' -Method PUT  -ScriptBlock {}
-        New-PolarisRoute -Path 'Test3B' -Method PUT  -ScriptBlock {}
-        New-PolarisRoute -Path 'Test3C' -Method GET  -ScriptBlock {}
-        New-PolarisRoute -Path 'Test4A' -Method PUT  -ScriptBlock {}
-        New-PolarisRoute -Path 'Test4B' -Method PUT  -ScriptBlock {}
-        New-PolarisRoute -Path 'Test5'  -Method GET  -ScriptBlock {}
-        New-PolarisRoute -Path 'Test5'  -Method POST -ScriptBlock {}
-        New-PolarisRoute -Path 'Test5'  -Method PUT  -ScriptBlock {}
-        New-PolarisRoute -Path 'Test6A' -Method GET  -ScriptBlock {}
-        New-PolarisRoute -Path 'Test6B' -Method GET  -ScriptBlock {}
-        New-PolarisRoute -Path 'Test7'  -Method POST -ScriptBlock {}
-        New-PolarisRoute -Path 'Test7'  -Method PUT  -ScriptBlock {}
+        New-PolarisRoute -Path '/Test0'  -Method GET  -ScriptBlock {}
+        New-PolarisRoute -Path '/Test0'  -Method POST -ScriptBlock {}
+        New-PolarisRoute -Path '/Test1'  -Method GET  -ScriptBlock {}
+        New-PolarisRoute -Path '/Test2'  -Method GET  -ScriptBlock {}
+        New-PolarisRoute -Path '/Test2'  -Method POST -ScriptBlock {}
+        New-PolarisRoute -Path '/Test3A' -Method PUT  -ScriptBlock {}
+        New-PolarisRoute -Path '/Test3B' -Method PUT  -ScriptBlock {}
+        New-PolarisRoute -Path '/Test3C' -Method GET  -ScriptBlock {}
+        New-PolarisRoute -Path '/Test4A' -Method PUT  -ScriptBlock {}
+        New-PolarisRoute -Path '/Test4B' -Method PUT  -ScriptBlock {}
+        New-PolarisRoute -Path '/Test5'  -Method GET  -ScriptBlock {}
+        New-PolarisRoute -Path '/Test5'  -Method POST -ScriptBlock {}
+        New-PolarisRoute -Path '/Test5'  -Method PUT  -ScriptBlock {}
+        New-PolarisRoute -Path '/Test6A' -Method GET  -ScriptBlock {}
+        New-PolarisRoute -Path '/Test6B' -Method GET  -ScriptBlock {}
+        New-PolarisRoute -Path '/Test7'  -Method POST -ScriptBlock {}
+        New-PolarisRoute -Path '/Test7'  -Method PUT  -ScriptBlock {}
     }
 
     It "Should default to get all routes" {
@@ -34,12 +34,12 @@
     }
 
     It "Should respect Path" {
-        $Routes = Get-PolarisRoute -Path 'Test2'
+        $Routes = Get-PolarisRoute -Path '/Test2'
         @( $Routes ).Count | Should Be 2
     }
 
     It "Should respect Method" {
-        $Routes = Get-PolarisRoute -Path 'Test3*' -Method PUT
+        $Routes = Get-PolarisRoute -Path '/Test3*' -Method PUT
         @( $Routes ).Count | Should Be 2
     }
 
@@ -49,32 +49,32 @@
     }
 
     It "Should accept multiple values for Path" {
-        $Routes = Get-PolarisRoute -Path 'Test4A', 'Test4B'
+        $Routes = Get-PolarisRoute -Path '/Test4A', '/Test4B'
         @( $Routes ).Count | Should Be 2
     }
 
     It "Should accept multiple values for Method" {
-        $Routes = Get-PolarisRoute -Path 'Test5' -Method GET, POST
+        $Routes = Get-PolarisRoute -Path '/Test5' -Method GET, POST
         @( $Routes ).Count | Should Be 2
     }
 
     It "Should accept wildcard values for Path" {
-        $Routes = Get-PolarisRoute -Path 'Test6*'
+        $Routes = Get-PolarisRoute -Path '/Test6*'
         @( $Routes ).Count | Should Be 2
     }
 
     It "Should accept wildcard values for Method" {
-        $Routes = Get-PolarisRoute -Path 'Test7' -Method 'P*'
+        $Routes = Get-PolarisRoute -Path '/Test7' -Method 'P*'
         @( $Routes ).Count | Should Be 2
     }
 
     It "Should accept pipeline input for Path" {
-        $Routes = 'Test6A', 'Test6B' | Get-PolarisRoute
+        $Routes = '/Test6A', '/Test6B' | Get-PolarisRoute
         @( $Routes ).Count | Should Be 2
     }
 
     It "Should accept pipeline property input for Path and Method" {
-        $Routes = Get-PolarisRoute -Path 'Test7' | Get-PolarisRoute
+        $Routes = Get-PolarisRoute -Path '/Test7' | Get-PolarisRoute
         @( $Routes ).Count | Should Be 2
     }
 

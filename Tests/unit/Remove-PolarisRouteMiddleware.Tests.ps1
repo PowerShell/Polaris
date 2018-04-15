@@ -65,23 +65,23 @@
         Remove-PolarisRouteMiddleware
 
         #  Create middleware to test against
-        New-PolarisRouteMiddleware -Name 'Test0'  -ScriptBlock {}
-        New-PolarisRouteMiddleware -Name 'Test1'  -ScriptBlock {}
-        New-PolarisRouteMiddleware -Name 'Test2A' -ScriptBlock {}
-        New-PolarisRouteMiddleware -Name 'Test2B' -ScriptBlock {}
-        New-PolarisRouteMiddleware -Name 'Test3A' -ScriptBlock {}
-        New-PolarisRouteMiddleware -Name 'Test3B' -ScriptBlock {}
-        New-PolarisRouteMiddleware -Name 'Test3C' -ScriptBlock {}
-        New-PolarisRouteMiddleware -Name 'Test4A' -ScriptBlock {}
-        New-PolarisRouteMiddleware -Name 'Test4B' -ScriptBlock {}
-        New-PolarisRouteMiddleware -Name 'Test5A' -ScriptBlock {}
-        New-PolarisRouteMiddleware -Name 'Test5B' -ScriptBlock {}
-        New-PolarisRouteMiddleware -Name 'Test6'  -ScriptBlock {}
+        New-PolarisRouteMiddleware -Name '/Test0'  -ScriptBlock {}
+        New-PolarisRouteMiddleware -Name '/Test1'  -ScriptBlock {}
+        New-PolarisRouteMiddleware -Name '/Test2A' -ScriptBlock {}
+        New-PolarisRouteMiddleware -Name '/Test2B' -ScriptBlock {}
+        New-PolarisRouteMiddleware -Name '/Test3A' -ScriptBlock {}
+        New-PolarisRouteMiddleware -Name '/Test3B' -ScriptBlock {}
+        New-PolarisRouteMiddleware -Name '/Test3C' -ScriptBlock {}
+        New-PolarisRouteMiddleware -Name '/Test4A' -ScriptBlock {}
+        New-PolarisRouteMiddleware -Name '/Test4B' -ScriptBlock {}
+        New-PolarisRouteMiddleware -Name '/Test5A' -ScriptBlock {}
+        New-PolarisRouteMiddleware -Name '/Test5B' -ScriptBlock {}
+        New-PolarisRouteMiddleware -Name '/Test6'  -ScriptBlock {}
         }
 
     It "Should delete middleware" {
         
-        Test-RemoveMiddleware -Name 'Test1'
+        Test-RemoveMiddleware -Name '/Test1'
         }
 
     It "Should do nothing when no middleware match" {
@@ -91,22 +91,22 @@
 
     It "Should accept multiple values for Name" {
 
-        Test-RemoveMiddleware -Name 'Test2A', 'Test2B'
+        Test-RemoveMiddleware -Name '/Test2A', '/Test2B'
         }
 
     It "Should accept wildcard values for Name" {
 
-        Test-RemoveMiddleware -Name 'Test3*'
+        Test-RemoveMiddleware -Name '/Test3*'
         }
 
     It "Should accept Name from pipeline" {
 
-        'Test4A', 'Test4B' | Test-RemoveMiddleware
+        '/Test4A', '/Test4B' | Test-RemoveMiddleware
         }
 
     It "Should accept Name from pipeline variables" {
 
-        Get-PolarisRouteMiddleware -Name 'Test5*' | Test-RemoveMiddleware
+        Get-PolarisRouteMiddleware -Name '/Test5*' | Test-RemoveMiddleware
         }
 
     It "Should delete all middleware if no Name parameter" {

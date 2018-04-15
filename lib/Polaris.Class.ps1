@@ -37,7 +37,9 @@ class Polaris {
             [PolarisResponse] $response = [PolarisResponse]::new()
 
             
-            [string] $route = $rawRequest.Url.AbsolutePath.TrimEnd('/').TrimStart('/')
+            [string] $route = $rawRequest.Url.AbsolutePath.TrimEnd('/')
+
+            if ( [string]::IsNullOrEmpty($route) ) { $route = "/" }
 
             try {
 
@@ -131,7 +133,9 @@ class Polaris {
             throw [ArgumentNullException]::new("scriptBlock")
         }
 
-        [string]$sanitizedPath = $path.TrimEnd('/').TrimStart('/')
+        [string]$sanitizedPath = $path.TrimEnd('/')
+
+        if ( [string]::IsNullOrEmpty($sanitizedPath) ) { $sanitizedPath = "/" }
 
         if (-not $this.ScriptBlockRoutes.ContainsKey($sanitizedPath)) {
             $this.ScriptBlockRoutes[$sanitizedPath] = [System.Collections.Generic.Dictionary[string, string]]::new()
@@ -150,7 +154,10 @@ class Polaris {
             throw [ArgumentNullException]::new("method")
         }
 
-        [string]$sanitizedPath = $path.TrimEnd('/').TrimStart('/')
+        [string]$sanitizedPath = $path.TrimEnd('/')
+
+        if ( [string]::IsNullOrEmpty($sanitizedPath) ) { $sanitizedPath = "/" }
+        
         $this.ScriptBlockRoutes[$sanitizedPath].Remove($method)
         if ($this.ScriptBlockRoutes[$sanitizedPath].Count -eq 0) {
             $this.ScriptBlockRoutes.Remove($sanitizedPath)
