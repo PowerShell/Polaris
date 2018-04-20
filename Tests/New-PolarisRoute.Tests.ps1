@@ -23,7 +23,7 @@
         ( Get-PolarisRoute -Path $Path -Method $Method ).Scriptblock | Should Be $Path
     }
     
-        ## Fix for bug n°108 - Creating route with a lowercase 'get'
+    ## Fix for bug n°108 - Creating route with a lowercase 'get'
 
     It "Should create route with lower case parameters" {
 
