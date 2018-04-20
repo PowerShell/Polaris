@@ -22,7 +22,21 @@
         #  Test route
         ( Get-PolarisRoute -Path $Path -Method $Method ).Scriptblock | Should Be $Path
     }
+    
+    ## Fix for bug n°108 - Creating route with a lowercase 'get'
 
+    It "Should create route with lower case parameters" {
+
+        New-PolarisRoute -Path /108 -Method get -ScriptBlock {
+
+            $line = "<h1>this is H1</h1>"
+            $response.SetContentType("text/html");  
+            $response.send($line)
+        } -force
+
+        (Get-PolarisRoute -Path 108).Method | should be 'GET'
+    }
+    
     It "Should create POST route" {
 
         #  Define route
