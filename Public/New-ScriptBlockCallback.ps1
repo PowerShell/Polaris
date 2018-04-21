@@ -1,5 +1,3 @@
-#requires -version 2.0
- 
 function New-ScriptBlockCallback {
     param(
         [parameter(Mandatory=$true)]
