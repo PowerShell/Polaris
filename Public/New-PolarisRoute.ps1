@@ -53,7 +53,7 @@ function New-PolarisRoute {
 
         $Polaris = $Script:Polaris
     )
-
+    $Method = $Method.ToUpper()
     $ExistingWebRoute = Get-PolarisRoute -Path $Path -Method $Method
 
     if ( $ExistingWebRoute -and $Force ) {
