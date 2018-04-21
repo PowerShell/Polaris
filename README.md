@@ -62,10 +62,6 @@ We can't do that without great feedback from you.
 
 If you have an idea or find a bug, join the discussions in the issues or create a new issue.
 
-## Limitations
-
-* All script executions happen in a sandboxed runspace which means common parameters can not be shared between routes
-
 ## License
 
 Polaris is licensed under the MIT License.
@@ -73,6 +69,7 @@ Polaris is licensed under the MIT License.
 ## Maintainers
 
 * [Tyler Leonhardt](https://github.com/tylerl0706) - [@TylerLeonhardt](https://twitter.com/TylerLeonhardt)
+* [Micah Rairdon](https://github.com/tiberriver256) - [@tiberriver256](https://twitter.com/tiberriver256)
 
 ## Code of Conduct
 
