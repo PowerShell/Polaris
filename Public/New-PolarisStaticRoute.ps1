@@ -74,7 +74,7 @@ function New-PolarisStaticRoute {
             Write-Debug "Requested Item: $RequestedItem"
              
             $FullPath = $RequestedItem.FullName
-            if ($RequestedItem.Attributes -match "Directory") {
+            if ($RequestedItem.PSIsContainer) {
 
                 if ($EnableDirectoryBrowser) {
                     $Content = New-DirectoryBrowser -Path $FullPath `
