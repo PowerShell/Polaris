@@ -77,11 +77,11 @@ function New-PolarisStaticRoute {
             if ($RequestedItem.PSIsContainer) {
 
                 if ($EnableDirectoryBrowser) {
-                    $Content = New-DirectoryBrowser -Path $FullPath `
+                    $Content = New-DirectoryBrowser -FileSystemPath $FullPath `
                         -HeaderName "Polaris Static File Server" `
-                        -SubfolderName $LocalPath `
-                        -Root "$((get-psdrive $NewDrive).Root)" `
-                        -RoutePath $RoutePath
+                        -DirectoryBrowserPath $LocalPath `
+                        -FileSystemRootFolder "$((get-psdrive $NewDrive).Root)" `
+                        -WebServerPath $RoutePath
 
                     $Response.ContentType = "text/html"
                     $Response.Send($Content)
