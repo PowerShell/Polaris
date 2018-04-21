@@ -36,7 +36,7 @@ function New-PolarisStaticRoute {
         $FolderPath,
 
         [bool]
-        $EnableDirectoryBrowser = $False,
+        $EnableDirectoryBrowser = $True,
         
         [switch]
         $Force,
@@ -91,9 +91,10 @@ function New-PolarisStaticRoute {
                 }
             }
             else {
-                $Content = [System.IO.File]::ReadAllBytes($FullPath)
+                $Response.SetStream(
+                    [System.IO.File]::Open($FullPath, [System.IO.FileMode]::Open)
+                )
                 $Response.ContentType = [PolarisResponse]::GetContentType($FullPath)
-                $Response.SendBytes($Content)
             }
         }
         catch [System.UnauthorizedAccessException] {

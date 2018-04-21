@@ -79,7 +79,7 @@ class Polaris{
 						$ErrorsBody += $_.Exception.ToString()
 						$ErrorsBody += $_.InvocationInfo.PositionMessage + "`n`n"
 						$Response.Send($ErrorsBody)
-						$Polaris.Log(($PowerShellInstance | ConvertTo-Json -Depth 3 | Out-String))
+                        $Polaris.Log($_)
 						$Response.SetStatusCode(500)
 					}
 				}
@@ -220,23 +220,63 @@ class Polaris{
 		$this.Listener.Start()
 	}
 
-	static [void] Send ([System.Net.HttpListenerResponse]$RawResponse,[PolarisResponse]$Response) {
-		try {
-			[Polaris]::Send($RawResponse,$Response.ByteResponse,$Response.StatusCode,$Response.ContentType,$Response.Headers);
-		}
-		catch {
-			throw $_
-		}
-	}
+    static [void] Send (
+        [System.Net.HttpListenerResponse]$RawResponse, 
+        [PolarisResponse]$Response
+	) {
+        try {
+            if ($Response.StreamResponse) {
+                [Polaris]::Send(
+                    $RawResponse,
+                    $Response.StreamResponse,
+                    $Response.StatusCode,
+                    $Response.ContentType,
+                    $Response.Headers
+                )
+            }
+            else {
+                [Polaris]::Send(
+					$RawResponse,
+					$Response.ByteResponse,
+					$Response.StatusCode,
+					$Response.ContentType,
+					$Response.Headers
+				)
+            }
+        }
+        catch {
+            throw $_
+        }
+    }
 
-	static [void] Send ([System.Net.HttpListenerResponse]$RawResponse,[byte[]]$ByteResponse,[int]$StatusCode,[string]$ContentType,[System.Net.WebHeaderCollection]$Headers) {
-		$RawResponse.StatusCode = $StatusCode;
-		$RawResponse.Headers = $Headers;
-		$RawResponse.ContentType = $ContentType;
-		$RawResponse.ContentLength64 = $ByteResponse.Length;
-		$RawResponse.OutputStream.Write($ByteResponse,0,$ByteResponse.Length);
-		$RawResponse.OutputStream.Close();
+    static [void] Send (
+        [System.Net.HttpListenerResponse]$RawResponse, 
+        [byte[]]$ByteResponse, 
+        [int]$StatusCode, 
+        [string]$ContentType, 
+		[System.Net.WebHeaderCollection]$Headers
+	) {
+        $RawResponse.StatusCode = $StatusCode;
+        $RawResponse.Headers = $Headers;
+        $RawResponse.ContentType = $ContentType;
+        $RawResponse.ContentLength64 = $ByteResponse.Length;
+        $RawResponse.OutputStream.Write($ByteResponse, 0, $ByteResponse.Length);
+        $RawResponse.OutputStream.Close();
 	}
+	
+	static [void] Send (
+        [System.Net.HttpListenerResponse]$RawResponse, 
+        [System.IO.Stream]$StreamResponse, 
+        [int]$StatusCode, 
+        [string]$ContentType, 
+		[System.Net.WebHeaderCollection]$Headers
+	) {
+        $RawResponse.StatusCode = $StatusCode;
+        $RawResponse.Headers = $Headers;
+        $RawResponse.ContentType = $ContentType;
+        $StreamResponse.CopyTo($RawResponse.OutputStream);
+        $RawResponse.OutputStream.Close();
+    }
 
 	static [void] Send (
 		[System.Net.HttpListenerResponse]$RawResponse,
