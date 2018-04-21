@@ -92,7 +92,7 @@ function New-PolarisStaticRoute {
             }
             else {
                 $Response.SetStream(
-                    [System.IO.File]::Open($FullPath, [System.IO.FileMode]::Open)
+                    [System.IO.File]::OpenRead($FullPath)
                 )
                 $Response.ContentType = [PolarisResponse]::GetContentType($FullPath)
             }
