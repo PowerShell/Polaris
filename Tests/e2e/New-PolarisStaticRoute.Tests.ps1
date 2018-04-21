@@ -41,7 +41,7 @@
             New-PolarisStaticRoute -RoutePath $using:RootPath -FolderPath $using:TestPath
 
             ####  Create a static route at the root
-            New-PolarisStaticRoute -RoutePath "/" -FolderPath $using:TestPath
+            New-PolarisStaticRoute -RoutePath "/" -FolderPath $using:TestPath -EnableDirectoryBrowser $true
 
             $Polaris = Start-Polaris -Port $using:Port
 
@@ -67,6 +67,13 @@
         #  Confirm file can be downloaded
         $Download = Invoke-WebRequest -Uri "http://localhost:$Port/File1.txt" -UseBasicParsing
         $Download.Content | Should be $File1Content
+    }
+
+    It "Should serve a directory browser when enabled" {
+
+        #  Confirm file can be downloaded
+        $Download = Invoke-WebRequest -Uri "http://localhost:$Port/" -UseBasicParsing
+        $Download.Content | Should -BeLike "*To Parent Directory*"
     }
 
     AfterAll {
