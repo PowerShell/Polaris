@@ -9,15 +9,15 @@ Import-Module -Name ..\Polaris.psd1
 $Hey = "What what!"
 # Hello World passing in the Path, Method & ScriptBlock
 New-PolarisRoute -Path /helloworld -Method GET -ScriptBlock {
-    $response.Send($Hey)
+    $Response.Send($Hey)
 } -Force
 
 # Query Parameters are supported
 New-PolarisRoute -Path /hellome -Method GET -ScriptBlock {
-    if ($request.Query['name']) {
-        $response.Send('Hello ' + $request.Query['name'])
+    if ($Request.Query['name']) {
+        $Response.Send('Hello ' + $Request.Query['name'])
     } else {
-        $response.Send('Hello World')
+        $Response.Send('Hello World')
     }
 }
 
@@ -27,7 +27,7 @@ $sbWow = {
     }
 
     # .Json helper function that sets content type
-    $response.Json(($json | ConvertTo-Json))
+    $Response.Json(($json | ConvertTo-Json))
 }
 
 # Supports helper functions for Get, Post, Put, Delete
@@ -35,10 +35,10 @@ New-PolarisPostRoute -Path /wow -ScriptBlock $sbWow
 
 # Body Parameters are supported if you use the -UseJsonBodyParserMiddleware
 New-PolarisPostRoute -Path /hello -ScriptBlock {
-    if ($request.Body.Name) {
-        $response.Send('Hello ' + $request.Body.Name);
+    if ($Request.Body.Name) {
+        $Response.Send('Hello ' + $Request.Body.Name);
     } else {
-        $response.Send('Hello World');
+        $Response.Send('Hello World');
     }
 }
 

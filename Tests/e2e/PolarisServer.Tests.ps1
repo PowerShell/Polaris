@@ -11,8 +11,8 @@ Describe "Test webserver use (E2E)" {
 
             # Support Headers
             New-PolarisRoute -Path /header -Method "GET" -ScriptBlock {
-                $response.SetHeader('Location', 'http://www.contoso.com/')
-                $response.Send("Header test")
+                $Response.SetHeader('Location', 'http://www.contoso.com/')
+                $Response.Send("Header test")
             }
 
             # Hello World passing in the Path, Method & ScriptBlock
@@ -38,7 +38,7 @@ Describe "Test webserver use (E2E)" {
                 }
 
                 # .Json helper function that sets content type
-                $response.Json(($json | ConvertTo-Json))
+                $Response.Json(($json | ConvertTo-Json))
             }
 
             # Supports helper functions for Get, Post, Put, Delete
@@ -54,7 +54,7 @@ Describe "Test webserver use (E2E)" {
                 $params = @{}
                 Write-Host "asdf"
                 throw "Error"
-                $response.Send("this should not show up in response")
+                $Response.Send("this should not show up in response")
             }
 
             # Start the app
@@ -72,23 +72,23 @@ Describe "Test webserver use (E2E)" {
 
     Context "Test different route responses" {
         It "test /helloworld route" {
-            $result = Invoke-WebRequest -Uri "http://localhost:$Port/helloworld" -UseBasicParsing -TimeoutSec 2
-            $result.Content | Should Be 'Hello World'
-            $result.StatusCode | Should Be 200
+            $Result = Invoke-WebRequest -Uri "http://localhost:$Port/helloworld" -UseBasicParsing -TimeoutSec 2
+            $Result.Content | Should Be 'Hello World'
+            $Result.StatusCode | Should Be 200
         }
 
         It "test /helloworld route with query params that do nothing" {
-            $result = Invoke-WebRequest -Uri "http://localhost:$Port/helloworld?test=true&another=one" -UseBasicParsing
-            $result.Content | Should Be 'Hello World'
-            $result.StatusCode | Should Be 200
+            $Result = Invoke-WebRequest -Uri "http://localhost:$Port/helloworld?test=true&another=one" -UseBasicParsing
+            $Result.Content | Should Be 'Hello World'
+            $Result.StatusCode | Should Be 200
         }
 
 
         It "test /header router" {
-            $result = Invoke-WebRequest -Uri "http://localhost:$Port/header" -UseBasicParsing
-            $result.Content | Should Be 'Header test'
-            $result.StatusCode | Should Be 200
-            $result.Headers['Location'] | Should be 'http://www.contoso.com/'
+            $Result = Invoke-WebRequest -Uri "http://localhost:$Port/header" -UseBasicParsing
+            $Result.Content | Should Be 'Header test'
+            $Result.StatusCode | Should Be 200
+            $Result.Headers['Location'] | Should be 'http://www.contoso.com/'
         }
         It "test /helloworld route with log query param" {
             $expectedText = `
@@ -98,26 +98,26 @@ Describe "Test webserver use (E2E)" {
 
 Hello World"
 
-            $result = Invoke-WebRequest -Uri "http://localhost:$Port/helloworld?PolarisLogs=true" -UseBasicParsing
-            $result.Content -replace "`r" | Should Be ($expectedText -replace "`r")
-            $result.StatusCode | Should Be 200
+            $Result = Invoke-WebRequest -Uri "http://localhost:$Port/helloworld?PolarisLogs=true" -UseBasicParsing
+            $Result.Content -replace "`r" | Should Be ($expectedText -replace "`r")
+            $Result.StatusCode | Should Be 200
         }
 
         It "test /hellome route with query param" {
-            $result = Invoke-WebRequest -Uri "http://localhost:$Port/hellome?name=PowerShell" -UseBasicParsing
-            $result.Content | Should Be 'Hello PowerShell'
-            $result.StatusCode | Should Be 200
+            $Result = Invoke-WebRequest -Uri "http://localhost:$Port/hellome?name=PowerShell" -UseBasicParsing
+            $Result.Content | Should Be 'Hello PowerShell'
+            $Result.StatusCode | Should Be 200
         }
 
         It "test /hellome route without query param" {
-            $result = Invoke-WebRequest -Uri "http://localhost:$Port/hellome" -UseBasicParsing
-            $result.Content | Should Be 'Hello World'
-            $result.StatusCode | Should Be 200
+            $Result = Invoke-WebRequest -Uri "http://localhost:$Port/hellome" -UseBasicParsing
+            $Result.Content | Should Be 'Hello World'
+            $Result.StatusCode | Should Be 200
         }
 
         It "test /wow route" {
-            $result = Invoke-RestMethod -Uri "http://localhost:$Port/wow" -Method POST
-            $result.wow | Should Be $true
+            $Result = Invoke-RestMethod -Uri "http://localhost:$Port/wow" -Method POST
+            $Result.wow | Should Be $true
         }
 
         It "test GET to /wow route" {
@@ -139,9 +139,9 @@ Hello World"
         }
 
         It "test /example route" {
-            $result = Invoke-WebRequest -Uri "http://localhost:$Port/example" -UseBasicParsing
-            $result.Content | Should Be 'test file'
-            $result.StatusCode | Should Be 200
+            $Result = Invoke-WebRequest -Uri "http://localhost:$Port/example" -UseBasicParsing
+            $Result.Content | Should Be 'test file'
+            $Result.StatusCode | Should Be 200
         }
 
         It "test /public/index.html static route" {
@@ -151,9 +151,9 @@ Hello World"
                 <img src="test.png" alt="yay" />
                 <img src="test1.png" alt="yay" />'
 
-            $result = Invoke-WebRequest -Uri "http://localhost:$Port/public/index.html" -UseBasicParsing
-            $result.Content | Should Be $expectedHtml
-            $result.StatusCode | Should Be 200
+            $Result = Invoke-WebRequest -Uri "http://localhost:$Port/public/index.html" -UseBasicParsing
+            $Result.Content | Should Be $expectedHtml
+            $Result.StatusCode | Should Be 200
         }
 
         It "test /error route that returns 500" {

@@ -1,35 +1,35 @@
-class PolarisResponse {
-    [byte[]] $ByteResponse = [byte]0
-    [string] $ContentType = "text/plain"
-    [System.Net.WebHeaderCollection] $Headers = [System.Net.WebHeaderCollection]::new()
-    [int] $StatusCode = 200
+class PolarisResponse{
+	[byte[]]$ByteResponse = [byte]0
+	[string]$ContentType = "text/plain"
+	[System.Net.WebHeaderCollection]$Headers = [System.Net.WebHeaderCollection]::new()
+	[int]$StatusCode = 200
 
-    Send([string]$stringResponse) {
-        $this.ByteResponse = [System.Text.Encoding]::UTF8.GetBytes($stringResponse)
-    }
+	Send ([string]$stringResponse) {
+		$this.ByteResponse = [System.Text.Encoding]::UTF8.GetBytes($stringResponse)
+	}
 
-    SendBytes([byte[]] $byteArray) {
-        $this.ByteResponse = $byteArray
-    }
+	SendBytes ([byte[]]$byteArray) {
+		$this.ByteResponse = $byteArray
+	}
 
-    Json([string] $stringResponse) {
-        $this.ByteResponse = [System.Text.Encoding]::UTF8.GetBytes($stringResponse)
-        $this.ContentType = "application/json"
-    }
+	Json ([string]$stringResponse) {
+		$this.ByteResponse = [System.Text.Encoding]::UTF8.GetBytes($stringResponse)
+		$this.ContentType = "application/json"
+	}
 
-    SetHeader([string] $headerName, [string] $headerValue) {
-        $this.Headers[$headerName] = $headerValue
-    }
+	SetHeader ([string]$headerName,[string]$headerValue) {
+		$this.Headers[$headerName] = $headerValue
+	}
 
-    SetStatusCode([int] $statusCode) {
-        $this.StatusCode = $statusCode
-    }
+	SetStatusCode ([int]$StatusCode) {
+		$this.StatusCode = $StatusCode
+	}
 
-    SetContentType([string] $contentType) {
-        $this.ContentType = $contentType
-    }
-    
-    static [string] GetContentType([string] $path) {
-        return [MimeTypes]::GetMimeType($path)
-    }
+	SetContentType ([string]$ContentType) {
+		$this.ContentType = $ContentType
+	}
+
+	static [string] GetContentType ([string]$Path) {
+		return [MimeTypes]::GetMimeType($Path)
+	}
 }

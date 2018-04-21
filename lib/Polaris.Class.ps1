@@ -1,279 +1,279 @@
-class Polaris {
-    
-    [Int]$Port
-    [System.Collections.Generic.List[PolarisMiddleWare]]$RouteMiddleWare = [System.Collections.Generic.List[PolarisMiddleWare]]::new()
-    [System.Collections.Generic.Dictionary[string, [System.Collections.Generic.Dictionary[string, scriptblock]]]]$ScriptBlockRoutes = [System.Collections.Generic.Dictionary[string, [System.Collections.Generic.Dictionary[string, scriptblock]]]]::new()
-    hidden [Action[string]]$Logger
-    hidden [System.Net.HttpListener]$Listener
-    hidden [bool]$StopServer = $False
-    [string]$getLogsString = "PolarisLogs"
-    [string] $ClassDefinitions = $script:ClassDefinitions
-    $ContextHandler = (New-ScriptBlockCallback -Callback {
+class Polaris{
 
-            param(
-                [System.IAsyncResult]
-                $AsyncResult
-            ) 
+	[int]$Port
+	[System.Collections.Generic.List[PolarisMiddleWare]]$RouteMiddleWare = [System.Collections.Generic.List[PolarisMiddleWare]]::new()
+	[System.Collections.Generic.Dictionary[string, [System.Collections.Generic.Dictionary[string, scriptblock]]]]$ScriptblockRoutes = [System.Collections.Generic.Dictionary[string, [System.Collections.Generic.Dictionary[string, scriptblock]]]]::new()
+	hidden [Action[string]]$Logger
+	hidden [System.Net.HttpListener]$Listener
+	hidden [bool]$StopServer = $False
+	[string]$GetLogsString = "PolarisLogs"
+	[string]$ClassDefinitions = $Script:ClassDefinitions
+	$ContextHandler = (New-ScriptBlockCallback -Callback {
 
-            [Polaris]$Polaris = $AsyncResult.AsyncState
-            $context = $Polaris.Listener.EndGetContext($AsyncResult)
-        
+			param(
+				[System.IAsyncResult]
+				$AsyncResult
+			)
 
-            if ($Polaris.StopServer -or $null -eq $context) {
-                if ($null -ne $Polaris.Listener) {
-                    $Polaris.Listener.Close()
-                }
-                break
-            }
-
-            $Polaris.Listener.BeginGetContext($Polaris.ContextHandler, $Polaris)
-
-            [System.Net.HttpListenerRequest] $rawRequest = $context.Request
-            [System.Net.HttpListenerResponse] $rawResponse = $context.Response
-
-            $Polaris.Log("request came in: " + $rawRequest.HttpMethod + " " + $rawRequest.RawUrl)
-
-            [PolarisRequest] $request = [PolarisRequest]::new($rawRequest)
-            [PolarisResponse] $response = [PolarisResponse]::new()
-
-            
-            [string] $route = $rawRequest.Url.AbsolutePath.TrimEnd('/')
-
-            if ( [string]::IsNullOrEmpty($route) ) { $route = "/" }
-
-            try {
-
-                # Run middleware in the order in which it was added
-                foreach ($middleware in $Polaris.RouteMiddleware) {
-                    $ScriptBlock = [scriptblock]::Create(
-                        "param(`$request,`$Response)`r`n" +
-                        $middleware.ScriptBlock.ToString()
-                    )
-                    
-                    Invoke-Command -ScriptBlock $ScriptBlock `
-                        -ArgumentList @($Request, $Response)
-                }
-
-                $Polaris.Log("Parsed Route: $Route")
-                $Polaris.Log("Request Method: $($rawRequest.HttpMethod)")
-                $Routes = $Polaris.ScriptBlockRoutes
-                $MatchingRoute = $Routes.keys.where( {$route -match $_})[0]
-                $MatchingMethod = $false
-
-                if ($MatchingRoute) {
-                    $MatchingMethod = $Routes[$MatchingRoute].Keys -contains $request.Method
-                }
-
-                if ($MatchingRoute -and $MatchingMethod) {
-                    try {
-                        $ScriptBlock = [scriptblock]::Create( 
-                            "param(`$request,`$Response)`r`n" +
-                            $Routes[$MatchingRoute][$request.Method].ToString()
-                        )
-                    
-                        Invoke-Command -ScriptBlock $ScriptBlock `
-                            -ArgumentList @($request, $response) `
-                            -InformationVariable InformationVariable
-                    }
-                    catch {
-                        $errorsBody += $_.Exception.ToString()
-                        $errorsBody += $_.InvocationInfo.PositionMessage + "`n`n"
-                        $response.Send($errorsBody)
-                        $Polaris.Log(($PowerShellInstance | ConvertTo-Json -Depth 3 | Out-String))
-                        $response.SetStatusCode(500)
-                    }
-                }
-                elseif ($MatchingRoute) {
-                    $response.Send("Method not allowed")
-                    $response.SetStatusCode(405)
-                }
-                else {
-                    $response.send("Not found")
-                    $response.SetStatusCode(404)
-                }
-            
-                # Handle logs
-                if ($request.Query -and $request.Query[$Polaris.GetLogsString]) {
-                    $informationBody = "`n"
-                    for ([int] $i = 0; $i -lt $InformationVariable.Count; $i++) {
-                        foreach ($tag in $InformationVariable[$i].Tags) {
-                            $informationBody += "[" + $tag + "]"
-                        }
-
-                        $informationBody += $InformationVariable[$i].MessageData.ToString() + "`n"
-                    }
-                    $informationBody += "`n"
-
-                    # Set response to the logs and the actual response (could be errors)
-                    $logBytes = [System.Text.Encoding]::UTF8.GetBytes($informationBody)
-                    $bytes = [byte[]]::new($logBytes.Length + $response.ByteResponse.Length)
-                    $logBytes.CopyTo($bytes, 0)
-                    $response.ByteResponse.CopyTo($bytes, $logBytes.Length)
-                    $response.ByteResponse = $bytes
-                }
-                [Polaris]::Send($rawResponse, $response)
-                
-            }
-            catch {
-                $Polaris.Log(($_ | out-string))
-                $response.SetStatusCode(500)
-                $response.Send($_)
-                $response.Close()
-                throw $_
-            }
-        })
+			[Polaris]$Polaris = $AsyncResult.AsyncState
+			$Context = $Polaris.Listener.EndGetContext($AsyncResult)
 
 
-    [Void] AddRoute(
-        [string]$path,
-        [string]$method,
-        [scriptblock]$scriptBlock
-    ) {
-        if ($null -eq $scriptBlock) {
-            throw [ArgumentNullException]::new("scriptBlock")
-        }
+			if ($Polaris.StopServer -or $null -eq $Context) {
+				if ($null -ne $Polaris.Listener) {
+					$Polaris.Listener.Close()
+				}
+				break
+			}
 
-        [string]$sanitizedPath = $path.TrimEnd('/')
+			$Polaris.Listener.BeginGetContext($Polaris.ContextHandler,$Polaris)
 
-        if ( [string]::IsNullOrEmpty($sanitizedPath) ) { $sanitizedPath = "/" }
+			[System.Net.HttpListenerRequest]$RawRequest = $Context.Request
+			[System.Net.HttpListenerResponse]$RawResponse = $Context.Response
 
-        if (-not $this.ScriptBlockRoutes.ContainsKey($sanitizedPath)) {
-            $this.ScriptBlockRoutes[$sanitizedPath] = [System.Collections.Generic.Dictionary[string, string]]::new()
-        }
-        $this.ScriptBlockRoutes[$sanitizedPath][$method] = $scriptBlock
-    }
-        
-    RemoveRoute(
-        [string]$path, 
-        [string]$method
-    ) {
-        if ($null -eq $path) {
-            throw [ArgumentNullException]::new("path")
-        }
-        if ($null -eq $method) {
-            throw [ArgumentNullException]::new("method")
-        }
+			$Polaris.Log("request came in: " + $RawRequest.HttpMethod + " " + $RawRequest.RawUrl)
 
-        [string]$sanitizedPath = $path.TrimEnd('/')
-
-        if ( [string]::IsNullOrEmpty($sanitizedPath) ) { $sanitizedPath = "/" }
-        
-        $this.ScriptBlockRoutes[$sanitizedPath].Remove($method)
-        if ($this.ScriptBlockRoutes[$sanitizedPath].Count -eq 0) {
-            $this.ScriptBlockRoutes.Remove($sanitizedPath)
-        }
-    }
-
-    AddMiddleware(
-        [string]$name,
-        [scriptblock]$scriptBlock
-    ) {
-        if ($null -eq $scriptBlock) {
-            throw [ArgumentNullException]::new("scriptBlock")
-        }
-        $this.RouteMiddleware.Add([PolarisMiddleware]@{
-                'Name'        = $name
-                'ScriptBlock' = $scriptBlock
-            })
-    }
-
-    RemoveMiddleware([string]$name) {
-        if ($null -eq $name) {
-            throw [ArgumentNullException]::new("name")
-        }
-        $this.RouteMiddleware.RemoveAll(
-            [Predicate[PolarisMiddleWare]]([scriptblock]::Create("`$args[0].Name -eq '$name'"))
-        )
-    }
-
-    [Void] Start(
-        [int]$port = 3000
-    ) {
-        $this.StopServer = $false
-        $this.InitListener($port)
-        $this.Listener.BeginGetContext($this.ContextHandler, $this)
-        $this.Log("App listening on Port: " + $port + "!")
-    }
-
-    [void] Stop() {
-        $this.StopServer = $true
-        $this.Listener.Close()
-        $this.Listener.Dispose()
-        $this.Log("Server Stopped.")
-    }    
-
-    [void] InitListener([int] $port) {
-        $this.Port = $port
-
-        $this.Listener = [System.Net.HttpListener]::new()
-
-        # If user is on a non-windows system or windows as administrator
-        if ([system.environment]::OSVersion.Platform -ne [System.PlatformID]::Win32NT -or
-            ([System.Environment]::OSVersion.Platform -eq [System.PlatformID]::Win32NT -and
-                ([System.Security.Principal.WindowsPrincipal]::new([System.Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([System.Security.Principal.WindowsBuiltInRole]::Administrator))) {
-            $this.Listener.Prefixes.Add("http://+:" + $this.Port + "/")
-        }
-        else {
-            $this.Listener.Prefixes.Add("http://localhost:" + $this.Port + "/")
-        }
-
-        $this.Listener.Start()
-    }
-
-    static [void] Send([System.Net.HttpListenerResponse]$rawResponse, [PolarisResponse]$response) {
-        try {
-            [Polaris]::Send($rawResponse, $response.ByteResponse, $response.StatusCode, $response.ContentType, $response.Headers );
-        }
-        catch {
-            throw $_         
-        }
-    }
-
-    static [void] Send([System.Net.HttpListenerResponse] $rawResponse, [byte[]]$byteResponse, [int]$statusCode, [string]$contentType, [System.Net.WebHeaderCollection]$Headers) {
-        $rawResponse.StatusCode = $statusCode;
-        $rawResponse.Headers = $Headers;
-        $rawResponse.ContentType = $contentType;
-        $rawResponse.ContentLength64 = $byteResponse.Length;
-        $rawResponse.OutputStream.Write($byteResponse, 0, $byteResponse.Length);
-        $rawResponse.OutputStream.Close();
-    }        
-		
-    static [void] Send(
-        [System.Net.HttpListenerResponse] $rawResponse,
-        [byte[]] $byteResponse,
-        [int] $statusCode,
-        [string] $contentType
-    ) {
-        $rawResponse.StatusCode = $statusCode;
-        $rawResponse.ContentType = $contentType;
-        $rawResponse.ContentLength64 = $byteResponse.Length;
-        $rawResponse.OutputStream.Write($byteResponse, 0, $byteResponse.Length);
-        $rawResponse.OutputStream.Close();
-    }
-
-    [Void] Log([string] $logString) {
-        try {
-            $this.Logger($logString)
-        }
-        catch {
-            Write-Host $_.Message
-            Write-Host $logString
-        }
-    }
+			[PolarisRequest]$Request = [PolarisRequest]::new($RawRequest)
+			[PolarisResponse]$Response = [PolarisResponse]::new()
 
 
-    Polaris(
-        [Action[string]]$Logger
-    ) {
-        if ($Logger) {
-            $this.Logger = $Logger
-        }
-        else {
-            $this.Logger = {
-                param($LogItem)
-                Write-Host $LogItem
-            }
-        }
+			[string]$Route = $RawRequest.Url.AbsolutePath.TrimEnd('/')
 
-    }
+			if ([string]::IsNullOrEmpty($Route)) { $Route = "/" }
+
+			try {
+
+				# Run middleware in the order in which it was added
+				foreach ($Middleware in $Polaris.RouteMiddleware) {
+					$Scriptblock = [scriptblock]::Create(
+						"param(`$Request,`$Response)`r`n" +
+						$Middleware.Scriptblock.ToString()
+					)
+
+					Invoke-Command -ScriptBlock $Scriptblock `
+ 						-ArgumentList @($Request,$Response)
+				}
+
+				$Polaris.Log("Parsed Route: $Route")
+				$Polaris.Log("Request Method: $($RawRequest.HttpMethod)")
+				$Routes = $Polaris.ScriptBlockRoutes
+				$MatchingRoute = $Routes.keys.Where({ $Route -match $_ })[0]
+				$MatchingMethod = $false
+
+				if ($MatchingRoute) {
+					$MatchingMethod = $Routes[$MatchingRoute].keys -contains $Request.Method
+				}
+
+				if ($MatchingRoute -and $MatchingMethod) {
+					try {
+						$Scriptblock = [scriptblock]::Create(
+							"param(`$Request,`$Response)`r`n" +
+							$Routes[$MatchingRoute][$Request.Method].ToString()
+						)
+
+						Invoke-Command -ScriptBlock $Scriptblock `
+ 							-ArgumentList @($Request,$Response) `
+ 							-InformationVariable InformationVariable
+					}
+					catch {
+						$ErrorsBody += $_.Exception.ToString()
+						$ErrorsBody += $_.InvocationInfo.PositionMessage + "`n`n"
+						$Response.Send($ErrorsBody)
+						$Polaris.Log(($PowerShellInstance | ConvertTo-Json -Depth 3 | Out-String))
+						$Response.SetStatusCode(500)
+					}
+				}
+				elseif ($MatchingRoute) {
+					$Response.Send("Method not allowed")
+					$Response.SetStatusCode(405)
+				}
+				else {
+					$Response.Send("Not found")
+					$Response.SetStatusCode(404)
+				}
+
+				# Handle logs
+				if ($Request.Query -and $Request.Query[$Polaris.GetLogsString]) {
+					$InformationBody = "`n"
+					for ([int]$i = 0; $i -lt $InformationVariable.Count; $i++) {
+						foreach ($tag in $InformationVariable[$i].Tags) {
+							$InformationBody += "[" + $tag + "]"
+						}
+
+						$InformationBody += $InformationVariable[$i].MessageData.ToString() + "`n"
+					}
+					$InformationBody += "`n"
+
+					# Set response to the logs and the actual response (could be errors)
+					$LogBytes = [System.Text.Encoding]::UTF8.GetBytes($InformationBody)
+					$Bytes = [byte[]]::new($LogBytes.Length + $Response.ByteResponse.Length)
+					$LogBytes.CopyTo($Bytes,0)
+					$Response.ByteResponse.CopyTo($Bytes,$LogBytes.Length)
+					$Response.ByteResponse = $Bytes
+				}
+				[Polaris]::Send($RawResponse,$Response)
+
+			}
+			catch {
+				$Polaris.Log(($_ | Out-String))
+				$Response.SetStatusCode(500)
+				$Response.Send($_)
+				$Response.Close()
+				throw $_
+			}
+		})
+
+
+	[void] AddRoute (
+		[string]$Path,
+		[string]$Method,
+		[scriptblock]$Scriptblock
+	) {
+		if ($null -eq $Scriptblock) {
+			throw [ArgumentNullException]::new("scriptBlock")
+		}
+
+		[string]$SanitizedPath = $Path.TrimEnd('/')
+
+		if ([string]::IsNullOrEmpty($SanitizedPath)) { $SanitizedPath = "/" }
+
+		if (-not $this.ScriptBlockRoutes.ContainsKey($SanitizedPath)) {
+			$this.ScriptBlockRoutes[$SanitizedPath] = [System.Collections.Generic.Dictionary[string, string]]::new()
+		}
+		$this.ScriptBlockRoutes[$SanitizedPath][$Method] = $Scriptblock
+	}
+
+	RemoveRoute (
+		[string]$Path,
+		[string]$Method
+	) {
+		if ($null -eq $Path) {
+			throw [ArgumentNullException]::new("path")
+		}
+		if ($null -eq $Method) {
+			throw [ArgumentNullException]::new("method")
+		}
+
+		[string]$SanitizedPath = $Path.TrimEnd('/')
+
+		if ([string]::IsNullOrEmpty($SanitizedPath)) { $SanitizedPath = "/" }
+
+		$this.ScriptBlockRoutes[$SanitizedPath].Remove($Method)
+		if ($this.ScriptBlockRoutes[$SanitizedPath].Count -eq 0) {
+			$this.ScriptBlockRoutes.Remove($SanitizedPath)
+		}
+	}
+
+	AddMiddleware (
+		[string]$Name,
+		[scriptblock]$Scriptblock
+	) {
+		if ($null -eq $Scriptblock) {
+			throw [ArgumentNullException]::new("scriptBlock")
+		}
+		$this.RouteMiddleware.Add([PolarisMiddleware]@{
+				'Name' = $Name
+				'ScriptBlock' = $Scriptblock
+			})
+	}
+
+	RemoveMiddleware ([string]$Name) {
+		if ($null -eq $Name) {
+			throw [ArgumentNullException]::new("name")
+		}
+		$this.RouteMiddleware.RemoveAll(
+			[Predicate[PolarisMiddleWare]]([scriptblock]::Create("`$args[0].Name -eq '$Name'"))
+		)
+	}
+
+	[void] Start (
+		[int]$Port = 3000
+	) {
+		$this.StopServer = $false
+		$this.InitListener($Port)
+		$this.Listener.BeginGetContext($this.ContextHandler,$this)
+		$this.Log("App listening on Port: " + $Port + "!")
+	}
+
+	[void] Stop () {
+		$this.StopServer = $true
+		$this.Listener.Close()
+		$this.Listener.Dispose()
+		$this.Log("Server Stopped.")
+	}
+
+	[void] InitListener ([int]$Port) {
+		$this.Port = $Port
+
+		$this.Listener = [System.Net.HttpListener]::new()
+
+		# If user is on a non-windows system or windows as administrator
+		if ([System.Environment]::OSVersion.Platform -ne [System.PlatformID]::Win32NT -or
+			([System.Environment]::OSVersion.Platform -eq [System.PlatformID]::Win32NT -and
+				([System.Security.Principal.WindowsPrincipal]::new([System.Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([System.Security.Principal.WindowsBuiltInRole]::Administrator))) {
+			$this.Listener.Prefixes.Add("http://+:" + $this.Port + "/")
+		}
+		else {
+			$this.Listener.Prefixes.Add("http://localhost:" + $this.Port + "/")
+		}
+
+		$this.Listener.Start()
+	}
+
+	static [void] Send ([System.Net.HttpListenerResponse]$RawResponse,[PolarisResponse]$Response) {
+		try {
+			[Polaris]::Send($RawResponse,$Response.ByteResponse,$Response.StatusCode,$Response.ContentType,$Response.Headers);
+		}
+		catch {
+			throw $_
+		}
+	}
+
+	static [void] Send ([System.Net.HttpListenerResponse]$RawResponse,[byte[]]$ByteResponse,[int]$StatusCode,[string]$ContentType,[System.Net.WebHeaderCollection]$Headers) {
+		$RawResponse.StatusCode = $StatusCode;
+		$RawResponse.Headers = $Headers;
+		$RawResponse.ContentType = $ContentType;
+		$RawResponse.ContentLength64 = $ByteResponse.Length;
+		$RawResponse.OutputStream.Write($ByteResponse,0,$ByteResponse.Length);
+		$RawResponse.OutputStream.Close();
+	}
+
+	static [void] Send (
+		[System.Net.HttpListenerResponse]$RawResponse,
+		[byte[]]$ByteResponse,
+		[int]$StatusCode,
+		[string]$ContentType
+	) {
+		$RawResponse.StatusCode = $StatusCode;
+		$RawResponse.ContentType = $ContentType;
+		$RawResponse.ContentLength64 = $ByteResponse.Length;
+		$RawResponse.OutputStream.Write($ByteResponse,0,$ByteResponse.Length);
+		$RawResponse.OutputStream.Close();
+	}
+
+	[void] Log ([string]$LogString) {
+		try {
+			$this.Logger($LogString)
+		}
+		catch {
+			Write-Host $_.Message
+			Write-Host $LogString
+		}
+	}
+
+
+	Polaris (
+		[Action[string]]$Logger
+	) {
+		if ($Logger) {
+			$this.Logger = $Logger
+		}
+		else {
+			$this.Logger = {
+				param($LogItem)
+				Write-Host $LogItem
+			}
+		}
+
+	}
 }

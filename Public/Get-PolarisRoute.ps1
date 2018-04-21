@@ -46,7 +46,7 @@ function Get-PolarisRoute {
         $Method = '*',
 
         
-        $Polaris = $script:Polaris
+        $Polaris = $Script:Polaris
     )
     
     process {

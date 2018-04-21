@@ -42,7 +42,7 @@ function New-PolarisStaticRoute {
         $Force,
 
         
-        $Polaris = $script:Polaris
+        $Polaris = $Script:Polaris
     )
     
     $ErrorAction = $PSBoundParameters["ErrorAction"]
@@ -52,7 +52,7 @@ function New-PolarisStaticRoute {
     
     CreateNewPolarisIfNeeded
     if ( -not $Polaris) {
-        $Polaris = $script:Polaris
+        $Polaris = $Script:Polaris
     }
     
     if ( -not ( Test-Path -Path $FolderPath ) ) {
@@ -64,13 +64,13 @@ function New-PolarisStaticRoute {
             -Root $FolderPath `
             -Scope Global).Name
     
-    $ScriptBlock = {
+    $Scriptblock = {
         $Content = ""
 
-        $localPath = ($request.Url.LocalPath -replace $RoutePath, "")
-        Write-Debug "Parsed local path: $localPath" 
+        $LocalPath = ($Request.Url.LocalPath -replace $RoutePath, "")
+        Write-Debug "Parsed local path: $LocalPath" 
         try {
-            $RequestedItem = Get-Item -LiteralPath "$NewDrive`:$localPath" -Force -ErrorAction Stop
+            $RequestedItem = Get-Item -LiteralPath "$NewDrive`:$LocalPath" -Force -ErrorAction Stop
             Write-Debug "Requested Item: $RequestedItem"
              
             $FullPath = $RequestedItem.FullName
@@ -79,11 +79,11 @@ function New-PolarisStaticRoute {
                 if ($EnableDirectoryBrowser) {
                     $Content = New-DirectoryBrowser -Path $FullPath `
                         -HeaderName "Polaris Static File Server" `
-                        -SubfolderName $localPath `
+                        -SubfolderName $LocalPath `
                         -Root "$((get-psdrive $NewDrive).Root)" `
                         -RoutePath $RoutePath
 
-                    $response.ContentType = "text/html"
+                    $Response.ContentType = "text/html"
                     $Response.Send($Content)
                 }
                 else {
@@ -92,21 +92,21 @@ function New-PolarisStaticRoute {
             }
             else {
                 $Content = [System.IO.File]::ReadAllBytes($FullPath)
-                $response.ContentType = [PolarisResponse]::GetContentType($FullPath)
+                $Response.ContentType = [PolarisResponse]::GetContentType($FullPath)
                 $Response.SendBytes($Content)
             }
         }
         catch [System.UnauthorizedAccessException] {
-            $response.StatusCode = 401
-            $response.ContentType = "text/html"
+            $Response.StatusCode = 401
+            $Response.ContentType = "text/html"
             $Content = "<h1>401 - Unauthorized</h1>"
-            $response.Send($Content)
+            $Response.Send($Content)
         }
         catch [System.Management.Automation.ItemNotFoundException] {
-            $response.StatusCode = 404
-            $response.ContentType = "text/html"
-            $Content = "<h1>404 - Page not found $localPath</h1>"
-            $response.Send($Content);
+            $Response.StatusCode = 404
+            $Response.ContentType = "text/html"
+            $Content = "<h1>404 - Page not found $LocalPath</h1>"
+            $Response.Send($Content);
         }
         catch {
             Throw $_
@@ -114,11 +114,11 @@ function New-PolarisStaticRoute {
     }
 
     # Inserting variables into scriptblock as hardcoded
-    $ScriptBlock = [scriptblock]::Create(
+    $Scriptblock = [scriptblock]::Create(
         "`$RoutePath = '$($RoutePath.TrimStart("/"))'`r`n" +
         "`$EnableDirectoryBrowser = `$$EnableDirectoryBrowser`r`n" +
         "`$NewDrive = '$NewDrive'`r`n" +
-        $ScriptBlock.ToString())
+        $Scriptblock.ToString())
 
-    New-PolarisRoute -Path $RoutePath -Method GET -ScriptBlock $ScriptBlock -Force:$Force -ErrorAction:$ErrorAction
+    New-PolarisRoute -Path $RoutePath -Method GET -ScriptBlock $Scriptblock -Force:$Force -ErrorAction:$ErrorAction
 }

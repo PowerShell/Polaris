@@ -1,1 +1,1 @@
-$response.Send("test file")
+$Response.Send("test file")

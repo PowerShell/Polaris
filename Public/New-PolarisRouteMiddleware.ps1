@@ -33,7 +33,7 @@ function New-PolarisRouteMiddleware {
 
         [Parameter( Mandatory = $True, Position = 1, ParameterSetName = 'ScriptBlock' )]
         [scriptblock]
-        $ScriptBlock,
+        $Scriptblock,
 
         [Parameter( Mandatory = $True, ParameterSetName = 'ScriptPath' )]
         [string]
@@ -43,7 +43,7 @@ function New-PolarisRouteMiddleware {
         $Force,
 
         
-        $Polaris = $script:Polaris
+        $Polaris = $Script:Polaris
     )
     # Checking if middleware already exists
     $ExistingMiddleWare = Get-PolarisRouteMiddleware -Name $Name -Polaris $Polaris
@@ -65,14 +65,14 @@ function New-PolarisRouteMiddleware {
     else {
         CreateNewPolarisIfNeeded
         if ( -not $Polaris) {
-            $Polaris = $script:Polaris
+            $Polaris = $Script:Polaris
         }
 
         switch ( $PSCmdlet.ParameterSetName ) {
             'ScriptBlock' {
-                $ScriptBlock = $ScriptBlock
+                $Scriptblock = $Scriptblock
 
-                $Polaris.AddMiddleware( $Name, $ScriptBlock )
+                $Polaris.AddMiddleware( $Name, $Scriptblock )
             }
             'ScriptPath' {
                 if ( Test-Path -Path $ScriptPath ) {

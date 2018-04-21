@@ -3,17 +3,17 @@ Describe "Test route creation" {
         Import-Module $PSScriptRoot\..\..\Polaris.psd1
 
         $defaultScriptBlock = {
-            $response.Send("test script")
+            $Response.Send("test script")
         }
         $defaultScriptPath = "$PSScriptRoot/../resources/test.ps1"
         $defaultStaticDirectory = "$PSScriptRoot/../resources/static"
 
         function RouteExists ($Path, $Method) {
-            [string]$sanitizedPath = $path.TrimEnd('/')
+            [string]$SanitizedPath = $Path.TrimEnd('/')
 
-            if ( [string]::IsNullOrEmpty($sanitizedPath) ) { $sanitizedPath = "/" }
+            if ( [string]::IsNullOrEmpty($SanitizedPath) ) { $SanitizedPath = "/" }
 
-            return $null -ne (Get-Polaris).ScriptBlockRoutes[$sanitizedPath][$Method] 
+            return $null -ne (Get-Polaris).ScriptBlockRoutes[$SanitizedPath][$Method] 
         }
     }
     Context "Using New-PolarisRoute" {
@@ -28,12 +28,12 @@ Describe "Test route creation" {
             @{ Path = '/test'; Method = 'PUT'; ScriptPath = $defaultScriptPath; ScriptBlock = $null }
             @{ Path = '/test'; Method = 'DELETE'; ScriptPath = $defaultScriptPath; ScriptBlock = $null }
         ) {
-            param ($Path, $Method, $ScriptPath, $ScriptBlock)
+            param ($Path, $Method, $ScriptPath, $Scriptblock)
             if ($ScriptPath) {
                 New-PolarisRoute -Path $Path -Method $Method -ScriptPath $ScriptPath
             }
             else {
-                New-PolarisRoute -Path $Path -Method $Method -ScriptBlock $ScriptBlock
+                New-PolarisRoute -Path $Path -Method $Method -ScriptBlock $Scriptblock
             }
             RouteExists -Path $Path -Method $Method | Should Be $true
         }
@@ -45,12 +45,12 @@ Describe "Test route creation" {
             @{ Path = '/test'; ScriptPath = $defaultScriptPath; ScriptBlock = $null }
             @{ Path = '/test'; ScriptPath = $null; ScriptBlock = $defaultScriptBlock }
         ) {
-            param ($Path, $ScriptPath, $ScriptBlock)
+            param ($Path, $ScriptPath, $Scriptblock)
             if ($ScriptPath -ne $null -and $ScriptPath -ne '') {
                 New-PolarisGetRoute -Path $Path -ScriptPath $ScriptPath
             }
             else {
-                New-PolarisGetRoute -Path $Path -ScriptBlock $ScriptBlock
+                New-PolarisGetRoute -Path $Path -ScriptBlock $Scriptblock
             }
             RouteExists -Path $Path -Method 'GET' | Should Be $true
         }
@@ -62,12 +62,12 @@ Describe "Test route creation" {
             @{ Path = '/test'; ScriptPath = $defaultScriptPath; ScriptBlock = $null }
             @{ Path = '/test'; ScriptPath = $null; ScriptBlock = $defaultScriptBlock }
         ) {
-            param ($Path, $ScriptPath, $ScriptBlock)
+            param ($Path, $ScriptPath, $Scriptblock)
             if ($ScriptPath) {
                 New-PolarisPostRoute -Path $Path -ScriptPath $ScriptPath
             }
             else {
-                New-PolarisPostRoute -Path $Path -ScriptBlock $ScriptBlock
+                New-PolarisPostRoute -Path $Path -ScriptBlock $Scriptblock
             }
             RouteExists -Path $Path -Method 'POST' | Should Be $true
         }
@@ -79,12 +79,12 @@ Describe "Test route creation" {
             @{ Path = '/test'; ScriptPath = $defaultScriptPath; ScriptBlock = $null }
             @{ Path = '/test'; ScriptPath = $null; ScriptBlock = $defaultScriptBlock }
         ) {
-            param ($Path, $ScriptPath, $ScriptBlock)
+            param ($Path, $ScriptPath, $Scriptblock)
             if ($ScriptPath) {
                 New-PolarisPutRoute -Path $Path -ScriptPath $ScriptPath
             }
             else {
-                New-PolarisPutRoute -Path $Path -ScriptBlock $ScriptBlock
+                New-PolarisPutRoute -Path $Path -ScriptBlock $Scriptblock
             }
             RouteExists -Path $Path -Method 'PUT' | Should Be $true
         }
@@ -96,12 +96,12 @@ Describe "Test route creation" {
             @{ Path = '/test'; ScriptPath = $defaultScriptPath; ScriptBlock = $null }
             @{ Path = '/test'; ScriptPath = $null; ScriptBlock = $defaultScriptBlock }
         ) {
-            param ($Path, $ScriptPath, $ScriptBlock)
+            param ($Path, $ScriptPath, $Scriptblock)
             if ($ScriptPath) {
                 New-PolarisDeleteRoute -Path $Path -ScriptPath $ScriptPath
             }
             else {
-                New-PolarisDeleteRoute -Path $Path -ScriptBlock $ScriptBlock
+                New-PolarisDeleteRoute -Path $Path -ScriptBlock $Scriptblock
             }
             RouteExists -Path $Path -Method 'DELETE' | Should Be $true
         }

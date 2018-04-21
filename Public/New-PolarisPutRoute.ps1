@@ -15,7 +15,7 @@
     A Polaris object
     Defaults to the script scoped Polaris
 .EXAMPLE
-    New-PolarisGetRoute -Path "helloworld" -ScriptBlock { $response.Send( 'Hello World' ) }
+    New-PolarisGetRoute -Path "helloworld" -ScriptBlock { $Response.Send( 'Hello World' ) }
     To view results, assuming default port:
     Start-Polaris
     Invoke-WebRequest -Uri http://localhost:8080/helloworld -Method PUT
@@ -34,7 +34,7 @@ function New-PolarisPutRoute {
 
         [Parameter( Mandatory = $True, Position = 1, ParameterSetName = 'ScriptBlock' )]
         [scriptblock]
-        $ScriptBlock,
+        $Scriptblock,
 
         [Parameter( Mandatory = $True, ParameterSetName = 'ScriptPath' )]
         [string]
@@ -44,11 +44,11 @@ function New-PolarisPutRoute {
         $Force,
 
         
-        $Polaris = $script:Polaris
+        $Polaris = $Script:Polaris
     )
 
     switch ( $PSCmdlet.ParameterSetName ) {
-        'ScriptBlock' { New-PolarisRoute -Path $Path -Method "PUT" -ScriptBlock $ScriptBlock -Force:$Force }
+        'ScriptBlock' { New-PolarisRoute -Path $Path -Method "PUT" -ScriptBlock $Scriptblock -Force:$Force }
         'ScriptPath' { New-PolarisRoute -Path $Path -Method "PUT" -ScriptPath  $ScriptPath  -Force:$Force }
     }
 }

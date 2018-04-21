@@ -1,4 +1,4 @@
-﻿$script:Polaris = $null
+﻿$Script:Polaris = $null
 
 # Handles the removal of the module
 $ExecutionContext.SessionState.Module.OnRemove =

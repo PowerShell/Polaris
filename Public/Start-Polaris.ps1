@@ -38,12 +38,12 @@ function Start-Polaris {
         $UseJsonBodyParserMiddleware = $False,
 
         
-        $Polaris = $script:Polaris
+        $Polaris = $Script:Polaris
     )
 
     if ( -not $Polaris) {
         CreateNewPolarisIfNeeded
-        $Polaris = $script:Polaris
+        $Polaris = $Script:Polaris
     }
 
     if ( $UseJsonBodyParserMiddleware ) {

@@ -22,20 +22,20 @@ Describe "Test middleware creation/usage (E2E)" {
             New-PolarisRouteMiddleware -Name TestMiddleware -ScriptBlock $defaultMiddleware
 
             New-PolarisPostRoute -Path "/hello" -ScriptBlock {
-                if ($request.Body.Name) {
-                    $response.Send('Hello ' + $request.Body.Name)
+                if ($Request.Body.Name) {
+                    $Response.Send('Hello ' + $Request.Body.Name)
                 }
                 else {
-                    $response.Send('Hello World')
+                    $Response.Send('Hello World')
                 }
             }
 
             New-PolarisPostRoute -Path "/NewProperty" -ScriptBlock {
-                if ($request.Body.NewProperty) {
-                    $response.Send('Hello ' + $request.Body.NewProperty)
+                if ($Request.Body.NewProperty) {
+                    $Response.Send('Hello ' + $Request.Body.NewProperty)
                 }
                 else {
-                    $response.Send('Hello World')
+                    $Response.Send('Hello World')
                 }
             }
 
