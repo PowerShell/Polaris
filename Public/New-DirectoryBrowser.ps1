@@ -28,7 +28,7 @@ function New-DirectoryBrowser {
         [Parameter(
             Mandatory = $false,
             HelpMessage = 'Header Name')]
-        [string]$HeaderName,
+        [string]$HeaderName = "Polaris Directory Browser",
 
         [Parameter(
             Mandatory = $false,
