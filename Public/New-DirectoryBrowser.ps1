@@ -5,15 +5,13 @@ function New-DirectoryBrowser {
         Renders a directory browser in HTML
     .DESCRIPTION
         Creates HTML that can be used as a directory browser
-    .PARAMETER FileSystemPath
-        The file path of the directory you would like to generate HTML
+    .PARAMETER RequestedItem
+        The directory you would like to generate HTML for
     .PARAMETER HeaderName
         The name you would like displayed at the top of the directory browser
     .PARAMETER DirectoryBrowserPath
         The current path in the directory browser relative to the root of the directory
         browser (not the root of the site).
-    .PARAMETER FileSystemRootFolder
-        The root of the directory browser on the file system
     .PARAMETER WebServerPath
         The current path of the directory browser relative to the root of Polaris
 #>
@@ -23,7 +21,7 @@ function New-DirectoryBrowser {
         [Parameter(
             Mandatory = $true,
             HelpMessage = 'Directory Path')]
-        [string]$FileSystemPath,
+        [System.IO.DirectoryInfo]$RequestedItem,
 
         [Parameter(
             Mandatory = $false,
@@ -34,8 +32,6 @@ function New-DirectoryBrowser {
             Mandatory = $false,
             HelpMessage = 'Directory Browser Path')]
         [string]$DirectoryBrowserPath,
-
-        [string]$FileSystemRootFolder,
 
         [string]$WebServerPath
     )
@@ -48,14 +44,12 @@ function New-DirectoryBrowser {
 <body>
 <h1>$HeaderName - $DirectoryBrowserPath</h1>
 <hr>
-"@
-    @"
-<a href="./../">[To Parent Directory]</a><br><br>
+$(if ($RequestedItem.FullName.TrimEnd("\") -ne $RequestedItem.PSDrive.Root) { '<a href="./../">[To Parent Directory]</a><br><br>'})
 <table cellpadding="5">
 "@
-    $Files = (Get-ChildItem "$FileSystemPath")
+    $Files = ($RequestedItem | Get-ChildItem)
     foreach ($File in $Files) {
-        $FileURL = "/" + $WebServerPath + ($File.FullName -replace [regex]::Escape($FileSystemRootFolder), "" ) -replace "\\", "/"
+        $FileURL = "./" + $WebServerPath + ($File.FullName -replace [regex]::Escape($RequestedItem.PSDrive.Root), "" ) -replace "\\", "/"
         if ($File.PSIsContainer) { $FileLength = "[dir]" } else { $FileLength = $File.Length }
         @"
 <tr>
