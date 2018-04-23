@@ -8,27 +8,27 @@
         Remove-PolarisRoute
 
         #  Create test route to test against
-        New-PolarisRoute -Path '/Test0'  -Method GET  -ScriptBlock {}
-        New-PolarisRoute -Path '/Test0'  -Method POST -ScriptBlock {}
-        New-PolarisRoute -Path '/Test1'  -Method GET  -ScriptBlock {}
-        New-PolarisRoute -Path '/Test2'  -Method GET  -ScriptBlock {}
-        New-PolarisRoute -Path '/Test2'  -Method POST -ScriptBlock {}
-        New-PolarisRoute -Path '/Test3A' -Method PUT  -ScriptBlock {}
-        New-PolarisRoute -Path '/Test3B' -Method PUT  -ScriptBlock {}
-        New-PolarisRoute -Path '/Test3C' -Method GET  -ScriptBlock {}
-        New-PolarisRoute -Path '/Test4A' -Method PUT  -ScriptBlock {}
-        New-PolarisRoute -Path '/Test4B' -Method PUT  -ScriptBlock {}
-        New-PolarisRoute -Path '/Test5'  -Method GET  -ScriptBlock {}
-        New-PolarisRoute -Path '/Test5'  -Method POST -ScriptBlock {}
-        New-PolarisRoute -Path '/Test5'  -Method PUT  -ScriptBlock {}
-        New-PolarisRoute -Path '/Test6A' -Method GET  -ScriptBlock {}
-        New-PolarisRoute -Path '/Test6B' -Method GET  -ScriptBlock {}
-        New-PolarisRoute -Path '/Test7'  -Method POST -ScriptBlock {}
-        New-PolarisRoute -Path '/Test7'  -Method PUT  -ScriptBlock {}
+        New-PolarisRoute -Path '/Test0'  -Method GET  -Scriptblock {}
+        New-PolarisRoute -Path '/Test0'  -Method POST -Scriptblock {}
+        New-PolarisRoute -Path '/Test1'  -Method GET  -Scriptblock {}
+        New-PolarisRoute -Path '/Test2'  -Method GET  -Scriptblock {}
+        New-PolarisRoute -Path '/Test2'  -Method POST -Scriptblock {}
+        New-PolarisRoute -Path '/Test3A' -Method PUT  -Scriptblock {}
+        New-PolarisRoute -Path '/Test3B' -Method PUT  -Scriptblock {}
+        New-PolarisRoute -Path '/Test3C' -Method GET  -Scriptblock {}
+        New-PolarisRoute -Path '/Test4A' -Method PUT  -Scriptblock {}
+        New-PolarisRoute -Path '/Test4B' -Method PUT  -Scriptblock {}
+        New-PolarisRoute -Path '/Test5'  -Method GET  -Scriptblock {}
+        New-PolarisRoute -Path '/Test5'  -Method POST -Scriptblock {}
+        New-PolarisRoute -Path '/Test5'  -Method PUT  -Scriptblock {}
+        New-PolarisRoute -Path '/Test6A' -Method GET  -Scriptblock {}
+        New-PolarisRoute -Path '/Test6B' -Method GET  -Scriptblock {}
+        New-PolarisRoute -Path '/Test7'  -Method POST -Scriptblock {}
+        New-PolarisRoute -Path '/Test7'  -Method PUT  -Scriptblock {}
     }
 
     It "Should default to get all routes" {
-        $ExpectedCount = (Get-Polaris).ScriptBlockRoutes.Values.Values.Count
+        $ExpectedCount = (Get-Polaris).ScriptblockRoutes.Values.Values.Count
         $Routes = Get-PolarisRoute
         @( $Routes ).Count | Should Be $ExpectedCount
     }

@@ -24,7 +24,7 @@
             $Scriptblock = [scriptblock]::Create( $Path )
 
             #  Create route
-            New-PolarisGetRoute -Path $Path -ScriptBlock $Scriptblock
+            New-PolarisGetRoute -Path $Path -Scriptblock $Scriptblock
 
             #  Test route
             ( Get-PolarisRoute -Path $Path -Method $Method ).Scriptblock | Should Be $Path
@@ -34,7 +34,7 @@
 
             #  Define route
             $Method = 'GET'
-            $Path   = "TestScriptBlockRoute$Method"
+            $Path   = "TestScriptblockRoute$Method"
 
             #  Create route
             New-PolarisGetRoute -Path $Path -ScriptPath $ScriptPath
@@ -54,7 +54,7 @@
             $Scriptblock = [scriptblock]::Create( $Path )
 
             #  Create route
-            New-PolarisPostRoute -Path $Path -ScriptBlock $Scriptblock
+            New-PolarisPostRoute -Path $Path -Scriptblock $Scriptblock
 
             #  Test route
             ( Get-PolarisRoute -Path $Path -Method $Method ).Scriptblock | Should Be $Path
@@ -64,7 +64,7 @@
 
             #  Define route
             $Method = 'POST'
-            $Path   = "TestScriptBlockRoute$Method"
+            $Path   = "TestScriptblockRoute$Method"
 
             #  Create route
             New-PolarisPostRoute -Path $Path -ScriptPath $ScriptPath
@@ -84,7 +84,7 @@
             $Scriptblock = [scriptblock]::Create( $Path )
 
             #  Create route
-            New-PolarisPutRoute -Path $Path -ScriptBlock $Scriptblock
+            New-PolarisPutRoute -Path $Path -Scriptblock $Scriptblock
 
             #  Test route
             ( Get-PolarisRoute -Path $Path -Method $Method ).Scriptblock | Should Be $Path
@@ -94,7 +94,7 @@
 
             #  Define route
             $Method = 'PUT'
-            $Path   = "TestScriptBlockRoute$Method"
+            $Path   = "TestScriptblockRoute$Method"
 
             #  Create route
             New-PolarisPutRoute -Path $Path -ScriptPath $ScriptPath
@@ -114,7 +114,7 @@
             $Scriptblock = [scriptblock]::Create( $Path )
 
             #  Create route
-            New-PolarisDeleteRoute -Path $Path -ScriptBlock $Scriptblock
+            New-PolarisDeleteRoute -Path $Path -Scriptblock $Scriptblock
  
             #  Test route
            ( Get-PolarisRoute -Path $Path -Method $Method ).Scriptblock | Should Be $Path
@@ -124,7 +124,7 @@
 
             #  Define route
             $Method = 'DELETE'
-            $Path   = "TestScriptBlockRoute$Method"
+            $Path   = "TestScriptblockRoute$Method"
 
             #  Create route
             New-PolarisDeleteRoute -Path $Path -ScriptPath $ScriptPath

@@ -29,7 +29,7 @@
 
         
 
-        Start-Job -ScriptBlock {
+        Start-Job -Scriptblock {
 
             #  Import module
             Import-Module $using:PSScriptRoot\..\..\Polaris.psd1

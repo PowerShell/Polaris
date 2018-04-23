@@ -8,7 +8,7 @@ class Polaris{
 	hidden [bool]$StopServer = $False
 	[string]$GetLogsString = "PolarisLogs"
 	[string]$ClassDefinitions = $Script:ClassDefinitions
-	$ContextHandler = (New-ScriptBlockCallback -Callback {
+	$ContextHandler = (New-ScriptblockCallback -Callback {
 
 			param(
 				[System.IAsyncResult]
@@ -50,13 +50,13 @@ class Polaris{
 						$Middleware.Scriptblock.ToString()
 					)
 
-					Invoke-Command -ScriptBlock $Scriptblock `
+					Invoke-Command -Scriptblock $Scriptblock `
  						-ArgumentList @($Request,$Response)
 				}
 
 				$Polaris.Log("Parsed Route: $Route")
 				$Polaris.Log("Request Method: $($RawRequest.HttpMethod)")
-				$Routes = $Polaris.ScriptBlockRoutes
+				$Routes = $Polaris.ScriptblockRoutes
 				$MatchingRoute = $Routes.keys.Where({ $Route -match $_ })[0]
 				$MatchingMethod = $false
 
@@ -71,7 +71,7 @@ class Polaris{
 							$Routes[$MatchingRoute][$Request.Method].ToString()
 						)
 
-						Invoke-Command -ScriptBlock $Scriptblock `
+						Invoke-Command -Scriptblock $Scriptblock `
  							-ArgumentList @($Request,$Response) `
  							-InformationVariable InformationVariable
 					}
@@ -137,10 +137,10 @@ class Polaris{
 
 		if ([string]::IsNullOrEmpty($SanitizedPath)) { $SanitizedPath = "/" }
 
-		if (-not $this.ScriptBlockRoutes.ContainsKey($SanitizedPath)) {
-			$this.ScriptBlockRoutes[$SanitizedPath] = [System.Collections.Generic.Dictionary[string, string]]::new()
+		if (-not $this.ScriptblockRoutes.ContainsKey($SanitizedPath)) {
+			$this.ScriptblockRoutes[$SanitizedPath] = [System.Collections.Generic.Dictionary[string, string]]::new()
 		}
-		$this.ScriptBlockRoutes[$SanitizedPath][$Method] = $Scriptblock
+		$this.ScriptblockRoutes[$SanitizedPath][$Method] = $Scriptblock
 	}
 
 	RemoveRoute (
@@ -158,9 +158,9 @@ class Polaris{
 
 		if ([string]::IsNullOrEmpty($SanitizedPath)) { $SanitizedPath = "/" }
 
-		$this.ScriptBlockRoutes[$SanitizedPath].Remove($Method)
-		if ($this.ScriptBlockRoutes[$SanitizedPath].Count -eq 0) {
-			$this.ScriptBlockRoutes.Remove($SanitizedPath)
+		$this.ScriptblockRoutes[$SanitizedPath].Remove($Method)
+		if ($this.ScriptblockRoutes[$SanitizedPath].Count -eq 0) {
+			$this.ScriptblockRoutes.Remove($SanitizedPath)
 		}
 	}
 
@@ -173,7 +173,7 @@ class Polaris{
 		}
 		$this.RouteMiddleware.Add([PolarisMiddleware]@{
 				'Name' = $Name
-				'ScriptBlock' = $Scriptblock
+				'Scriptblock' = $Scriptblock
 			})
 	}
 

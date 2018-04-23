@@ -59,7 +59,7 @@
         Remove-PolarisRoute
 
         #  Create a route which will conflict with next command
-        New-PolarisRoute -Path "$RootPath" -Method GET -ScriptBlock {'Existing script'}
+        New-PolarisRoute -Path "$RootPath" -Method GET -Scriptblock {'Existing script'}
 
         #  Create static routes
         { New-PolarisStaticRoute -RoutePath "$RootPath" -FolderPath $TestPath -ErrorAction Stop } |
@@ -72,7 +72,7 @@
         Remove-PolarisRoute
 
         #  Create a route which will conflict with next command
-        New-PolarisRoute -Path "$RootPath" -Method GET -ScriptBlock {'Existing script'}
+        New-PolarisRoute -Path "$RootPath" -Method GET -Scriptblock {'Existing script'}
 
         #  Create static routes
         New-PolarisStaticRoute -RoutePath "$RootPath" -FolderPath $TestPath -Force
@@ -84,7 +84,7 @@
 
         #  Confirm conflicting route was overwritten
         $NewRoute = Get-PolarisRoute "$RootPath" -Method GET
-        $NewRoute.ScriptBlock.toString().TrimStart().SubString( 0, 20 ) | Should be "`$RoutePath = 'BaseRo"
+        $NewRoute.Scriptblock.toString().TrimStart().SubString( 0, 20 ) | Should be "`$RoutePath = 'BaseRo"
     }
 
     AfterAll {

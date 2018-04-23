@@ -17,7 +17,7 @@
         $Scriptblock = [scriptblock]::Create( $Path )
 
         #  Create route
-        New-PolarisRoute -Path $Path -Method $Method -ScriptBlock $Scriptblock
+        New-PolarisRoute -Path $Path -Method $Method -Scriptblock $Scriptblock
         
         #  Test route
         ( Get-PolarisRoute -Path $Path -Method $Method ).Scriptblock | Should Be $Path
@@ -27,7 +27,7 @@
 
     It "Should create route with lower case parameters" {
 
-        New-PolarisRoute -Path /108 -Method get -ScriptBlock {
+        New-PolarisRoute -Path /108 -Method get -Scriptblock {
 
             $line = "<h1>this is H1</h1>"
             $response.SetContentType("text/html");  
@@ -45,7 +45,7 @@
         $Scriptblock = [scriptblock]::Create( $Path )
 
         #  Create route
-        New-PolarisRoute -Path $Path -Method $Method -ScriptBlock $Scriptblock
+        New-PolarisRoute -Path $Path -Method $Method -Scriptblock $Scriptblock
         
         #  Test route
         ( Get-PolarisRoute -Path $Path -Method $Method ).Scriptblock | Should Be $Path
@@ -59,7 +59,7 @@
         $Scriptblock = [scriptblock]::Create( $Path )
 
         #  Create route
-        New-PolarisRoute -Path $Path -Method $Method -ScriptBlock $Scriptblock
+        New-PolarisRoute -Path $Path -Method $Method -Scriptblock $Scriptblock
         
         #  Test route
         ( Get-PolarisRoute -Path $Path -Method $Method ).Scriptblock | Should Be $Path
@@ -73,7 +73,7 @@
         $Scriptblock = [scriptblock]::Create( $Path )
 
         #  Create route
-        New-PolarisRoute -Path $Path -Method $Method -ScriptBlock $Scriptblock
+        New-PolarisRoute -Path $Path -Method $Method -Scriptblock $Scriptblock
         
         #  Test route
         ( Get-PolarisRoute -Path $Path -Method $Method ).Scriptblock | Should Be $Path
@@ -83,7 +83,7 @@
 
         #  Define route
         $Method = 'GET'
-        $Path = "TestScriptBlockRoute$Method"
+        $Path = "TestScriptblockRoute$Method"
         $ScriptPath = "TestDrive:\$Path.ps1"
 
         $Path | Out-File -FilePath $ScriptPath -NoNewline
@@ -99,7 +99,7 @@
 
         #  Define route
         $Method = 'GET'
-        $Path = "TestScriptBlockRoute$Method"
+        $Path = "TestScriptblockRoute$Method"
         $ScriptPath = "TestDrive:\DOESNOTEXIST.ps1"
 
         #  Create route
@@ -115,14 +115,14 @@
         $Scriptblock = [scriptblock]::Create( $Path )
 
         #  Create route
-        New-PolarisRoute -Path $Path -Method $Method -ScriptBlock $Scriptblock
+        New-PolarisRoute -Path $Path -Method $Method -Scriptblock $Scriptblock
 
         #  Define route
         $Method = 'POST'
         $Scriptblock = [scriptblock]::Create( $Path )
 
         #  Create route
-        New-PolarisRoute -Path $Path -Method $Method -ScriptBlock $Scriptblock
+        New-PolarisRoute -Path $Path -Method $Method -Scriptblock $Scriptblock
 
         #  Test route
         ( Get-PolarisRoute -Path $Path -Method $Method ).Scriptblock | Should Be $Path
@@ -136,10 +136,10 @@
         $Scriptblock = [scriptblock]::Create( $Path )
 
         #  Create route
-        New-PolarisRoute -Path $Path -Method $Method -ScriptBlock $Scriptblock
+        New-PolarisRoute -Path $Path -Method $Method -Scriptblock $Scriptblock
 
         #  Create route
-        { New-PolarisRoute -Path $Path -Method $Method -ScriptBlock $Scriptblock -ErrorAction Stop } |
+        { New-PolarisRoute -Path $Path -Method $Method -Scriptblock $Scriptblock -ErrorAction Stop } |
             Should Throw
     }
 
@@ -154,7 +154,7 @@
         $Scriptblock = [scriptblock]::Create( $NewContent )
 
         #  Create route
-        New-PolarisRoute -Path $Path -Method $Method -ScriptBlock $Scriptblock -Force
+        New-PolarisRoute -Path $Path -Method $Method -Scriptblock $Scriptblock -Force
 
         
         #  Test route

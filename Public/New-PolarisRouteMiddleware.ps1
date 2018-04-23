@@ -6,8 +6,8 @@
     manipulate request and response objects and run before web route scripts.
 .PARAMETER Name
     Name of the middleware.
-.PARAMETER ScriptBlock
-    ScriptBlock to run when middleware is triggered.
+.PARAMETER Scriptblock
+    Scriptblock to run when middleware is triggered.
 .PARAMETER ScriptPath
     Full path and name to script to run when middleware is triggered.
 .PARAMETER Force
@@ -22,7 +22,7 @@ $JsonBodyParserMiddleware =
         $Request.Body = $Request.BodyString | ConvertFrom-Json
     }
 }
-New-PolarisRouteMiddleware -Name JsonBodyParser -ScriptBlock $JsonBodyParserMiddleware
+New-PolarisRouteMiddleware -Name JsonBodyParser -Scriptblock $JsonBodyParserMiddleware
 #>
 function New-PolarisRouteMiddleware {
     [CmdletBinding()]
@@ -31,7 +31,7 @@ function New-PolarisRouteMiddleware {
         [string]
         $Name,
 
-        [Parameter( Mandatory = $True, Position = 1, ParameterSetName = 'ScriptBlock' )]
+        [Parameter( Mandatory = $True, Position = 1, ParameterSetName = 'Scriptblock' )]
         [scriptblock]
         $Scriptblock,
 
@@ -69,7 +69,7 @@ function New-PolarisRouteMiddleware {
         }
 
         switch ( $PSCmdlet.ParameterSetName ) {
-            'ScriptBlock' {
+            'Scriptblock' {
                 $Polaris.AddMiddleware( $Name, $Scriptblock )
             }
             'ScriptPath' {

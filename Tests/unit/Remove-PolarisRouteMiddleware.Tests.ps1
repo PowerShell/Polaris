@@ -65,18 +65,18 @@
         Remove-PolarisRouteMiddleware
 
         #  Create middleware to test against
-        New-PolarisRouteMiddleware -Name '/Test0'  -ScriptBlock {}
-        New-PolarisRouteMiddleware -Name '/Test1'  -ScriptBlock {}
-        New-PolarisRouteMiddleware -Name '/Test2A' -ScriptBlock {}
-        New-PolarisRouteMiddleware -Name '/Test2B' -ScriptBlock {}
-        New-PolarisRouteMiddleware -Name '/Test3A' -ScriptBlock {}
-        New-PolarisRouteMiddleware -Name '/Test3B' -ScriptBlock {}
-        New-PolarisRouteMiddleware -Name '/Test3C' -ScriptBlock {}
-        New-PolarisRouteMiddleware -Name '/Test4A' -ScriptBlock {}
-        New-PolarisRouteMiddleware -Name '/Test4B' -ScriptBlock {}
-        New-PolarisRouteMiddleware -Name '/Test5A' -ScriptBlock {}
-        New-PolarisRouteMiddleware -Name '/Test5B' -ScriptBlock {}
-        New-PolarisRouteMiddleware -Name '/Test6'  -ScriptBlock {}
+        New-PolarisRouteMiddleware -Name '/Test0'  -Scriptblock {}
+        New-PolarisRouteMiddleware -Name '/Test1'  -Scriptblock {}
+        New-PolarisRouteMiddleware -Name '/Test2A' -Scriptblock {}
+        New-PolarisRouteMiddleware -Name '/Test2B' -Scriptblock {}
+        New-PolarisRouteMiddleware -Name '/Test3A' -Scriptblock {}
+        New-PolarisRouteMiddleware -Name '/Test3B' -Scriptblock {}
+        New-PolarisRouteMiddleware -Name '/Test3C' -Scriptblock {}
+        New-PolarisRouteMiddleware -Name '/Test4A' -Scriptblock {}
+        New-PolarisRouteMiddleware -Name '/Test4B' -Scriptblock {}
+        New-PolarisRouteMiddleware -Name '/Test5A' -Scriptblock {}
+        New-PolarisRouteMiddleware -Name '/Test5B' -Scriptblock {}
+        New-PolarisRouteMiddleware -Name '/Test6'  -Scriptblock {}
         }
 
     It "Should delete middleware" {

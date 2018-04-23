@@ -1,4 +1,4 @@
-function New-ScriptBlockCallback {
+function New-ScriptblockCallback {
     param(
         [parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
@@ -6,16 +6,16 @@ function New-ScriptBlockCallback {
     )
 <#
     .SYNOPSIS
-        Allows running ScriptBlocks via .NET async callbacks.
+        Allows running Scriptblocks via .NET async callbacks.
  
     .DESCRIPTION
-        Allows running ScriptBlocks via .NET async callbacks. Internally this is
+        Allows running Scriptblocks via .NET async callbacks. Internally this is
         managed by converting .NET async callbacks into .NET events. This enables
-        PowerShell 2.0 to run ScriptBlocks indirectly through Register-ObjectEvent.         
+        PowerShell 2.0 to run Scriptblocks indirectly through Register-ObjectEvent.         
  
     .PARAMETER Callback
-        Specify a ScriptBlock to be executed in response to the callback.
-        Because the ScriptBlock is executed by the eventing subsystem, it only has
+        Specify a Scriptblock to be executed in response to the callback.
+        Because the Scriptblock is executed by the eventing subsystem, it only has
         access to global scope. Any additional arguments to this function will be
         passed as event MessageData.
          
@@ -25,7 +25,7 @@ function New-ScriptBlockCallback {
          
         void Bar(AsyncCallback handler, int blah)
          
-        ps> [foo]::bar((New-ScriptBlockCallback { ... }), 42)                        
+        ps> [foo]::bar((New-ScriptblockCallback { ... }), 42)                        
  
     .OUTPUTS
         A System.AsyncCallback delegate.

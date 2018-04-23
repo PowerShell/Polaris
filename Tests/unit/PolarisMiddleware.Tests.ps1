@@ -3,7 +3,7 @@ Describe "Test middleware creation/usage" {
     BeforeAll {
         Import-Module $PSScriptRoot\..\..\Polaris.psd1
 
-        New-PolarisRoute -Path /helloworld -Method GET -ScriptBlock {
+        New-PolarisRoute -Path /helloworld -Method GET -Scriptblock {
             $Response.Send('Hello World')
         }
 
@@ -37,7 +37,7 @@ Describe "Test middleware creation/usage" {
         }
         BeforeEach {
             $app.RouteMiddleware.Count | Should Be 1
-            New-PolarisRouteMiddleware -Name TestMiddleware -ScriptBlock $defaultMiddleware
+            New-PolarisRouteMiddleware -Name TestMiddleware -Scriptblock $defaultMiddleware
         }
         AfterEach {
             Remove-PolarisRouteMiddleware -Name TestMiddleware

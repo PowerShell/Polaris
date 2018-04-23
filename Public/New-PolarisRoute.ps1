@@ -8,8 +8,8 @@
 .PARAMETER Method
     HTTP verb/method to be serviced.
     Valid values are GET, HEAD, POST, PUT, DELETE, CONNECT, OPTIONS, TRACE
-.PARAMETER ScriptBlock
-    ScriptBlock that will be triggered when web route is called.
+.PARAMETER Scriptblock
+    Scriptblock that will be triggered when web route is called.
 .PARAMETER ScriptPath
     Full path and name of script that will be triggered when web route is called.
 .PARAMETER Force
@@ -18,7 +18,7 @@
     A Polaris object
     Defaults to the script scoped Polaris
 .EXAMPLE
-    New-PolarisRoute -Path "helloworld" -Method "GET" -ScriptBlock { $Response.Send( 'Hello World' ) }
+    New-PolarisRoute -Path "helloworld" -Method "GET" -Scriptblock { $Response.Send( 'Hello World' ) }
     To view results:
     Start-Polaris
     Start-Process http://localhost:8080/helloworld
@@ -40,7 +40,7 @@ function New-PolarisRoute {
         [string]
         $Method,
 
-        [Parameter( Mandatory = $True, Position = 2, ParameterSetName = 'ScriptBlock' )]
+        [Parameter( Mandatory = $True, Position = 2, ParameterSetName = 'Scriptblock' )]
         [scriptblock]
         $Scriptblock,
 
@@ -80,7 +80,7 @@ function New-PolarisRoute {
         }
 
         switch ( $PSCmdlet.ParameterSetName ) {
-            'ScriptBlock' {
+            'Scriptblock' {
                 $Polaris.AddRoute( $Path, $Method, $Scriptblock )
             }
             'ScriptPath' {

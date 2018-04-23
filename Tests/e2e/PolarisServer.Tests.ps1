@@ -5,25 +5,25 @@ Describe "Test webserver use (E2E)" {
         $Port = Get-Random -Minimum 8000 -Maximum 8999
         $IsUnix = $PSVersionTable.Platform -eq "Unix"
 
-        Start-Job -ScriptBlock {
+        Start-Job -Scriptblock {
             # Import Polaris
             Import-Module -Name $using:PSScriptRoot\..\..\Polaris.psd1
 
             # Support Headers
-            New-PolarisRoute -Path /header -Method "GET" -ScriptBlock {
+            New-PolarisRoute -Path /header -Method "GET" -Scriptblock {
                 $Response.SetHeader('Location', 'http://www.contoso.com/')
                 $Response.Send("Header test")
             }
 
-            # Hello World passing in the Path, Method & ScriptBlock
-            New-PolarisRoute -Path /helloworld -Method GET -ScriptBlock {
+            # Hello World passing in the Path, Method & Scriptblock
+            New-PolarisRoute -Path /helloworld -Method GET -Scriptblock {
                 Write-Host "This is Write-Host"
                 Write-Information "This is Write-Information" -Tags Tag0
                 $Response.Send('Hello World')
             }
 
-            # Hello World passing in the Path, Method & ScriptBlock
-            New-PolarisRoute -Path /hellome -Method GET -ScriptBlock {
+            # Hello World passing in the Path, Method & Scriptblock
+            New-PolarisRoute -Path /hellome -Method GET -Scriptblock {
                 if ($Request.Query['name']) {
                     $Response.Send('Hello ' + $Request.Query['name'])
                 }
@@ -42,7 +42,7 @@ Describe "Test webserver use (E2E)" {
             }
 
             # Supports helper functions for Get, Post, Put, Delete
-            New-PolarisPostRoute -Path /wow -ScriptBlock $sbWow
+            New-PolarisPostRoute -Path /wow -Scriptblock $sbWow
 
             # Pass in script file
             New-PolarisRoute -Path /example -Method GET -ScriptPath $using:PSScriptRoot\..\resources\test.ps1
@@ -50,7 +50,7 @@ Describe "Test webserver use (E2E)" {
             # Also support static serving of a directory
             New-PolarisStaticRoute -FolderPath $using:PSScriptRoot/../resources/static -RoutePath /public
 
-            New-PolarisGetRoute -Path /error -ScriptBlock {
+            New-PolarisGetRoute -Path /error -Scriptblock {
                 $params = @{}
                 Write-Host "asdf"
                 throw "Error"

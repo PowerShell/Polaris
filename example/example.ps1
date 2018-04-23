@@ -7,13 +7,13 @@ if(-not (Test-Path -Path ..\Polaris.psd1)) {
 Import-Module -Name ..\Polaris.psd1
 
 $Hey = "What what!"
-# Hello World passing in the Path, Method & ScriptBlock
-New-PolarisRoute -Path /helloworld -Method GET -ScriptBlock {
+# Hello World passing in the Path, Method & Scriptblock
+New-PolarisRoute -Path /helloworld -Method GET -Scriptblock {
     $Response.Send($Hey)
 } -Force
 
 # Query Parameters are supported
-New-PolarisRoute -Path /hellome -Method GET -ScriptBlock {
+New-PolarisRoute -Path /hellome -Method GET -Scriptblock {
     if ($Request.Query['name']) {
         $Response.Send('Hello ' + $Request.Query['name'])
     } else {
@@ -31,10 +31,10 @@ $sbWow = {
 }
 
 # Supports helper functions for Get, Post, Put, Delete
-New-PolarisPostRoute -Path /wow -ScriptBlock $sbWow
+New-PolarisPostRoute -Path /wow -Scriptblock $sbWow
 
 # Body Parameters are supported if you use the -UseJsonBodyParserMiddleware
-New-PolarisPostRoute -Path /hello -ScriptBlock {
+New-PolarisPostRoute -Path /hello -Scriptblock {
     if ($Request.Body.Name) {
         $Response.Send('Hello ' + $Request.Body.Name);
     } else {

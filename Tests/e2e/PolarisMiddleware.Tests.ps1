@@ -4,10 +4,10 @@ Describe "Test middleware creation/usage (E2E)" {
 
         $Port = Get-Random -Minimum 7000 -Maximum 7999
 
-        Start-Job -ScriptBlock {
+        Start-Job -Scriptblock {
             Import-Module $using:PSScriptRoot\..\..\Polaris.psd1
 
-            New-PolarisRoute -Path /helloworld -Method GET -ScriptBlock {
+            New-PolarisRoute -Path /helloworld -Method GET -Scriptblock {
                 $Response.Send('Hello World')
             }
 
@@ -19,9 +19,9 @@ Describe "Test middleware creation/usage (E2E)" {
                 }
             }
 
-            New-PolarisRouteMiddleware -Name TestMiddleware -ScriptBlock $defaultMiddleware
+            New-PolarisRouteMiddleware -Name TestMiddleware -Scriptblock $defaultMiddleware
 
-            New-PolarisPostRoute -Path "/hello" -ScriptBlock {
+            New-PolarisPostRoute -Path "/hello" -Scriptblock {
                 if ($Request.Body.Name) {
                     $Response.Send('Hello ' + $Request.Body.Name)
                 }
@@ -30,7 +30,7 @@ Describe "Test middleware creation/usage (E2E)" {
                 }
             }
 
-            New-PolarisPostRoute -Path "/NewProperty" -ScriptBlock {
+            New-PolarisPostRoute -Path "/NewProperty" -Scriptblock {
                 if ($Request.Body.NewProperty) {
                     $Response.Send('Hello ' + $Request.Body.NewProperty)
                 }

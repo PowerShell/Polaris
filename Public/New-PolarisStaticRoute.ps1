@@ -121,5 +121,5 @@ function New-PolarisStaticRoute {
         "`$NewDrive = '$NewDrive'`r`n" +
         $Scriptblock.ToString())
 
-    New-PolarisRoute -Path $RoutePath -Method GET -ScriptBlock $Scriptblock -Force:$Force -ErrorAction:$ErrorAction
+    New-PolarisRoute -Path $RoutePath -Method GET -Scriptblock $Scriptblock -Force:$Force -ErrorAction:$ErrorAction
 }
