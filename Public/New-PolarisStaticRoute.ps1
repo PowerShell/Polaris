@@ -67,7 +67,7 @@ function New-PolarisStaticRoute {
     $Scriptblock = {
         $Content = ""
 
-        $LocalPath = ($Request.Url.LocalPath -replace $RoutePath, "")
+        $LocalPath = ($Request.Url.LocalPath -replace "^$RoutePath", "")
         Write-Debug "Parsed local path: $LocalPath" 
         try {
             $RequestedItem = Get-Item -LiteralPath "$NewDrive`:$LocalPath" -Force -ErrorAction Stop
