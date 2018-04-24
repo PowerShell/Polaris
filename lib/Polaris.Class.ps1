@@ -240,6 +240,12 @@ class Polaris {
             $this.Listener.Prefixes.Add("http://localhost:" + $this.Port + "/")
         }
 
+        $this.Listener.IgnoreWriteExceptions = $true
+        $this.Listener.TimeoutManager.RequestQueue = [timespan]::FromMinutes(5)
+        $this.Listener.TimeoutManager.IdleConnection = [timespan]::FromSeconds(45)
+        $this.Listener.TimeoutManager.EntityBody = [timespan]::FromSeconds(50)
+        $this.Listener.TimeoutManager.HeaderWait = [timespan]::FromSeconds(5)
+
         $this.Listener.Start()
     }
 
