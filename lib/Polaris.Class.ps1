@@ -152,9 +152,7 @@ class Polaris {
             throw [ArgumentNullException]::new("scriptBlock")
         }
 
-        [string]$SanitizedPath = $Path.TrimEnd('/')
-
-        if ([string]::IsNullOrEmpty($SanitizedPath)) { $SanitizedPath = "/" }
+        [string]$SanitizedPath = [Polaris]::SanitizePath($Path)
 
         if (-not $this.ScriptblockRoutes.ContainsKey($SanitizedPath)) {
             $this.ScriptblockRoutes[$SanitizedPath] = [System.Collections.Generic.Dictionary[string, string]]::new()
@@ -173,14 +171,20 @@ class Polaris {
             throw [ArgumentNullException]::new("method")
         }
 
-        [string]$SanitizedPath = $Path.TrimEnd('/')
-
-        if ([string]::IsNullOrEmpty($SanitizedPath)) { $SanitizedPath = "/" }
+        [string]$SanitizedPath = [Polaris]::SanitizePath($Path)
 
         $this.ScriptblockRoutes[$SanitizedPath].Remove($Method)
         if ($this.ScriptblockRoutes[$SanitizedPath].Count -eq 0) {
             $this.ScriptblockRoutes.Remove($SanitizedPath)
         }
+    }
+
+    static [string] SanitizePath([string]$Path){
+        $SanitizedPath = $Path.TrimEnd('/')
+
+        if ([string]::IsNullOrEmpty($SanitizedPath)) { $SanitizedPath = "/" }
+
+        return $SanitizedPath
     }
 
     AddMiddleware (
@@ -243,28 +247,23 @@ class Polaris {
         [System.Net.HttpListenerResponse]$RawResponse, 
         [PolarisResponse]$Response
     ) {
-        try {
-            if ($Response.StreamResponse) {
-                [Polaris]::Send(
-                    $RawResponse,
-                    $Response.StreamResponse,
-                    $Response.StatusCode,
-                    $Response.ContentType,
-                    $Response.Headers
-                )
-            }
-            else {
-                [Polaris]::Send(
-                    $RawResponse,
-                    $Response.ByteResponse,
-                    $Response.StatusCode,
-                    $Response.ContentType,
-                    $Response.Headers
-                )
-            }
+        if ($Response.StreamResponse) {
+            [Polaris]::Send(
+                $RawResponse,
+                $Response.StreamResponse,
+                $Response.StatusCode,
+                $Response.ContentType,
+                $Response.Headers
+            )
         }
-        catch {
-            throw $_
+        else {
+            [Polaris]::Send(
+                $RawResponse,
+                $Response.ByteResponse,
+                $Response.StatusCode,
+                $Response.ContentType,
+                $Response.Headers
+            )
         }
     }
 
@@ -303,11 +302,7 @@ class Polaris {
         [int]$StatusCode,
         [string]$ContentType
     ) {
-        $RawResponse.StatusCode = $StatusCode;
-        $RawResponse.ContentType = $ContentType;
-        $RawResponse.ContentLength64 = $ByteResponse.Length;
-        $RawResponse.OutputStream.Write($ByteResponse, 0, $ByteResponse.Length);
-        $RawResponse.OutputStream.Close();
+        [Polaris]::Send($RawResponse, $ByteResponse, $StatusCode, $ContentType, $Null)
     }
 
     [void] Log ([string]$LogString) {
