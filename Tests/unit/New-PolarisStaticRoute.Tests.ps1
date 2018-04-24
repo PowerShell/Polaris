@@ -66,6 +66,20 @@
             Should Throw
     }
 
+    It "Should trim only the leading / from route path" {
+
+        #  Start with a clean slate
+        Remove-PolarisRoute
+
+        #  Create a static route with many / in the path
+        New-PolarisStaticRoute -RoutePath "/foo/foo/foo" -FolderPath $TestPath
+
+        #  Verify generated scriptblock has the correct string
+        $Routes = Get-PolarisRoute
+        $Routes[0].Scriptblock | Should BeLike "*'foo/foo/foo'*"
+        
+    }
+
     It "Should overwrite matching route with Force switch" {
 
         #  Start with a clean slate
