@@ -27,7 +27,7 @@ class Polaris {
             }
 
             $Polaris.Listener.BeginGetContext($Polaris.ContextHandler, $Polaris)
-            
+
             [System.Net.HttpListenerRequest]$RawRequest = $Context.Request
             [System.Net.HttpListenerResponse]$RawResponse = $Context.Response
 
@@ -117,7 +117,11 @@ class Polaris {
                 $Polaris.Log(($_ | Out-String))
                 $Response.SetStatusCode(500)
                 $Response.Send($_)
-                [Polaris]::Send($RawResponse, $Response)
+                try{
+                    [Polaris]::Send($RawResponse, $Response)
+                } catch {
+                    $Polaris.Log($_)
+                }
                 $Polaris.Log($_)
             }
         })
