@@ -27,7 +27,7 @@ class Polaris {
             }
 
             $Polaris.Listener.BeginGetContext($Polaris.ContextHandler, $Polaris)
-
+            
             [System.Net.HttpListenerRequest]$RawRequest = $Context.Request
             [System.Net.HttpListenerResponse]$RawResponse = $Context.Response
 
@@ -117,8 +117,8 @@ class Polaris {
                 $Polaris.Log(($_ | Out-String))
                 $Response.SetStatusCode(500)
                 $Response.Send($_)
-                $Response.Close()
-                throw $_
+                [Polaris]::Send($RawResponse, $Response)
+                $Polaris.Log($_)
             }
         })
 
@@ -137,7 +137,8 @@ class Polaris {
 
         Invoke-Command -Scriptblock $Scriptblock `
             -ArgumentList @($Request, $Response) `
-            -InformationVariable InformationVariable
+            -InformationVariable InformationVariable `
+            -ErrorAction Stop
 			
         return $InformationVariable
     }
