@@ -67,7 +67,7 @@ function New-PolarisStaticRoute {
     $Scriptblock = {
         $Content = ""
 
-        $LocalPath = ($Request.Url.LocalPath -replace "^$RoutePath", "")
+        $LocalPath = ($Request.Url.LocalPath -replace "^/$RoutePath", "")
         Write-Debug "Parsed local path: $LocalPath" 
         try {
             $RequestedItem = Get-Item -LiteralPath "$NewDrive`:$LocalPath" -Force -ErrorAction Stop
@@ -79,7 +79,6 @@ function New-PolarisStaticRoute {
                     $Content = New-DirectoryBrowser -RequestedItem $RequestedItem `
                         -HeaderName "Polaris Static File Server" `
                         -DirectoryBrowserPath $LocalPath `
-                        -WebServerPath $RoutePath
 
                     $Response.ContentType = "text/html"
                     $Response.Send($Content)
@@ -90,9 +89,9 @@ function New-PolarisStaticRoute {
             }
             else {
                 $Response.SetStream(
-                    [System.IO.File]::OpenRead($FullPath)
+                    [System.IO.File]::OpenRead($RequestedItem.FullName)
                 )
-                $Response.ContentType = [PolarisResponse]::GetContentType($FullPath)
+                $Response.ContentType = [PolarisResponse]::GetContentType($RequestedItem.FullName)
             }
         }
         catch [System.UnauthorizedAccessException] {

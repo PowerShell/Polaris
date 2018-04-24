@@ -73,7 +73,7 @@
 
         #  Confirm file can be downloaded
         $Download = Invoke-WebRequest -Uri "http://localhost:$Port/" -UseBasicParsing
-        $Download.Content | Should BeLike "*To Parent Directory*"
+        $Download.Content | Should BeLike "*Polaris Static File Server*"
     }
 
     AfterAll {

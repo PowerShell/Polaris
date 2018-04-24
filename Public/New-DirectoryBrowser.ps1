@@ -12,8 +12,6 @@ function New-DirectoryBrowser {
     .PARAMETER DirectoryBrowserPath
         The current path in the directory browser relative to the root of the directory
         browser (not the root of the site).
-    .PARAMETER WebServerPath
-        The current path of the directory browser relative to the root of Polaris
 #>
 
     param (
@@ -31,10 +29,10 @@ function New-DirectoryBrowser {
         [Parameter(
             Mandatory = $false,
             HelpMessage = 'Directory Browser Path')]
-        [string]$DirectoryBrowserPath,
-
-        [string]$WebServerPath
+        [string]$DirectoryBrowserPath
     )
+
+    Write-Debug "DirectoryBrowserPath: $DirectoryBrowserPath"
 
     @"
 <html>
@@ -49,8 +47,8 @@ $(if ($RequestedItem.FullName.TrimEnd("\") -ne $RequestedItem.PSDrive.Root) { '<
 "@
     $Files = ($RequestedItem | Get-ChildItem)
     foreach ($File in $Files) {
-        $FileURL = "./" + $WebServerPath + ($File.FullName -replace [regex]::Escape($RequestedItem.PSDrive.Root), "" ) -replace "\\", "/"
-        if ($File.PSIsContainer) { $FileLength = "[dir]" } else { $FileLength = $File.Length }
+        $FileURL = "./" + ($File.PSChildName) -replace "\\", "/"
+        if ($File.PSIsContainer) { $FileUrl += "/"; $FileLength = "[dir]" } else { $FileLength = $File.Length }
         @"
 <tr>
 <td align="right">$($File.LastWriteTime)</td>
