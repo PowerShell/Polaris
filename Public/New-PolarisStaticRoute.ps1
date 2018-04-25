@@ -33,7 +33,7 @@ function New-PolarisStaticRoute {
 
         [Parameter( Mandatory = $True )]
         [string]
-        $FolderPath,
+        $FolderPath = "./",
 
         [bool]
         $EnableDirectoryBrowser = $True,
