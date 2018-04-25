@@ -17,10 +17,12 @@
 function Stop-Polaris {
     [CmdletBinding()]
     param(
-        $ServerContext = $script:Polaris
+        $ServerContext = $Script:Polaris
     )
 
     if ( $ServerContext ) {
         $ServerContext.Stop()
     }
+
+    Get-PSDrive PolarisStaticFileServer* | Remove-PSDrive
 }

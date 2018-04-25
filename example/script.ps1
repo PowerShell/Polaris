@@ -1,1 +1,1 @@
-$response.Send("example")
+$Response.Send("example")

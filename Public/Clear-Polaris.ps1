@@ -9,7 +9,7 @@ Clear-Polaris
 Should only be used for testing
 #>
 function Clear-Polaris {
-    if ($script:Polaris) {
+    if ($Script:Polaris) {
         Remove-Variable -Name Polaris -Scope script
     }
 }

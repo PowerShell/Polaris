@@ -46,14 +46,14 @@ function Get-PolarisRoute {
         $Method = '*',
 
         
-        $Polaris = $script:Polaris
+        $Polaris = $Script:Polaris
     )
     
     process {
         if ( $Polaris ) {
             $WebRoutes = [System.Collections.ArrayList]@()
 
-            ForEach ( $Route in $Polaris.ScriptBlockRoutes.GetEnumerator() ) {
+            ForEach ( $Route in $Polaris.ScriptblockRoutes.GetEnumerator() ) {
                 ForEach ( $RouteMethod in $Route.Value.GetEnumerator() ) {
                     $Null = $WebRoutes.Add( [pscustomobject]@{ Path = $Route.Key; Method = $RouteMethod.Key; Scriptblock = $RouteMethod.Value } )
                 }
@@ -61,9 +61,9 @@ function Get-PolarisRoute {
 
             $Filter = [scriptblock]::Create( (
                     '( ' + 
-                    ( $Path.ForEach( {   "`$_.Path   -like `"$($_.TrimStart('/'))`"" } ) -join ' -or ' ) + 
+                    ( $Path.ForEach( {   "`$_.Path   -like `"/$($_.TrimStart("/"))`"" } ) -join ' -or ' ) + 
                     ' ) -and ( ' +
-                    ( $Method.ForEach( { "`$_.Method -like `"$($_.TrimStart('/'))`"" } ) -join ' -or ' ) +
+                    ( $Method.ForEach( { "`$_.Method -like `"$($_)`"" } ) -join ' -or ' ) +
                     ' )' ) )
 
             $WebRoutes = $WebRoutes.Where( $Filter )

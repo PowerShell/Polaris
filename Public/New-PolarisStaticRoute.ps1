@@ -33,13 +33,16 @@ function New-PolarisStaticRoute {
 
         [Parameter( Mandatory = $True )]
         [string]
-        $FolderPath,
+        $FolderPath = "./",
+
+        [bool]
+        $EnableDirectoryBrowser = $True,
         
         [switch]
         $Force,
 
         
-        $Polaris = $script:Polaris
+        $Polaris = $Script:Polaris
     )
     
     $ErrorAction = $PSBoundParameters["ErrorAction"]
@@ -49,65 +52,71 @@ function New-PolarisStaticRoute {
     
     CreateNewPolarisIfNeeded
     if ( -not $Polaris) {
-        $Polaris = $script:Polaris
+        $Polaris = $Script:Polaris
     }
     
     if ( -not ( Test-Path -Path $FolderPath ) ) {
         Write-Error -Exception FileNotFoundException -Message "Folder does not exist at path $FolderPath"
     }
 
-    $FolderPath = (Get-Item -Path $FolderPath).FullName
+    $NewDrive = (New-PSDrive -Name "PolarisStaticFileServer$([guid]::NewGuid().guid)" `
+            -PSProvider FileSystem `
+            -Root $FolderPath `
+            -Scope Global).Name
+    
+    $Scriptblock = {
+        $Content = ""
 
-    # Builds a script for serving content from the given folder that includes an HTML browser for the folder
-    $ScriptBlockString = @"
-    New-PSDrive -Name PolarisStaticFileServer -PSProvider FileSystem -Root '$FolderPath' -Scope Global
+        $LocalPath = ($Request.Url.LocalPath -replace "^/$RoutePath", "")
+        Write-Debug "Parsed local path: $LocalPath" 
+        try {
+            $RequestedItem = Get-Item -LiteralPath "$NewDrive`:$LocalPath" -Force -ErrorAction Stop
+            Write-Debug "Requested Item: $RequestedItem"
+             
+            if ($RequestedItem.PSIsContainer) {
 
-    `$RoutePath = '$RoutePath'
+                if ($EnableDirectoryBrowser) {
+                    $Content = New-DirectoryBrowser -RequestedItem $RequestedItem `
+                        -HeaderName "Polaris Static File Server" `
+                        -DirectoryBrowserPath $LocalPath `
 
-    $(Get-Content $PSScriptRoot\..\Private\New-DirectoryBrowser.ps1 | Out-String)
-
-    `$Content = ""
-
-    `$localPath = (`$request.Url.LocalPath -replace `$RoutePath, "") -replace "/","\"
-    try {
-        `$RequestedItem = Get-Item -LiteralPath "PolarisStaticFileServer:`$localPath" -Force -ErrorAction Stop
-        `$FullPath = `$RequestedItem.FullName
-        if (`$RequestedItem.Attributes -match "Directory") {
-            
-            `$Content = Get-DirectoryContent -Path `$FullPath ``
-                            -HeaderName "Polaris Static File Server" ``
-                            -SubfolderName `$localPath ``
-                            -Root "`$((get-psdrive PolarisStaticFileServer).Root)"
-
-            `$response.ContentType = "text/html"
-            `$Response.Send(`$Content)
+                    $Response.ContentType = "text/html"
+                    $Response.Send($Content)
+                }
+                else {
+                    throw [System.Management.Automation.ItemNotFoundException]'file not found'
+                }
+            }
+            else {
+                $Response.SetStream(
+                    [System.IO.File]::OpenRead($RequestedItem.FullName)
+                )
+                $Response.ContentType = [PolarisResponse]::GetContentType($RequestedItem.FullName)
+            }
         }
-        else {
-            `$Content = [System.IO.File]::ReadAllBytes(`$FullPath)
-            `$response.ContentType = [PolarisResponse]::GetContentType(`$FullPath)
-            `$Response.SendBytes(`$Content)
+        catch [System.UnauthorizedAccessException] {
+            $Response.StatusCode = 401
+            $Response.ContentType = "text/html"
+            $Content = "<h1>401 - Unauthorized</h1>"
+            $Response.Send($Content)
+        }
+        catch [System.Management.Automation.ItemNotFoundException] {
+            $Response.StatusCode = 404
+            $Response.ContentType = "text/html"
+            $Content = "<h1>404 - Page not found $LocalPath</h1>"
+            $Response.Send($Content);
+        }
+        catch {
+            Throw $_
         }
     }
-    catch [System.UnauthorizedAccessException] {
-        `$response.StatusCode = 401
-        `$response.ContentType = "text/html"
-        `$Content = "<h1>401 - Unauthorized</h1>"
-        `$response.Send(`$Content)
-    }
-    catch [System.Management.Automation.ItemNotFoundException] {
-        `$response.StatusCode = 404
-        `$response.ContentType = "text/html"
-        `$Content = "<h1>404 - Page not found `$localPath</h1>"
-        `$Content += Get-DirectoryContent -Path PolarisStaticFileServer:\ -HeaderName "Polaris Static File Server" -SubfolderName "\" -Root "PolarisStaticFileServer:\"
-        `$response.Send(`$Content);
-    }
-    catch {
-        Throw `$_
-    }
 
-"@
+    # Inserting variables into scriptblock as hardcoded
+    $Scriptblock = [scriptblock]::Create(
+        "`$RoutePath = '$($RoutePath.TrimStart("/"))'`r`n" +
+        "`$EnableDirectoryBrowser = `$$EnableDirectoryBrowser`r`n" +
+        "`$NewDrive = '$NewDrive'`r`n" +
+        $Scriptblock.ToString())
 
-    $ScriptBlock = [scriptblock]::Create($ScriptBlockString)
-
-    New-PolarisRoute -Path $RoutePath -Method GET -ScriptBlock $ScriptBlock -Force:$Force -ErrorAction:$ErrorAction
+    New-PolarisRoute -Path $RoutePath -Method GET -Scriptblock $Scriptblock -Force:$Force -ErrorAction:$ErrorAction
 }

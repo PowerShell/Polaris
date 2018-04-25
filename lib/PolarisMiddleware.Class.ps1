@@ -1,8 +1,8 @@
-class PolarisMiddleWare {
-    
-    [string]$Name
-    [string]$ScriptBlock
-    
-    PolarisMiddleWare() {}
-    
+class PolarisMiddleWare{
+
+	[string]$Name
+	[scriptblock]$Scriptblock
+
+	PolarisMiddleWare () {}
+
 }

@@ -38,19 +38,19 @@ function Start-Polaris {
         $UseJsonBodyParserMiddleware = $False,
 
         
-        $Polaris = $script:Polaris
+        $Polaris = $Script:Polaris
     )
 
-    CreateNewPolarisIfNeeded
     if ( -not $Polaris) {
-        $Polaris = $script:Polaris
+        CreateNewPolarisIfNeeded
+        $Polaris = $Script:Polaris
     }
 
     if ( $UseJsonBodyParserMiddleware ) {
-        New-PolarisRouteMiddleware -Name JsonBodyParser -ScriptBlock $JsonBodyParserMiddlerware
+        Use-PolarisJsonBodyParserMiddleware -Polaris $Polaris
     }
 
-    $Polaris.Start( $Port, $MinRunspaces, $MaxRunspaces )
-    
+    $Polaris.Start( $Port )
+
     return $Polaris
 }

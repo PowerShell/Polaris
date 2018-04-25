@@ -8,8 +8,8 @@
 .PARAMETER Method
     HTTP verb/method to be serviced.
     Valid values are GET, HEAD, POST, PUT, DELETE, CONNECT, OPTIONS, TRACE
-.PARAMETER ScriptBlock
-    ScriptBlock that will be triggered when web route is called.
+.PARAMETER Scriptblock
+    Scriptblock that will be triggered when web route is called.
 .PARAMETER ScriptPath
     Full path and name of script that will be triggered when web route is called.
 .PARAMETER Force
@@ -18,7 +18,7 @@
     A Polaris object
     Defaults to the script scoped Polaris
 .EXAMPLE
-    New-PolarisRoute -Path "helloworld" -Method "GET" -ScriptBlock { $response.Send( 'Hello World' ) }
+    New-PolarisRoute -Path "helloworld" -Method "GET" -Scriptblock { $Response.Send( 'Hello World' ) }
     To view results:
     Start-Polaris
     Start-Process http://localhost:8080/helloworld
@@ -40,9 +40,9 @@ function New-PolarisRoute {
         [string]
         $Method,
 
-        [Parameter( Mandatory = $True, Position = 2, ParameterSetName = 'ScriptBlock' )]
+        [Parameter( Mandatory = $True, Position = 2, ParameterSetName = 'Scriptblock' )]
         [scriptblock]
-        $ScriptBlock,
+        $Scriptblock,
 
         [Parameter( Mandatory = $True, ParameterSetName = 'ScriptPath' )]
         [string]
@@ -51,7 +51,7 @@ function New-PolarisRoute {
         [switch]
         $Force,
 
-        $Polaris = $script:Polaris
+        $Polaris = $Script:Polaris
     )
     $Method = $Method.ToUpper()
     $ExistingWebRoute = Get-PolarisRoute -Path $Path -Method $Method
@@ -72,7 +72,7 @@ function New-PolarisRoute {
     else {
         CreateNewPolarisIfNeeded
         if( -not $Polaris){
-            $Polaris = $script:Polaris
+            $Polaris = $Script:Polaris
         }
 
         if ( -not $Path.StartsWith( '/' ) ) {
@@ -80,13 +80,13 @@ function New-PolarisRoute {
         }
 
         switch ( $PSCmdlet.ParameterSetName ) {
-            'ScriptBlock' {
-                $Polaris.AddRoute( $Path, $Method, [string]$ScriptBlock )
+            'Scriptblock' {
+                $Polaris.AddRoute( $Path, $Method, $Scriptblock )
             }
             'ScriptPath' {
                 if ( Test-Path -Path $ScriptPath ) {
                     $Script = Get-Content -Path $ScriptPath -Raw
-                    $Polaris.AddRoute( $Path, $Method, $Script )
+                    $Polaris.AddRoute( $Path, $Method, [scriptblock]::Create($Script) )
                 }
                 else {
                     $PSCmdlet.WriteError( (

@@ -6,8 +6,8 @@
     manipulate request and response objects and run before web route scripts.
 .PARAMETER Name
     Name of the middleware.
-.PARAMETER ScriptBlock
-    ScriptBlock to run when middleware is triggered.
+.PARAMETER Scriptblock
+    Scriptblock to run when middleware is triggered.
 .PARAMETER ScriptPath
     Full path and name to script to run when middleware is triggered.
 .PARAMETER Force
@@ -16,13 +16,13 @@
     A Polaris object
     Defaults to the script scoped Polaris
 .EXAMPLE
-$JsonBodyParserMiddlerware =
+$JsonBodyParserMiddleware =
 {
     if ($Request.BodyString -ne $null) {
         $Request.Body = $Request.BodyString | ConvertFrom-Json
     }
 }
-New-PolarisRouteMiddleware -Name JsonBodyParser -ScriptBlock $JsonBodyParserMiddleware
+New-PolarisRouteMiddleware -Name JsonBodyParser -Scriptblock $JsonBodyParserMiddleware
 #>
 function New-PolarisRouteMiddleware {
     [CmdletBinding()]
@@ -31,9 +31,9 @@ function New-PolarisRouteMiddleware {
         [string]
         $Name,
 
-        [Parameter( Mandatory = $True, Position = 1, ParameterSetName = 'ScriptBlock' )]
+        [Parameter( Mandatory = $True, Position = 1, ParameterSetName = 'Scriptblock' )]
         [scriptblock]
-        $ScriptBlock,
+        $Scriptblock,
 
         [Parameter( Mandatory = $True, ParameterSetName = 'ScriptPath' )]
         [string]
@@ -43,7 +43,7 @@ function New-PolarisRouteMiddleware {
         $Force,
 
         
-        $Polaris = $script:Polaris
+        $Polaris = $Script:Polaris
     )
     # Checking if middleware already exists
     $ExistingMiddleWare = Get-PolarisRouteMiddleware -Name $Name -Polaris $Polaris
@@ -64,18 +64,18 @@ function New-PolarisRouteMiddleware {
     }
     else {
         CreateNewPolarisIfNeeded
-        if( -not $Polaris){
-            $Polaris = $script:Polaris
+        if ( -not $Polaris) {
+            $Polaris = $Script:Polaris
         }
 
         switch ( $PSCmdlet.ParameterSetName ) {
-            'ScriptBlock' {
-                $Polaris.AddMiddleware( $Name, [string]$ScriptBlock )
+            'Scriptblock' {
+                $Polaris.AddMiddleware( $Name, $Scriptblock )
             }
             'ScriptPath' {
                 if ( Test-Path -Path $ScriptPath ) {
                     $Script = Get-Content -Path $ScriptPath -Raw
-                    $Polaris.AddMiddleware( $Name, $Script )
+                    $Polaris.AddMiddleware( $Name, [scriptblock]::Create($Script) )
                 }
                 else {
                     $PSCmdlet.WriteError( (

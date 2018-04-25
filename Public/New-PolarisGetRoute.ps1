@@ -5,8 +5,8 @@
     Wrapper for New-PolarisRoute -Method GET
 .PARAMETER Path
     Path (path/route/endpoint) of the web route to to be serviced.
-.PARAMETER ScriptBlock
-    ScriptBlock that will be triggered when web route is called.
+.PARAMETER Scriptblock
+    Scriptblock that will be triggered when web route is called.
 .PARAMETER ScriptPath
     Full path and name of script that will be triggered when web route is called.
 .PARAMETER Force
@@ -15,7 +15,7 @@
     A Polaris object
     Defaults to the script scoped Polaris
 .EXAMPLE
-    New-PolarisGetRoute -Path "helloworld" -ScriptBlock { $response.Send( 'Hello World' ) }
+    New-PolarisGetRoute -Path "helloworld" -Scriptblock { $Response.Send( 'Hello World' ) }
     To view results:
     Start-Polaris
     Start-Process http://localhost:8080/helloworld
@@ -32,9 +32,9 @@ function New-PolarisGetRoute {
         [string]
         $Path,
 
-        [Parameter( Mandatory = $True, Position = 1, ParameterSetName = 'ScriptBlock' )]
+        [Parameter( Mandatory = $True, Position = 1, ParameterSetName = 'Scriptblock' )]
         [scriptblock]
-        $ScriptBlock,
+        $Scriptblock,
 
         [Parameter( Mandatory = $True, ParameterSetName = 'ScriptPath' )]
         [string]
@@ -44,11 +44,11 @@ function New-PolarisGetRoute {
         $Force,
 
         
-        $Polaris = $script:Polaris
+        $Polaris = $Script:Polaris
     )
 
     switch ( $PSCmdlet.ParameterSetName ) {
-        'ScriptBlock' { New-PolarisRoute -Path $Path -Method "GET" -ScriptBlock $ScriptBlock -Force:$Force }
+        'Scriptblock' { New-PolarisRoute -Path $Path -Method "GET" -Scriptblock $Scriptblock -Force:$Force }
         'ScriptPath' { New-PolarisRoute -Path $Path -Method "GET" -ScriptPath  $ScriptPath  -Force:$Force }
     }
 }

@@ -3,7 +3,7 @@
     BeforeAll {
         
         #  Import module
-        Import-Module $PSScriptRoot\..\Polaris.psd1
+        Import-Module $PSScriptRoot\..\..\Polaris.psd1
 
         #  Define test function to reduce redundancy
         function Test-RemoveRoute
@@ -61,35 +61,35 @@
         Remove-PolarisRoute
 
         #  Create some web routes to test against
-        New-PolarisRoute -Path 'Test0'  -Method GET  -ScriptBlock {}
-        New-PolarisRoute -Path 'Test0'  -Method POST -ScriptBlock {}
-        New-PolarisRoute -Path 'Test1'  -Method GET  -ScriptBlock {}
-        New-PolarisRoute -Path 'Test2'  -Method GET  -ScriptBlock {}
-        New-PolarisRoute -Path 'Test2'  -Method POST -ScriptBlock {}
-        New-PolarisRoute -Path 'Test3A' -Method PUT  -ScriptBlock {}
-        New-PolarisRoute -Path 'Test3B' -Method PUT  -ScriptBlock {}
-        New-PolarisRoute -Path 'Test3C' -Method GET  -ScriptBlock {}
-        New-PolarisRoute -Path 'Test4A' -Method GET  -ScriptBlock {}
-        New-PolarisRoute -Path 'Test4B' -Method GET  -ScriptBlock {}
-        New-PolarisRoute -Path 'Test5'  -Method GET  -ScriptBlock {}
-        New-PolarisRoute -Path 'Test5'  -Method POST -ScriptBlock {}
-        New-PolarisRoute -Path 'Test5'  -Method PUT  -ScriptBlock {}
-        New-PolarisRoute -Path 'Test6A' -Method GET  -ScriptBlock {}
-        New-PolarisRoute -Path 'Test6B' -Method GET  -ScriptBlock {}
-        New-PolarisRoute -Path 'Test7A' -Method GET  -ScriptBlock {}
-        New-PolarisRoute -Path 'Test7B' -Method GET  -ScriptBlock {}
+        New-PolarisRoute -Path '/Test0'  -Method GET  -Scriptblock {}
+        New-PolarisRoute -Path '/Test0'  -Method POST -Scriptblock {}
+        New-PolarisRoute -Path '/Test1'  -Method GET  -Scriptblock {}
+        New-PolarisRoute -Path '/Test2'  -Method GET  -Scriptblock {}
+        New-PolarisRoute -Path '/Test2'  -Method POST -Scriptblock {}
+        New-PolarisRoute -Path '/Test3A' -Method PUT  -Scriptblock {}
+        New-PolarisRoute -Path '/Test3B' -Method PUT  -Scriptblock {}
+        New-PolarisRoute -Path '/Test3C' -Method GET  -Scriptblock {}
+        New-PolarisRoute -Path '/Test4A' -Method GET  -Scriptblock {}
+        New-PolarisRoute -Path '/Test4B' -Method GET  -Scriptblock {}
+        New-PolarisRoute -Path '/Test5'  -Method GET  -Scriptblock {}
+        New-PolarisRoute -Path '/Test5'  -Method POST -Scriptblock {}
+        New-PolarisRoute -Path '/Test5'  -Method PUT  -Scriptblock {}
+        New-PolarisRoute -Path '/Test6A' -Method GET  -Scriptblock {}
+        New-PolarisRoute -Path '/Test6B' -Method GET  -Scriptblock {}
+        New-PolarisRoute -Path '/Test7A' -Method GET  -Scriptblock {}
+        New-PolarisRoute -Path '/Test7B' -Method GET  -Scriptblock {}
         }
 
     It "Should delete route" {
-        Test-RemoveRoute -Path 'Test1' -Method 'GET'
+        Test-RemoveRoute -Path '/Test1' -Method 'GET'
         }
 
     It "Should respect Path" {
-        Test-RemoveRoute -Path 'Test2' -Method '*'
+        Test-RemoveRoute -Path '/Test2' -Method '*'
         }
 
     It "Should respect Method" {
-        Test-RemoveRoute -Path 'Test3*' -Method 'PUT'
+        Test-RemoveRoute -Path '/Test3*' -Method 'PUT'
         }
 
     It "Should do nothing when no routes match" {
@@ -97,19 +97,19 @@
         }
 
     It "Should accept multiple values for Path" {
-        Test-RemoveRoute -Path 'Test4A', 'Test4B' -Method 'GET'
+        Test-RemoveRoute -Path '/Test4A', '/Test4B' -Method 'GET'
         }
 
     It "Should accept multiple values for Method" {
-        Test-RemoveRoute -Path 'Test5' -Method 'GET', 'POST'
+        Test-RemoveRoute -Path '/Test5' -Method 'GET', 'POST'
         }
 
     It "Should accept Path from pipeline" {
-        'Test6A', 'Test6B' | Test-RemoveRoute
+        '/Test6A', '/Test6B' | Test-RemoveRoute
         }
 
     It "Should accept Path and Method from pipeline variables" {
-        Get-PolarisRoute -Path 'Test7A', 'Test7B' | Test-RemoveRoute
+        Get-PolarisRoute -Path '/Test7A', '/Test7B' | Test-RemoveRoute
         }
 
     AfterAll {

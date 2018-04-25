@@ -3,7 +3,7 @@
     BeforeAll {
 
         #  Import module
-        Import-Module $PSScriptRoot\..\Polaris.psd1
+        Import-Module $PSScriptRoot\..\..\Polaris.psd1
 
         #  Start with a clean slate
         Remove-PolarisRouteMiddleware
@@ -16,7 +16,7 @@
         $Scriptblock = [scriptblock]::Create( $Name )
 
         #  Create middleware
-        New-PolarisRouteMiddleware -Name $Name -ScriptBlock $Scriptblock
+        New-PolarisRouteMiddleware -Name $Name -Scriptblock $Scriptblock
 
         #  Test middleware
         ( Get-PolarisRouteMiddleware -Name $Name ).Scriptblock | Should Be $Name
@@ -56,10 +56,10 @@
         $Scriptblock = [scriptblock]::Create( $Name )
 
         #  Create middleware
-        New-PolarisRouteMiddleware -Name $Name -ScriptBlock $Scriptblock
+        New-PolarisRouteMiddleware -Name $Name -Scriptblock $Scriptblock
 
         #  Create middleware
-        { New-PolarisRouteMiddleware -Name $Name -ScriptBlock $Scriptblock -ErrorAction Stop } |
+        { New-PolarisRouteMiddleware -Name $Name -Scriptblock $Scriptblock -ErrorAction Stop } |
             Should Throw
     }
 
@@ -71,7 +71,7 @@
         $Scriptblock = [scriptblock]::Create( $NewContent )
 
         #  Create middleware
-        New-PolarisRouteMiddleware -Name $Name -ScriptBlock $Scriptblock
+        New-PolarisRouteMiddleware -Name $Name -Scriptblock $Scriptblock
 
         #  Test middleware
         ( Get-PolarisRouteMiddleware -Name $Name ).Scriptblock | Should Be $NewContent

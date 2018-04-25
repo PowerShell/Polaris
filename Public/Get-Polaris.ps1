@@ -9,6 +9,6 @@ Get-Polaris
 Should only be used for testing
 #>
 function Get-Polaris {
-    return $script:Polaris
+    return $Script:Polaris
 }
 

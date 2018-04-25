@@ -3,7 +3,7 @@
     BeforeAll {
 
         #  Import module
-        Import-Module $PSScriptRoot\..\Polaris.psd1
+        Import-Module $PSScriptRoot\..\..\Polaris.psd1
 
         #  Start with a clean slate
         Remove-PolarisRoute
@@ -53,24 +53,31 @@
         $AllRoutes.Count | Should Be 1
     }
 
-    It "Should create routes that serve files" {
-
-        #  Confirm file can be downloaded
-        $Download = Invoke-WebRequest -Uri $File1Uri -TimeoutSec 10 -UseBasicParsing
-        $Download.Content | Should be $File1Content
-    }
-
     It "Should throw error if route for file exists" {
 
         #  Start with a clean slate
         Remove-PolarisRoute
 
         #  Create a route which will conflict with next command
-        New-PolarisRoute -Path "$RootPath" -Method GET -ScriptBlock {'Existing script'}
+        New-PolarisRoute -Path "$RootPath" -Method GET -Scriptblock {'Existing script'}
 
         #  Create static routes
         { New-PolarisStaticRoute -RoutePath "$RootPath" -FolderPath $TestPath -ErrorAction Stop } |
             Should Throw
+    }
+
+    It "Should trim only the leading / from route path" {
+
+        #  Start with a clean slate
+        Remove-PolarisRoute
+
+        #  Create a static route with many / in the path
+        New-PolarisStaticRoute -RoutePath "/foo/foo/foo" -FolderPath $TestPath
+
+        #  Verify generated scriptblock has the correct string
+        $Routes = Get-PolarisRoute
+        $Routes[0].Scriptblock | Should BeLike "*'foo/foo/foo'*"
+        
     }
 
     It "Should overwrite matching route with Force switch" {
@@ -79,7 +86,7 @@
         Remove-PolarisRoute
 
         #  Create a route which will conflict with next command
-        New-PolarisRoute -Path "$RootPath" -Method GET -ScriptBlock {'Existing script'}
+        New-PolarisRoute -Path "$RootPath" -Method GET -Scriptblock {'Existing script'}
 
         #  Create static routes
         New-PolarisStaticRoute -RoutePath "$RootPath" -FolderPath $TestPath -Force
@@ -91,7 +98,7 @@
 
         #  Confirm conflicting route was overwritten
         $NewRoute = Get-PolarisRoute "$RootPath" -Method GET
-        $NewRoute.ScriptBlock.TrimStart().SubString( 0, 20 ) | Should be 'New-PSDrive -Name Po'
+        $NewRoute.Scriptblock.toString().TrimStart().SubString( 0, 20 ) | Should be "`$RoutePath = 'BaseRo"
     }
 
     AfterAll {

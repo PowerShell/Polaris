@@ -1,4 +1,4 @@
-﻿$script:Polaris = $null
+﻿$Script:Polaris = $null
 
 # Handles the removal of the module
 $ExecutionContext.SessionState.Module.OnRemove =
@@ -7,18 +7,9 @@ $ExecutionContext.SessionState.Module.OnRemove =
     Clear-Polaris
 }.GetNewClosure()
 
-$JsonBodyParserMiddlerware =
-{
-    if ( $Request.BodyString -ne $Null ) {
-        $Request.Body = $Request.BodyString | ConvertFrom-Json
-    }
-}
-
 # Classes used in Polaris.Class.Ps1 need to be loaded before it
 $Classes = @( Get-ChildItem -Path $PSScriptRoot\lib\*.ps1 -ErrorAction SilentlyContinue | where {$_.Name -ne "Polaris.Class.ps1"})
 $Classes += @( Get-ChildItem -Path $PSScriptRoot\lib\Polaris.Class.ps1 -ErrorAction SilentlyContinue )
-
-$script:ClassDefinitions = $Classes | Get-Content -Raw | Out-String
 
 # Get public and private function definition files.
 $Public = @( Get-ChildItem -Path $PSScriptRoot\Public\*.ps1 -ErrorAction SilentlyContinue )
@@ -33,8 +24,6 @@ Foreach ($import in @($Public + $Private + $Classes)) {
         Write-Error -Message "Failed to import function $($import.fullname): $_"
     }
 }
-
-CreateNewPolarisIfNeeded
 
 # Here I might...
 # Read in or create an initial config file and variable
