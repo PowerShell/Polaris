@@ -42,7 +42,7 @@ function New-DirectoryBrowser {
 <body>
 <h1>$HeaderName - $DirectoryBrowserPath</h1>
 <hr>
-$(if ($RequestedItem.FullName.TrimEnd("\") -ne $RequestedItem.PSDrive.Root) { '<a href="./../">[To Parent Directory]</a><br><br>'})
+$(if ($RequestedItem.FullName.TrimEnd([System.IO.Path]::DirectorySeparatorChar) -ne $RequestedItem.PSDrive.Root) { '<a href="./../">[To Parent Directory]</a><br><br>'})
 <table cellpadding="5">
 "@
     $Files = ($RequestedItem | Get-ChildItem)
