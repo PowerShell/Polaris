@@ -12,4 +12,7 @@
 # End of https://www.gitignore.io/api/powershell
 
 # Pester output
-test/TestsResults.xml
+TestsResults.xml
+
+# Package output
+out
