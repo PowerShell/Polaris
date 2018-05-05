@@ -57,7 +57,7 @@ class Polaris {
                 $Polaris.Log("Parsed Route: $Route")
                 $Polaris.Log("Request Method: $($RawRequest.HttpMethod)")
                 $Routes = $Polaris.ScriptblockRoutes
-                $MatchingRoute = $Routes.keys.Where( { $Route -match $_ })[0]
+                $MatchingRoute = $Routes.keys.Where( { $Route -eq $_ })[0]
                 $MatchingMethod = $false
 
                 if ($MatchingRoute) {
