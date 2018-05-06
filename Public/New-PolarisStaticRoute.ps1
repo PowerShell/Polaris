@@ -31,7 +31,6 @@ function New-PolarisStaticRoute {
         [string]
         $RoutePath = "/",
 
-        [Parameter( Mandatory = $True )]
         [string]
         $FolderPath = "./",
 
