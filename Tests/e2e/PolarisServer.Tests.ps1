@@ -15,6 +15,11 @@ Describe "Test webserver use (E2E)" {
                 $Response.Send("Header test")
             }
 
+            # Support Path Parameters
+            New-PolarisGetRoute -Path "/Hello/{Name}" -ScriptBlock {
+                $Response.Send("Hello $($Parameters.Name)")
+            }
+
             # Hello World passing in the Path, Method & Scriptblock
             New-PolarisRoute -Path /helloworld -Method GET -Scriptblock {
                 Write-Host "This is Write-Host"
@@ -107,6 +112,20 @@ Hello World"
             $Result = Invoke-WebRequest -Uri "http://localhost:$Port/hellome?name=PowerShell" -UseBasicParsing
             $Result.Content | Should Be 'Hello PowerShell'
             $Result.StatusCode | Should Be 200
+        }
+
+        It "test /hello/{Name} route with name as path parameter" {
+            $Result = Invoke-WebRequest -Uri "http://localhost:$Port/hello/Testing" -UseBasicParsing
+            $Result.Content | Should Be 'Hello Testing'
+            $Result.StatusCode | Should Be 200
+        }
+
+        It "test /hellomenew should respond 404" {
+            {$Result = Invoke-RestMethod -Uri "http://localhost:$Port/hellomenew?name=PowerShell" -UseBasicParsing} | Should Throw
+        }
+
+        It "test /hellome/new should respond 404" {
+            {$Result = Invoke-RestMethod -Uri "http://localhost:$Port/hellome/new?name=PowerShell" -UseBasicParsing} | Should Throw
         }
 
         It "test /hellome route without query param" {

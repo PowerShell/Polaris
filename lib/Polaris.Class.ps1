@@ -37,7 +37,7 @@ class Polaris {
             [PolarisResponse]$Response = [PolarisResponse]::new()
 
 
-			[string]$Route = $RawRequest.Url.AbsolutePath.TrimEnd('/')
+			[string]$Route = $RawRequest.Url.AbsolutePath
 			
 			[System.Management.Automation.InformationRecord[]]$InformationVariable = @()
 
@@ -48,7 +48,8 @@ class Polaris {
                 # Run middleware in the order in which it was added
                 foreach ($Middleware in $Polaris.RouteMiddleware) {
 					$InformationVariable += $Polaris.InvokeRoute(
-							$Middleware.Scriptblock,
+                            $Middleware.Scriptblock,
+                            $Null,
 							$Request,
 							$Response
 						)
@@ -57,7 +58,13 @@ class Polaris {
                 $Polaris.Log("Parsed Route: $Route")
                 $Polaris.Log("Request Method: $($RawRequest.HttpMethod)")
                 $Routes = $Polaris.ScriptblockRoutes
-                $MatchingRoute = $Routes.keys.Where( { $Route -match $_ })[0]
+
+                #
+                # Searching for the first route that matches by the most specific route paths first.
+                #
+                $MatchingRoute = $Routes.keys | Sort-Object -Property Length -Descending | Where-Object { $Route -match (Convert-PathParameters -Path $_) } | Select-Object -First 1
+                $Parameters = ([PSCustomObject]$Matches)
+                Write-Debug "Parameters: $Parameters"
                 $MatchingMethod = $false
 
                 if ($MatchingRoute) {
@@ -68,7 +75,8 @@ class Polaris {
                     try {
 
                         $InformationVariable += $Polaris.InvokeRoute(
-							$Routes[$MatchingRoute][$Request.Method],
+                            $Routes[$MatchingRoute][$Request.Method],
+                            $Parameters,
 							$Request,
 							$Response
 						)
@@ -128,6 +136,7 @@ class Polaris {
 
     hidden [object] InvokeRoute (
         [Scriptblock]$Route,
+        [PSCustomObject]$Parameters,
         [PolarisRequest]$Request,
         [PolarisResponse]$Response
     ) {
@@ -135,12 +144,12 @@ class Polaris {
         $InformationVariable = ""
 
         $Scriptblock = [scriptblock]::Create(
-            "param(`$Request,`$Response)`r`n" +
+            "param(`$Parameters,`$Request,`$Response)`r`n" +
             $Route.ToString()
         )
 
         Invoke-Command -Scriptblock $Scriptblock `
-            -ArgumentList @($Request, $Response) `
+            -ArgumentList @($Parameters, $Request, $Response) `
             -InformationVariable InformationVariable `
             -ErrorAction Stop
 			

@@ -161,6 +161,18 @@
         ( Get-PolarisRoute -Path $Path -Method $Method ).Scriptblock | Should Be $NewContent
     }
 
+    It "Should throw an error for an invalid path" {
+
+        #  Define route
+        $Method = 'GET'
+        $Path = "TestExisting/?Hello=WhatWhat"
+        $NewContent = "NewContent"
+        $Scriptblock = [scriptblock]::Create( $NewContent )
+
+        #  Create route
+        { New-PolarisRoute -Path $Path -Method $Method -Scriptblock $Scriptblock -Force } | Should Throw
+    }
+
     AfterAll {
 
         #  Clean up test routes
