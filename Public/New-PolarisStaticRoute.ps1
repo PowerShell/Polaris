@@ -117,7 +117,7 @@ function New-PolarisStaticRoute {
         "`$NewDrive = '$NewDrive'`r`n" +
         $Scriptblock.ToString())
 
-    $PolarisPath = "$RoutePath/{FilePath}" -replace "//","/"
+    $PolarisPath = "$RoutePath/:FilePath" -replace "//","/"
 
     New-PolarisRoute -Path $PolarisPath -Method GET -Scriptblock $Scriptblock -Force:$Force -ErrorAction:$ErrorAction
 }
