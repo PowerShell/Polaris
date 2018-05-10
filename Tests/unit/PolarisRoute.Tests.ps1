@@ -112,13 +112,13 @@ Describe "Test route creation" {
 
             New-PolarisStaticRoute -FolderPath $defaultStaticDirectory
 
-            RouteExists -Path "/:FilePath" -Method 'GET' | Should Be $true
+            RouteExists -Path "/:FilePath?" -Method 'GET' | Should Be $true
         }
         It "Will create a route for every file in a directory with the RoutePath param" {
 
             New-PolarisStaticRoute -RoutePath '/test' -FolderPath $defaultStaticDirectory
 
-            RouteExists -Path '/test/:FilePath' -Method 'GET' | Should Be $true
+            RouteExists -Path '/test/:FilePath?' -Method 'GET' | Should Be $true
         }
     }
 

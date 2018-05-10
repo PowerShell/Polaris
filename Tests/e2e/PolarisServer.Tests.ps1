@@ -16,8 +16,8 @@ Describe "Test webserver use (E2E)" {
             }
 
             # Support Path Parameters
-            New-PolarisGetRoute -Path "/Hello/{Name}" -ScriptBlock {
-                $Response.Send("Hello $($Parameters.Name)")
+            New-PolarisGetRoute -Path "/hello/:Name" -ScriptBlock {
+                $Response.Send("Hello $($Request.Parameters.Name)")
             }
 
             # Hello World passing in the Path, Method & Scriptblock
@@ -114,7 +114,7 @@ Hello World"
             $Result.StatusCode | Should Be 200
         }
 
-        It "test /hello/{Name} route with name as path parameter" {
+        It "test /hello/:Name route with name as path parameter" {
             $Result = Invoke-WebRequest -Uri "http://localhost:$Port/hello/Testing" -UseBasicParsing
             $Result.Content | Should Be 'Hello Testing'
             $Result.StatusCode | Should Be 200

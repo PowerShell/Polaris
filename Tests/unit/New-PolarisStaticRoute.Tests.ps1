@@ -44,7 +44,7 @@
 
         #  Confirm expected routes created
         $Routes = @()
-        $Routes += Get-PolarisRoute -Path "$RootPath/:FilePath" -Method Get
+        $Routes += Get-PolarisRoute -Path "$RootPath/:FilePath?" -Method Get
         $Routes.Count | Should Be 1
 
         #  Confirm no other routes created
@@ -59,7 +59,7 @@
         Remove-PolarisRoute
 
         #  Create a route which will conflict with next command
-        New-PolarisRoute -Path "$RootPath/:FilePath" -Method GET -Scriptblock {'Existing script'}
+        New-PolarisRoute -Path "$RootPath/:FilePath?" -Method GET -Scriptblock {'Existing script'}
 
         #  Create static routes
         { New-PolarisStaticRoute -RoutePath "$RootPath" -FolderPath $TestPath -ErrorAction Stop } |
@@ -97,7 +97,7 @@
         $Routes.Count | Should Be 1
 
         #  Confirm conflicting route was overwritten
-        $NewRoute = Get-PolarisRoute "$RootPath/:FilePath" -Method GET
+        $NewRoute = Get-PolarisRoute "$RootPath/:FilePath?" -Method GET
         $NewRoute.Scriptblock.toString().TrimStart().SubString( 0, 20 ) | Should be "`$RoutePath = 'BaseRo"
     }
 
