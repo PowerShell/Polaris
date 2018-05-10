@@ -66,7 +66,7 @@ function New-PolarisStaticRoute {
     $Scriptblock = {
         $Content = ""
 
-        $LocalPath = $Parameters.FilePath
+        $LocalPath = $Request.Parameters.FilePath
         Write-Debug "Parsed local path: $LocalPath" 
         try {
             $RequestedItem = Get-Item -LiteralPath "$NewDrive`:$LocalPath" -Force -ErrorAction Stop
@@ -117,7 +117,7 @@ function New-PolarisStaticRoute {
         "`$NewDrive = '$NewDrive'`r`n" +
         $Scriptblock.ToString())
 
-    $PolarisPath = "$RoutePath/:FilePath" -replace "//","/"
+    $PolarisPath = "$RoutePath/:FilePath?" -replace "//", "/"
 
     New-PolarisRoute -Path $PolarisPath -Method GET -Scriptblock $Scriptblock -Force:$Force -ErrorAction:$ErrorAction
 }
