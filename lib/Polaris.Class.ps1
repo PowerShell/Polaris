@@ -62,8 +62,8 @@ class Polaris {
                 #
                 # Searching for the first route that matches by the most specific route paths first.
                 #
-                $MatchingRoute = $Routes.keys | Sort-Object -Property Length -Descending | Where-Object { $Route -match (Convert-PathParameters -Path $_) } | Select-Object -First 1
-                $Parameters = ([PSCustomObject]$Matches)
+                $MatchingRoute = $Routes.keys | Sort-Object -Property Length -Descending | Where-Object { $Route -match [Polaris]::ConvertPathToRegex($_) } | Select-Object -First 1
+                $Request.Parameters = ([PSCustomObject]$Matches)
                 Write-Debug "Parameters: $Parameters"
                 $MatchingMethod = $false
 
@@ -199,6 +199,23 @@ class Polaris {
         if ([string]::IsNullOrEmpty($SanitizedPath)) { $SanitizedPath = "/" }
 
         return $SanitizedPath
+    }
+
+    static [RegEx] ConvertPathToRegex([string]$Path){
+        Write-Debug "Path: $path"
+        $path = $path -replace '\.', '\.'
+        $path = $path -replace '-', '\-'
+        $path = $path -replace '\*', '.*'
+        $path = "^$path$"
+        $path = $path -replace ":(\w+)(\?{0,1})", '(?<$1>.+)$2'
+
+        Write-Debug "Parsed Regex: $path"
+        return [RegEx]::New($path)
+    }
+
+    static [RegEx] ConvertPathToRegex([RegEx]$Path){
+        Write-Debug "Path is a RegEx"
+        return $Path
     }
 
     AddMiddleware (
