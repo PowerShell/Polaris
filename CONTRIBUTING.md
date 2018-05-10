@@ -23,3 +23,11 @@ Fixing issues also does not require a lot of administrative work. The basic step
 
 ## Reviews
 We are using GitHub's internal capabilites for our code reviews. Either we, the Polaris team, or you, the community, can review the changes and add comments. The author of the pull request can then go through all issues, fix them and add commits to his branch, which will show up in the pull request. When all issues are fixed and there is nothing else to do, we will gladly merge your pull request.
+
+## Breaking Changes
+We would like to avoid making breaking changes where possible. Any time you need to make modifications to an end-to-end test or a unit test you are breaking the contract of functionality developers expect from Polaris and it is classified as a breaking change. If you feel a breaking change needs to happen or should be proposed we will use the following process:
+
+1. Breaking changes should be proposed in an issue labled RFC ###. 
+2. The RFC should sit available for review and comment by the community for at least **two weeks** before a pull request corresponding to the change can be merged.
+3. The description of the breaking change and the new version number should be added to **Breaking-Changes.md** for in the pull request for future record.
+4. Not everyone checks Github every day, get some visibility to the RFC by announcing it in powershell.slack.com and/or twitter.
