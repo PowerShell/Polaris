@@ -246,7 +246,7 @@ class Polaris {
         }
 
         $this.Listener.IgnoreWriteExceptions = $true
-        if($this.Listener | Get-Member -Name TimeoutManager){
+        if([System.Environment]::OSVersion.Platform -eq [System.PlatformID]::Win32NT -and ($this.Listener | Get-Member -Name TimeoutManager)){
             $this.Listener.TimeoutManager.RequestQueue = [timespan]::FromMinutes(5)
             $this.Listener.TimeoutManager.IdleConnection = [timespan]::FromSeconds(45)
             $this.Listener.TimeoutManager.EntityBody = [timespan]::FromSeconds(50)
