@@ -12,7 +12,7 @@ RUN Import-Module PackageManagement; `
     Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force; `
     Set-PSRepository -Name PSGallery -InstallationPolicy Trusted | Out-Null; `
     Install-Module platyPS -Scope CurrentUser -Force; `
-    Install-Module Pester -Scope CurrentUser -Force;
+    Install-Module Pester -Scope CurrentUser -Force -SkipPublisherCheck;
 
 # Copy build script over
 COPY build.ps1 containerFiles/build.ps1
