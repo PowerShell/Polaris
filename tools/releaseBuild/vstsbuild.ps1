@@ -26,7 +26,7 @@ Begin
 End {
 
     $AdditionalFiles = .{
-        Join-Path $PSScriptRoot -child "Image/build.ps1"
+        Join-Path $PSScriptRoot -child "Image/buildPolaris.ps1"
         Join-Path $PSScriptRoot -child "Image/dockerInstall.psm1"
         }
     $buildPackageName = $null

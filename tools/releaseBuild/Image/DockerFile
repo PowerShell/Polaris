@@ -15,7 +15,7 @@ RUN Import-Module PackageManagement; `
     Install-Module Pester -Scope CurrentUser -Force -SkipPublisherCheck;
 
 # Copy build script over
-COPY build.ps1 containerFiles/build.ps1
+COPY buildPolaris.ps1 containerFiles/buildPolaris.ps1
 
 # Uncomment to debug locally
 # RUN Import-Module ./containerFiles/dockerInstall.psm1; `
