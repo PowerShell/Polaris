@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<SignConfigXML>
+  <job platform="" configuration="" dest="__OUTPATHROOT__\Signed" jobname="PowerShell Editor Services" approvers="vigarg;gstolt">
+    <file src="__INPATHROOT__\release\out\Polaris\Polaris.psd1" signType="Authenticode"
+      dest="__OUTPATHROOT__\Polaris\Polaris.psd1" />
+    <file src="__INPATHROOT__\release\out\Polaris\Polaris.psm1" signType="Authenticode"
+      dest="__OUTPATHROOT__\Polaris\Polaris.psm1" />
+  </job>
+</SignConfigXML>
+
+
+
+
