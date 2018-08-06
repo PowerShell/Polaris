@@ -12,19 +12,19 @@ Describe "Polaris Routing (e2e)" {
             $DebugPreference = "Continue"
 
             New-PolarisRoute -Path "/users/:userId/books/:bookId" -Method "GET" -Scriptblock {
-                $Response.Send($Request.Parameters)
+                $Response.Send(($Request.Parameters | ConvertTo-JSON))
             }
 
             New-PolarisRoute -Path "/flights/:from-:to" -Method "GET" -Scriptblock {
-                $Response.Send($Request.Parameters)
+                $Response.Send(($Request.Parameters | ConvertTo-JSON))
             }
 
             New-PolarisRoute -Path "/flights/:from.:to" -Method "GET" -Scriptblock {
-                $Response.Send($Request.Parameters)
+                $Response.Send(($Request.Parameters | ConvertTo-JSON))
             }
 
             New-PolarisRoute -Path "/user/(?<userId>\d+)" -Method "GET" -Scriptblock {
-                $Response.Send($Request.Parameters)
+                $Response.Send(($Request.Parameters | ConvertTo-JSON))
             }
 
             New-PolarisRoute -Path "/" -Method "GET" -Scriptblock {
@@ -69,21 +69,24 @@ Describe "Polaris Routing (e2e)" {
     }
     
     It "should match and extract named parameters anywhere in the route" {
-        $Result = Invoke-WebRequest -Uri "http://localhost:$Port/users/12/books/123" -UseBasicParsing -TimeoutSec 2
-        $Result.Content | Should Be '@{bookId=123; userId=12; 0=/users/12/books/123}'
+        $Result = Invoke-RestMethod -Uri "http://localhost:$Port/users/12/books/123" -UseBasicParsing -TimeoutSec 2
+        $Result.bookId | Should Be '123'
+        $Result.userId | Should Be '12'
     }
 
     It "should interpret . and - literally" {
-        $Result = Invoke-WebRequest -Uri "http://localhost:$Port/flights/LAX-SFO" -UseBasicParsing -TimeoutSec 2
-        $Result.Content | Should Be '@{from=LAX; to=SFO; 0=/flights/LAX-SFO}'
+        $Result = Invoke-RestMethod -Uri "http://localhost:$Port/flights/LAX-SFO" -UseBasicParsing -TimeoutSec 2
+        $Result.from | Should Be 'LAX'
+        $Result.to | Should Be 'SFO'
 
-        $Result = Invoke-WebRequest -Uri "http://localhost:$Port/flights/LAX.SFO" -UseBasicParsing -TimeoutSec 2
-        $Result.Content | Should Be '@{from=LAX; to=SFO; 0=/flights/LAX.SFO}'
+        $Result = Invoke-RestMethod -Uri "http://localhost:$Port/flights/LAX.SFO" -UseBasicParsing -TimeoutSec 2
+        $Result.from | Should Be 'LAX'
+        $Result.to | Should Be 'SFO'
     }
 
     It "should allow custom named capture regular expressions" {
-        $Result = Invoke-WebRequest -Uri "http://localhost:$Port/user/42" -UseBasicParsing -TimeoutSec 2
-        $Result.Content | Should Be '@{userId=42; 0=/user/42}'
+        $Result = Invoke-RestMethod -Uri "http://localhost:$Port/user/42" -UseBasicParsing -TimeoutSec 2
+        $Result.userId | Should Be '42'
     }
 
     It "should provide matches with basic strings" {
