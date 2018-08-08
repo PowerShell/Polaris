@@ -39,6 +39,7 @@
 
             ####  Create static routes
             New-PolarisStaticRoute -RoutePath $using:RootPath -FolderPath $using:TestPath
+            Write-Output "RootPath: $using:RootPath  --- FolderPath: $using:TestPath"
 
             ####  Create a static route at the root
             New-PolarisStaticRoute -RoutePath "/" -FolderPath $using:TestPath -EnableDirectoryBrowser $true

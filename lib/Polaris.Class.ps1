@@ -37,9 +37,9 @@ class Polaris {
             [PolarisResponse]$Response = [PolarisResponse]::new()
 
 
-			[string]$Route = $RawRequest.Url.AbsolutePath.TrimEnd('/')
-			
-			[System.Management.Automation.InformationRecord[]]$InformationVariable = @()
+            [string]$Route = $RawRequest.Url.AbsolutePath
+            
+            [System.Management.Automation.InformationRecord[]]$InformationVariable = @()
 
             if ([string]::IsNullOrEmpty($Route)) { $Route = "/" }
 
@@ -47,17 +47,24 @@ class Polaris {
 
                 # Run middleware in the order in which it was added
                 foreach ($Middleware in $Polaris.RouteMiddleware) {
-					$InformationVariable += $Polaris.InvokeRoute(
-							$Middleware.Scriptblock,
-							$Request,
-							$Response
-						)
+                    $InformationVariable += $Polaris.InvokeRoute(
+                            $Middleware.Scriptblock,
+                            $Null,
+                            $Request,
+                            $Response
+                        )
                 }
 
                 $Polaris.Log("Parsed Route: $Route")
                 $Polaris.Log("Request Method: $($RawRequest.HttpMethod)")
                 $Routes = $Polaris.ScriptblockRoutes
-                $MatchingRoute = $Routes.keys.Where( { $Route -match $_ })[0]
+
+                #
+                # Searching for the first route that matches by the most specific route paths first.
+                #
+                $MatchingRoute = $Routes.keys | Sort-Object -Property Length -Descending | Where-Object { $Route -match [Polaris]::ConvertPathToRegex($_) } | Select-Object -First 1
+                $Request.Parameters = ([PSCustomObject]$Matches)
+                Write-Debug "Parameters: $Parameters"
                 $MatchingMethod = $false
 
                 if ($MatchingRoute) {
@@ -68,13 +75,14 @@ class Polaris {
                     try {
 
                         $InformationVariable += $Polaris.InvokeRoute(
-							$Routes[$MatchingRoute][$Request.Method],
-							$Request,
-							$Response
-						)
-						
-					}
-					catch {
+                            $Routes[$MatchingRoute][$Request.Method],
+                            $Parameters,
+                            $Request,
+                            $Response
+                        )
+                        
+                    }
+                    catch {
                         $ErrorsBody += $_.Exception.ToString()
                         $ErrorsBody += $_.InvocationInfo.PositionMessage + "`n`n"
                         $Response.Send($ErrorsBody)
@@ -128,6 +136,7 @@ class Polaris {
 
     hidden [object] InvokeRoute (
         [Scriptblock]$Route,
+        [PSCustomObject]$Parameters,
         [PolarisRequest]$Request,
         [PolarisResponse]$Response
     ) {
@@ -135,15 +144,15 @@ class Polaris {
         $InformationVariable = ""
 
         $Scriptblock = [scriptblock]::Create(
-            "param(`$Request,`$Response)`r`n" +
+            "param(`$Parameters,`$Request,`$Response)`r`n" +
             $Route.ToString()
         )
 
         Invoke-Command -Scriptblock $Scriptblock `
-            -ArgumentList @($Request, $Response) `
+            -ArgumentList @($Parameters, $Request, $Response) `
             -InformationVariable InformationVariable `
             -ErrorAction Stop
-			
+            
         return $InformationVariable
     }
 
@@ -192,6 +201,34 @@ class Polaris {
         return $SanitizedPath
     }
 
+    static [RegEx] ConvertPathToRegex([string]$Path){
+        Write-Debug "Path: $path"
+        # Replacing all periods with an escaped period to prevent regex wildcard
+        $path = $path -replace '\.', '\.'
+        # Replacing all - with \- to escape the dash
+        $path = $path -replace '-', '\-'
+        # Replacing the wildcard character * with a regex aggressive match .*
+        $path = $path -replace '\*', '.*'
+        # Creating a strictly matching regular expression that must match beginning (^) to end ($)
+        $path = "^$path$"
+        # Creating a route based parameter
+        #   Match any and all word based characters after the : for the name of the parameter
+        #   Use the name in a named capture group that will show up in the $matches variable
+        #   References:
+        #       - https://docs.microsoft.com/en-us/dotnet/standard/base-types/grouping-constructs-in-regular-expressions#named_matched_subexpression
+        #       - https://technet.microsoft.com/en-us/library/2007.11.powershell.aspx
+        #       - https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_automatic_variables?view=powershell-6#matches
+        $path = $path -replace ":(\w+)(\?{0,1})", '(?<$1>.+)$2'
+
+        Write-Debug "Parsed Regex: $path"
+        return [RegEx]::New($path)
+    }
+
+    static [RegEx] ConvertPathToRegex([RegEx]$Path){
+        Write-Debug "Path is a RegEx"
+        return $Path
+    }
+
     AddMiddleware (
         [string]$Name,
         [scriptblock]$Scriptblock
@@ -228,8 +265,8 @@ class Polaris {
         $this.Listener.Close()
         $this.Listener.Dispose()
         $this.Log("Server Stopped.")
+        
     }
-
     [void] InitListener ([int]$Port) {
         $this.Port = $Port
 
@@ -294,7 +331,7 @@ class Polaris {
         $RawResponse.OutputStream.Write($ByteResponse, 0, $ByteResponse.Length);
         $RawResponse.OutputStream.Close();
     }
-	
+    
     static [void] Send (
         [System.Net.HttpListenerResponse]$RawResponse, 
         [System.IO.Stream]$StreamResponse, 
