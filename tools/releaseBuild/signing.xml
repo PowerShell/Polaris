@@ -51,8 +51,8 @@
       dest="__OUTPATHROOT__\Polaris\Public\Start-Polaris.ps1" />
     <file src="__INPATHROOT__\release\out\Polaris\Public\Stop-Polaris.ps1" signType="Authenticode"
       dest="__OUTPATHROOT__\Polaris\Public\Stop-Polaris.ps1" />
-    <file src="__INPATHROOT__\release\out\Polaris\Public\Use-PolarisJsonBoddyParserMiddleware.ps1" signType="Authenticode"
-      dest="__OUTPATHROOT__\Polaris\Public\Use-PolarisJsonBoddyParserMiddleware.ps1" />
+    <file src="__INPATHROOT__\release\out\Polaris\Public\Use-PolarisJsonBodyParserMiddleware.ps1" signType="Authenticode"
+      dest="__OUTPATHROOT__\Polaris\Public\Use-PolarisJsonBodyParserMiddleware.ps1" />
   </job>
 </SignConfigXML>
 
