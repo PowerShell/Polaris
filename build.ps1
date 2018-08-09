@@ -77,5 +77,8 @@ else {
         Copy-Item -Path "$PSScriptRoot\Polaris.ps*1" -Destination "$PSScriptRoot\out\Polaris\" -Force
         Copy-Item -Path "$PSScriptRoot\README.md" -Destination "$PSScriptRoot\out\Polaris\" -Force
         Copy-Item -Path "$PSScriptRoot\LICENSE.txt" -Destination "$PSScriptRoot\out\Polaris\" -Force
+        Copy-Item -Path "$PSScriptRoot\lib" -Destination "$PSScriptRoot\out\Polaris\" -Force -Recurse
+        Copy-Item -Path "$PSScriptRoot\Public" -Destination "$PSScriptRoot\out\Polaris\" -Force -Recurse
+        Copy-Item -Path "$PSScriptRoot\Private" -Destination "$PSScriptRoot\out\Polaris\" -Force -Recurse
     }
 }
