@@ -33,16 +33,7 @@
     Description = 'A cross-platform, minimalist web framework for PowerShell'
     
     # Minimum version of the Windows PowerShell engine required by this module
-    # PowerShellVersion = ''
-    
-    # Name of the Windows PowerShell host required by this module
-    # PowerShellHostName = ''
-    
-    # Minimum version of the Windows PowerShell host required by this module
-    # PowerShellHostVersion = ''
-    
-    # Minimum version of Microsoft .NET Framework required by this module. This prerequisite is valid for the PowerShell Desktop edition only.
-    # DotNetFrameworkVersion = ''
+    PowerShellVersion = '5.1'
     
     # Minimum version of the common language runtime (CLR) required by this module. This prerequisite is valid for the PowerShell Desktop edition only.
     # CLRVersion = ''
@@ -52,9 +43,6 @@
     
     # Modules that must be imported into the global environment prior to importing this module
     # RequiredModules = @()
-    
-    # Assemblies that must be loaded prior to importing this module
-    RequiredAssemblies = @("System.Web")
     
     # Script files (.ps1) that are run in the caller's environment prior to importing this module.
     ScriptsToProcess   = @(
@@ -104,9 +92,6 @@
     
     # Aliases to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no aliases to export.
     AliasesToExport    = '*'
-    
-    # DSC resources to export from this module
-    # DscResourcesToExport = @()
     
     # List of all modules packaged with this module
     # ModuleList = @()
