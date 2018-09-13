@@ -9,7 +9,7 @@
 @{
 
     # Script module or binary module file associated with this manifest.
-    RootModule = "$PSScriptRoot\Polaris.psm1"
+    RootModule = "Polaris.psm1"
     
     # Version number of this module.
     ModuleVersion = '0.1.0'
@@ -46,12 +46,12 @@
     
     # Script files (.ps1) that are run in the caller's environment prior to importing this module.
     ScriptsToProcess   = @(
-        "$PSScriptRoot\Public\New-ScriptblockCallback.ps1",
-        "$PSScriptRoot\lib\MimeTypes.Class.ps1",
-        "$PSScriptRoot\lib\PolarisRequest.Class.ps1",
-        "$PSScriptRoot\lib\PolarisResponse.Class.ps1",
-        "$PSScriptRoot\lib\PolarisMiddleware.Class.ps1",
-        "$PSScriptRoot\lib\Polaris.Class.ps1"
+        "Public\New-ScriptblockCallback.ps1",
+        "lib\MimeTypes.Class.ps1",
+        "lib\PolarisRequest.Class.ps1",
+        "lib\PolarisResponse.Class.ps1",
+        "lib\PolarisMiddleware.Class.ps1",
+        "lib\Polaris.Class.ps1"
     )
     
     # Type files (.ps1xml) to be loaded when importing this module
