@@ -2,6 +2,7 @@
 
 [![Join the chat at https://gitter.im/PowerShellPolaris/Lobby](https://badges.gitter.im/PowerShellPolaris/Lobby.svg)](https://gitter.im/PowerShellPolaris/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build status](https://ci.appveyor.com/api/projects/status/0ak497mbjn6dibxw/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/polaris/branch/master)
+![PowerShell Gallery](https://img.shields.io/badge/powershellgallery-0.1.0-blue.svg)
 
 A cross-platform, minimalist web framework for [PowerShell](https://github.com/powershell/powershell).
 
@@ -35,14 +36,23 @@ Polaris' differentiation is that it is cross-platform and uses the .NET HttpList
 
 ### Steps
 
-1.  Clone or download the zip of the repo
-1.  Open [PowerShell](https://github.com/powershell/powershell)
+#### From the [PowerShell Gallery](https://powershellgallery.com)
 
-At this point, you can now run `Import-Module ./Polaris.psd1` to start using Polaris! Checkout [the wiki](https://github.com/PowerShell/Polaris/wiki) for more usage!
+```powershell
+PS > Install-Module Polaris
+```
+
+You can now try out the [example above](#example) or checkout [the wiki](https://github.com/PowerShell/Polaris/wiki) for more usage!
+
+#### From source
+
+1. Clone or download the zip of the repo
+1. Open [PowerShell](https://github.com/powershell/powershell)
+1. At this point, you can now run `Import-Module ./Polaris.psd1`
+
+You can now try out the [example above](#example) or checkout [the wiki](https://github.com/PowerShell/Polaris/wiki) for more usage!
 
 You can also run all the Pester tests by running `Invoke-Pester` in the `test` directory. You may need the [fork of Pester that supports PowerShell](https://github.com/powershell/psl-pester).
-
-_Installation from the PowerShell Gallery coming soon!_
 
 ## Documentation
 
