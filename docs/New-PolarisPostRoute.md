@@ -30,7 +30,7 @@ Wrapper for New-PolarisRoute -Method POST
 
 ### EXAMPLE 1
 ```
-New-PolarisGetRoute -Path "helloworld" -Scriptblock { $Response.Send( 'Hello World' ) }
+New-PolarisPostRoute -Path "helloworld" -Scriptblock { $Response.Send( 'Hello World' ) }
 ```
 
 To view results, assuming default port:
@@ -39,7 +39,7 @@ Invoke-WebRequest -Uri http://localhost:8080/helloworld -Method POST
 
 ### EXAMPLE 2
 ```
-New-PolarisGetRoute -Path "helloworld" -ScriptPath D:\Scripts\Example.ps1
+New-PolarisPostRoute -Path "helloworld" -ScriptPath D:\Scripts\Example.ps1
 ```
 
 To view results, assuming default port:
