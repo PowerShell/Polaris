@@ -288,7 +288,6 @@ class Polaris {
             ([System.Environment]::OSVersion.Platform -eq [System.PlatformID]::Win32NT -and
                 ([System.Security.Principal.WindowsPrincipal]::new([System.Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([System.Security.Principal.WindowsBuiltInRole]::Administrator))) {
             $this.Listener.Prefixes.Add("$($ListenerPrefix)://+:" + $this.Port + "/")
-            $this.Log("$($ListenerPrefix)://+:" + $this.Port + "/")
         }
         else {
             $this.Listener.Prefixes.Add("$($ListenerPrefix)://localhost:" + $this.Port + "/")
