@@ -52,7 +52,7 @@ function Start-Polaris {
         Use-PolarisJsonBodyParserMiddleware -Polaris $Polaris
     }
 
-    $Polaris.Start( $Port, [bool]$Https )
+    $Polaris.Start( $Port, $Https.IsPresent )
 
     return $Polaris
 }
