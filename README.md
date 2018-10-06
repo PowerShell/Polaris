@@ -52,7 +52,7 @@ You can now try out the [example above](#example) or checkout [the wiki](https:/
 
 You can now try out the [example above](#example) or checkout [the wiki](https://github.com/PowerShell/Polaris/wiki) for more usage!
 
-You can also run all the Pester tests by running `Invoke-Pester` in the `test` directory. You may need the [fork of Pester that supports PowerShell](https://github.com/powershell/psl-pester).
+You can also run all the Pester tests by running `Invoke-Pester` in the `test` directory. You will need [Pester](https://github.com/pester/Pester) version [4.1.0](https://github.com/pester/Pester/blob/master/CHANGELOG.md#410-november-15-2017) or higher to run the tests on Linux or MacOS.
 
 ## Documentation
 
