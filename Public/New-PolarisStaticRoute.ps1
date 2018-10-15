@@ -2,7 +2,9 @@
 .SYNOPSIS
     Creates web routes to recursively serve folder contents
 .DESCRIPTION
-    Creates web routes to recursively serve folder contents. Perfect for static websites.
+    Creates web routes to recursively serve folder contents. Perfect for static websites. 
+    Also if a default file (for example index.html) is detected, A route pointing to the 
+    value of the parameter "Routepath" will be created.
 .PARAMETER RoutePath
     Root route that the folder path will be served to.
     Defaults to "/".
@@ -57,11 +59,11 @@ function New-PolarisStaticRoute {
     if ( -not ( Test-Path -Path $FolderPath ) ) {
         Write-Error -Exception FileNotFoundException -Message "Folder does not exist at path $FolderPath"
     }
-
-    $NewDrive = (New-PSDrive -Name "PolarisStaticFileServer$([guid]::NewGuid().guid)" `
-            -PSProvider FileSystem `
-            -Root $FolderPath `
-            -Scope Global).Name
+    
+        $NewDrive = (New-PSDrive -Name "PolarisStaticFileServer$([guid]::NewGuid().guid)" `
+                -PSProvider FileSystem `
+                -Root $FolderPath `
+                -Scope Global).Name
     
     $Scriptblock = {
         $Content = ""
@@ -69,7 +71,9 @@ function New-PolarisStaticRoute {
         $LocalPath = $Request.Parameters.FilePath
         Write-Debug "Parsed local path: $LocalPath" 
         try {
+
             $RequestedItem = Get-Item -LiteralPath "$NewDrive`:$LocalPath" -Force -ErrorAction Stop
+            
             Write-Debug "Requested Item: $RequestedItem"
              
             if ($RequestedItem.PSIsContainer) {
@@ -110,6 +114,7 @@ function New-PolarisStaticRoute {
         }
     }
 
+    
     # Inserting variables into scriptblock as hardcoded
     $Scriptblock = [scriptblock]::Create(
         "`$RoutePath = '$($RoutePath.TrimStart("/"))'`r`n" +
@@ -117,7 +122,69 @@ function New-PolarisStaticRoute {
         "`$NewDrive = '$NewDrive'`r`n" +
         $Scriptblock.ToString())
 
-    $PolarisPath = "$RoutePath/:FilePath?" -replace "//", "/"
 
+    $PolarisPath = "$RoutePath/:FilePath?" -replace "//", "/"
     New-PolarisRoute -Path $PolarisPath -Method GET -Scriptblock $Scriptblock -Force:$Force -ErrorAction:$ErrorAction
+
+    $DefaultScriptblock = {
+        $Content = ""
+
+        $LocalPath = $Request.Parameters.FilePath
+        Write-Debug "Parsed local path: $LocalPath" 
+        try {
+
+            $StandardHTMLFiles = @("index.html","index.htm","default.html","default.htm")
+            foreach($FileName in $StandardHTMLFiles){
+                $FilePath = Join-Path "$($NewDrive):" -ChildPath "$FileName"
+                if(Test-Path -Path $FilePath){
+                    $File = $FileName
+                    break
+                }
+            }
+
+            $RequestedItem = Get-Item -LiteralPath "$NewDrive`:$File" -Force -ErrorAction Stop
+            
+            Write-Debug "Requested Item: $RequestedItem"
+            $Response.SetStream(
+                [System.IO.File]::OpenRead($RequestedItem.FullName)
+            )
+            $Response.ContentType = [PolarisResponse]::GetContentType($RequestedItem.FullName)
+            
+        }
+        catch [System.UnauthorizedAccessException] {
+            $Response.StatusCode = 401
+            $Response.ContentType = "text/html"
+            $Content = "<h1>401 - Unauthorized</h1>"
+            $Response.Send($Content)
+        }
+        catch [System.Management.Automation.ItemNotFoundException] {
+            $Response.StatusCode = 404
+            $Response.ContentType = "text/html"
+            $Content = "<h1>404 - Page not found $LocalPath</h1>"
+            $Response.Send($Content);
+        }
+        catch {
+            Throw $_
+        }
+    }
+
+    $StandardHTMLFiles = @("index.html","index.htm","default.html","default.htm")
+    foreach($FileName in $StandardHTMLFiles){
+        $FilePath = Join-Path $FolderPath -ChildPath $FileName
+        if(Test-Path -Path $FilePath){
+            $File = $FileName
+            break
+        }
+    }
+
+    if($File){
+        # Inserting variables into scriptblock as hardcoded
+        $DefaultScriptblock = [scriptblock]::Create(
+        "`$RoutePath = '$($RoutePath.TrimStart("/"))'`r`n" +
+        "`$EnableDirectoryBrowser = `$$EnableDirectoryBrowser`r`n" +
+        "`$NewDrive = '$NewDrive'`r`n" +
+        $DefaultScriptblock.ToString())
+        $PolarisPath = "$RoutePath" -replace "//", "/"
+        New-PolarisRoute -Path $PolarisPath -Method GET -Scriptblock $DefaultScriptblock -Force:$Force -ErrorAction:$ErrorAction
+    }
 }

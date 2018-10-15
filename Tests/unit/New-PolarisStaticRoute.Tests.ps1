@@ -17,13 +17,16 @@
         #  Create test files
         $File1 = ( New-Item -Path $TestPath   -Name 'File1.txt' -ItemType File ).FullName
         $Null = New-Item -Path $TestPath   -Name 'File2.txt' -ItemType File
+        $Null = New-Item -Path $TestPath -Name 'index.html' -ItemType File
         $Null = New-Item -Path $TestFolder -Name 'File3.txt' -ItemType File
         $Null = New-Item -Path $TestFolder -Name 'File4.txt' -ItemType File
+        
 
         #  Define expected routes
         $Paths = @(
             "$RootPath/File1.txt"
             "$RootPath/File2.txt"
+            "$RootPath/index.html"
             "$RootPath/Sub1/File3.txt"
             "$RootPath/Sub1/File4.txt" )
 
@@ -50,7 +53,12 @@
         #  Confirm no other routes created
         $AllRoutes = @()
         $AllRoutes += Get-PolarisRoute
-        $AllRoutes.Count | Should Be 1
+        $AllRoutes.Count | Should Be 2
+    }
+
+    It "Should create a static route a default file (index.html in this case)" {
+        $Route = Get-PolarisRoute -Path /BaseRoot 
+        $Route | Should not BeNullOrEmpty
     }
 
     It "Should throw error if route for file exists" {
