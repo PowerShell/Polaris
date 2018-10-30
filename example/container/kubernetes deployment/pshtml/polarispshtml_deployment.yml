@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: polarispshtml
+  labels:
+    app: polarispshtml
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: polarispshtml
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: polarispshtml
+    spec:
+      containers:
+      - image: stijnc/polarispshtml:0.3
+        name: polarispshtml
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 250m
+            memory: 256Mi
+        ports:
+        - containerPort: 8080
+          name: polarispshtml

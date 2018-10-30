@@ -1,0 +1,91 @@
+body {
+    font-family: 'Roboto', serif;
+}
+ul {
+    font-size: 1.5em;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+.resources {
+    font-size: 1.5em;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    text-align: left;
+    list-style-item: circle;
+}
+.resourceitem {
+    text-align: left;
+}
+nav li {
+    float: right;
+}
+
+li a {
+    display: block;
+    color: #333;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+.resourcelink {
+    text-align: left;
+    display: block;
+    color: #333;
+    padding: 14px 16px;
+    text-decoration: none;
+
+}
+li a:hover {
+    background-color: white;
+}
+div.gallery {
+    display: block;
+    margin: 5px;
+    border: 1px solid #ccc;
+    float: left;
+    width: 200px;
+}
+div.gallery:hover {
+    border: 1px solid #777;
+}
+div.gallery img {
+    width: 100%;
+    min-height: 200px;
+    height: auto;
+}
+.responsive {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 30%;
+}
+header {
+    padding-left: 1.5em;
+    font-size: 48px;
+}
+div.logo {
+    float: left;
+}
+.clearfix:after {
+    content: '';
+    display: table;
+    clear: both;
+}
+footer {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 40%;
+    text-align: center;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: #777;
+}
+footer p h3{
+    text-align: center;
+}
