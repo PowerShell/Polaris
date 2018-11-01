@@ -371,7 +371,7 @@ class Polaris {
 
     [void] Log ([string]$LogString) {
         try {
-            $this.Logger($LogString)
+            $this.Logger.Invoke($LogString)
         }
         catch {
             Write-Host $_.Message

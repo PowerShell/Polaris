@@ -169,12 +169,8 @@ Hello World"
         }
 
         It "test /public/index.html static route" {
-            $expectedHtml = `
-                '<div>hello world</div>
-                <img src="test.png" alt="yay" />
-                <img src="test.png" alt="yay" />
-                <img src="test1.png" alt="yay" />'
-
+            $expectedHtml = Get-Content -Raw "$PSScriptRoot/../resources/static/index.html"
+            
             $Result = Invoke-WebRequest -Uri "http://localhost:$Port/public/index.html" -UseBasicParsing
             $Result.Content | Should Be $expectedHtml
             $Result.StatusCode | Should Be 200
