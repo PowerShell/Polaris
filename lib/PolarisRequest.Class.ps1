@@ -12,8 +12,9 @@ class PolarisRequest {
     [string]$ClientIP
     [System.Net.HttpListenerRequest]$RawRequest
     [PSCustomObject]$Parameters
+    [System.Security.Principal.IPrincipal]$User
 
-    PolarisRequest ([System.Net.HttpListenerRequest]$RawRequest) {
+    PolarisRequest ([System.Net.HttpListenerRequest]$RawRequest, [System.Security.Principal.IPrincipal]$User) {
         $this.RawRequest = $RawRequest
         $this.BodyString = [System.IO.StreamReader]::new($RawRequest.InputStream).ReadToEnd()
         $this.AcceptTypes = $this.RawRequest.AcceptTypes
@@ -24,6 +25,7 @@ class PolarisRequest {
         $this.Url = $this.RawRequest.Url
         $this.UserAgent = $this.RawRequest.UserAgent
         $this.ClientIP = $this.RawRequest.RemoteEndPoint.Address
+        $this.User = $User
     }
 }
 

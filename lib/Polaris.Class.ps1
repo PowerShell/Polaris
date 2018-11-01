@@ -252,10 +252,11 @@ class Polaris {
 
     [void] Start (
         [int]$Port = 3000,
-        [bool]$Https
+        [bool]$Https,
+        [string]$Auth
     ) {
         $this.StopServer = $false
-        $this.InitListener($Port,$Https)
+        $this.InitListener($Port,$Https,$Auth)
         $this.Listener.BeginGetContext($this.ContextHandler, $this)
         $this.Log("App listening on Port: " + $Port + "!")
     }
@@ -280,7 +281,12 @@ class Polaris {
             $ListenerPrefix = "https"
         }else{
             $ListenerPrefix = "http"
-        }        
+        }
+
+        if($Auth -eq "Basic"){
+            $this.Log("Basic Auth Enabled:")
+            $this.Listener.AuthenticationSchemes = "Basic"
+        }              
 
         # If user is on a non-windows system or windows as administrator
         if ([System.Environment]::OSVersion.Platform -ne [System.PlatformID]::Win32NT -or

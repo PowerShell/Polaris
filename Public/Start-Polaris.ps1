@@ -38,7 +38,12 @@ function Start-Polaris {
         $UseJsonBodyParserMiddleware = $False,
 
         [switch]
-        $Https = $False,        
+        $Https = $False,
+
+        [Parameter(ParameterSetName = 'Authentication')]
+        [ValidateSet("None", "Basic")]
+        [String]
+        $Auth = "None",        
 
         $Polaris = $Script:Polaris
     )
@@ -52,7 +57,7 @@ function Start-Polaris {
         Use-PolarisJsonBodyParserMiddleware -Polaris $Polaris
     }
 
-    $Polaris.Start( $Port, $Https.IsPresent )
+    $Polaris.Start( $Port, $Https.IsPresent, $Auth)
 
     return $Polaris
 }
