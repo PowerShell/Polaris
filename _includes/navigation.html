@@ -1,0 +1,75 @@
+<div class="sidebar">
+    <header class="sidebar__logo" role="banner">
+
+        <a href="{{site.baseurl}}/">Polaris</a>
+
+    </header>
+    <nav class="sidebar__nav">
+        <div class="sidebar__nav-interior">
+
+            <p align="center" class="section__header">
+
+                Can we make any improvements on this document?
+
+                <br><br>
+
+                <a
+                    href="{{site.github.owner_url}}/Polaris/edit/gh-pages/{{page.path}}"
+                    target="_blank" class="button button-outline">
+
+                    <i style="font-size: 16px" class="fab fa-github"></i>
+                    Edit on GitHub
+
+                </a>
+            </p>
+
+            <br><br>
+
+            <h3 class="section__header">
+                About Guides
+            </h3>
+
+            <ul class="section__links">
+
+                {% for page in site.pages %}
+                {% if page.type == 'about' %}
+
+                <li class="section__item">
+                    <a class="section__link"
+                        href="{{site.baseurl}}{{ page.url }}"
+                        title="{{ page.title }}">
+                        {{ page.title }}
+                    </a>
+                </li>
+
+                {% endif %}
+                {% endfor %}
+
+            </ul>
+
+
+            <h3 class="section__header">
+                API Documentation
+            </h3>
+
+            <ul class="section__links">
+
+                {% for page in site.pages %}
+                {% if page.type == 'api' %}
+
+                <li class="section__item">
+                    <a class="section__link"
+                        href="{{site.baseurl}}{{ page.url }}"
+                        title="{{ page.title }}">
+                        {{ page.title }}
+                    </a>
+                </li>
+
+                {% endif %}
+                {% endfor %}
+
+            </ul>
+
+        </div>
+    </nav>
+</div>

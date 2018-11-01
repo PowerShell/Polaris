@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>{{ page.title }}</title>
+
+        <link rel="stylesheet"
+            href="//fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+        <link rel="stylesheet"
+            href="https://use.fontawesome.com/releases/v5.4.2/css/all.css"
+            integrity="sha384-/rXc/GQVaYpyDdyxK+ecHPVYJSN9bmVFBvjA/9eOB+pb3F2w2N6fc5qB9Ew5yIns"
+            crossorigin="anonymous">
+        <link rel="stylesheet"
+            href="//cdn.rawgit.com/necolas/normalize.css/master/normalize.css">
+        <link rel="stylesheet"
+            href="{{ site.baseurl }}/styles/milligram.css">
+        <link rel="stylesheet" href="{{ site.baseurl }}/styles/main.css">
+    </head>
+    <body>
+        {% include navigation.html %}
+        <div class="content__overlay"></div>
+        <div class="content__area">
+            <section class="content" id="content">
+                <button class="menu-button">
+                    <span aria-hidden="true"><svg height="16" viewBox="0 0 12
+                            16" width="12" xmlns="http://www.w3.org/2000/svg"><path
+                                d="m11.41 9h-10.82c-.59 0-.59-.41-.59-1s0-1
+                                .59-1h10.81c.59 0 .59.41.59 1s0 1-.59
+                                1zm0-4h-10.82c-.59 0-.59-.41-.59-1s0-1
+                                .59-1h10.81c.59 0 .59.41.59 1s0 1-.59 1zm-10.82
+                                6h10.81c.59 0 .59.41.59 1s0 1-.59 1h-10.81c-.59
+                                0-.59-.41-.59-1s0-1 .59-1z"></path></svg></span>
+                    <span>Menu</span>
+                </button>
+                {{ content }}
+            </section>
+        </div>
+        <script>
+            (() => {
+                var menuButton = document.querySelector('.menu-button')
+                var sidebar = document.querySelector('.sidebar')
+                var contentOverlay = document.querySelector('.content__overlay')
+
+                menuButton.addEventListener('click', function () {
+                    sidebar.classList.toggle('sidebar--is-visible')
+                    contentOverlay.classList.toggle('content__overlay--is-active')
+                })
+
+                contentOverlay.addEventListener('click', function () {
+                    sidebar.classList.toggle('sidebar--is-visible')
+                    contentOverlay.classList.toggle('content__overlay--is-active')
+                })
+            })();
+        </script>
+    </body>
+</html>

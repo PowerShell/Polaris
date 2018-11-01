@@ -38,10 +38,10 @@ Add any other context about the problem here.
 
 ---
 
-Run the following script and copy and paste the results here:
+Run the following script to send some useful version information in HTML to your clipboard and paste the contents here:
 
 ```ps
 $Version = [pscustomobject]$PSVersionTable
 $Version.PSCompatibleVersions = ($Version.PSCompatibleVersions | foreach { "$($_.Major).$($_.Minor).$($_.Build).$($_.Revision)" }) -join ",  "
-(Get-Module Polaris | select Name,Version | ConvertTo-Html -Fragment | Out-String) + ($Version | ConvertTo-Html -Fragment | Out-String)
+(Get-Module Polaris | select Name,Version | ConvertTo-Html -Fragment | Out-String) + ($Version | ConvertTo-Html -Fragment | Out-String) | clip
 ```
