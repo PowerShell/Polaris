@@ -98,3 +98,9 @@ git rebase -i master
 ```
 
 This will open up a text editor where you can specify which commits to squash.
+
+### Recommended git / github learning resources
+
+Github Learning Lab - [https://lab.github.com/](https://lab.github.com/)
+Interactive Git Branching Tutorial - [https://learngitbranching.js.org/](https://learngitbranching.js.org/)
+Additional resources - [https://try.github.io/](https://try.github.io/)
