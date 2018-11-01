@@ -1,4 +1,4 @@
-/ A task runner that invokes Pester to run all Pester tests under the
+// A task runner that invokes Pester to run all Pester tests under the
 // current workspace folder.
 // NOTE: This Test task runner requires an updated version of Pester (>=4.0.3)
 // in order for the problemMatcher to find failed test information (message, line, file).
