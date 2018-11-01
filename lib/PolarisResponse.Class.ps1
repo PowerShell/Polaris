@@ -4,6 +4,11 @@ class PolarisResponse {
     [System.Net.WebHeaderCollection]$Headers = [System.Net.WebHeaderCollection]::new()
     [int]$StatusCode = 200
     [System.IO.Stream]$StreamResponse
+    [System.Net.HttpListenerResponse]$RawResponse
+
+    PolarisResponse ([System.Net.HttpListenerResponse]$RawResponse) {
+        $this.RawResponse = $RawResponse
+    }
 
     Send ([string]$stringResponse) {
         $this.ByteResponse = [System.Text.Encoding]::UTF8.GetBytes($stringResponse)
