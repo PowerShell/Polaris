@@ -32,7 +32,7 @@ class Polaris {
 
             $Polaris.Log("request came in: " + $RawRequest.HttpMethod + " " + $RawRequest.RawUrl)
 
-            [PolarisRequest]$Request = [PolarisRequest]::new($RawRequest)
+            [PolarisRequest]$Request = [PolarisRequest]::new($RawRequest, $Context.User)
             [PolarisResponse]$Response = [PolarisResponse]::new($Context.Response)
 
 
