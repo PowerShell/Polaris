@@ -42,7 +42,7 @@ function Start-Polaris {
 
         [Parameter(ParameterSetName = 'Authentication')]
         [ValidateSet("None", "Basic")]
-        [String]
+        [System.Net.AuthenticationSchemes]
         $Auth = "None",        
 
         $Polaris = $Script:Polaris
