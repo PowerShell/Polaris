@@ -4,7 +4,7 @@ about: Used for proposing breaking changes. See CONTRIBUTING.md for more informa
 
 ---
 
-# RFC #[Insert RFC # Here]
+# RFC #[Insert RFC number here]
 
 We would like to avoid making breaking changes where possible. Any time you need to make modifications to an end-to-end test or a unit test you are breaking the contract of functionality developers expect from Polaris and it is classified as a breaking change. If you feel a breaking change needs to happen or should be proposed we will use the following process:
 
