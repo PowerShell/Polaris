@@ -11,9 +11,6 @@
 .PARAMETER ServerContext
     Polaris instance to stop.
     Defaults to the global instance.
-.PARAMETER Polaris
-    A Polaris object
-    Defaults to the script scoped Polaris
 .EXAMPLE
     Stop-Polaris
 .EXAMPLE
