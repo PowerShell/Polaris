@@ -1,3 +1,8 @@
+#
+# Copyright (c) Microsoft. All rights reserved.
+# Licensed under the MIT license. See LICENSE file in the project root for full license information.
+#
+
 <#
 .SYNOPSIS
     Returns the internal instance of Polaris
@@ -11,4 +16,3 @@
 function Get-Polaris {
     return $Script:Polaris
 }
-
