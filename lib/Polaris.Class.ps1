@@ -34,12 +34,11 @@ class Polaris {
             $Polaris.Listener.BeginGetContext($Polaris.ContextHandler, $Polaris)
 
             [System.Net.HttpListenerRequest]$RawRequest = $Context.Request
-            [System.Net.HttpListenerResponse]$RawResponse = $Context.Response
 
             $Polaris.Log("request came in: " + $RawRequest.HttpMethod + " " + $RawRequest.RawUrl)
 
             [PolarisRequest]$Request = [PolarisRequest]::new($RawRequest)
-            [PolarisResponse]$Response = [PolarisResponse]::new()
+            [PolarisResponse]$Response = [PolarisResponse]::new($Context.Response)
 
 
             [string]$Route = $RawRequest.Url.AbsolutePath
@@ -123,7 +122,7 @@ class Polaris {
                     $Response.ByteResponse.CopyTo($Bytes, $LogBytes.Length)
                     $Response.ByteResponse = $Bytes
                 }
-                [Polaris]::Send($RawResponse, $Response)
+                [Polaris]::Send($Response)
 
             }
             catch {
@@ -131,7 +130,7 @@ class Polaris {
                 $Response.SetStatusCode(500)
                 $Response.Send($_)
                 try{
-                    [Polaris]::Send($RawResponse, $Response)
+                    [Polaris]::Send($Response)
                 } catch {
                     $Polaris.Log($_)
                 }
@@ -310,12 +309,11 @@ class Polaris {
     }
 
     static [void] Send (
-        [System.Net.HttpListenerResponse]$RawResponse, 
         [PolarisResponse]$Response
     ) {
         if ($Response.StreamResponse) {
             [Polaris]::Send(
-                $RawResponse,
+                $Response.RawResponse,
                 $Response.StreamResponse,
                 $Response.StatusCode,
                 $Response.ContentType,
@@ -324,7 +322,7 @@ class Polaris {
         }
         else {
             [Polaris]::Send(
-                $RawResponse,
+                $Response.RawResponse,
                 $Response.ByteResponse,
                 $Response.StatusCode,
                 $Response.ContentType,
