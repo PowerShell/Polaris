@@ -1,12 +1,12 @@
 <#
 .SYNOPSIS
-Returns the internal instance of Polaris
+    Returns the internal instance of Polaris
 .DESCRIPTION
-Returns the instance of the Polaris .NET Standard object
+    Returns the instance of the Polaris .NET Standard object
 .EXAMPLE
-Get-Polaris
+    Get-Polaris
 .NOTES
-Should only be used for testing
+    Should only be used for testing
 #>
 function Get-Polaris {
     return $Script:Polaris

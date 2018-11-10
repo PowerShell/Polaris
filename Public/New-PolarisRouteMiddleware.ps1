@@ -16,13 +16,15 @@
     A Polaris object
     Defaults to the script scoped Polaris
 .EXAMPLE
-$JsonBodyParserMiddleware =
-{
-    if ($Request.BodyString -ne $null) {
-        $Request.Body = $Request.BodyString | ConvertFrom-Json
+    $JsonBodyParserMiddleware =
+    {
+        if ($Request.BodyString -ne $null) {
+            $Request.Body = $Request.BodyString | ConvertFrom-Json
+        }
     }
-}
-New-PolarisRouteMiddleware -Name JsonBodyParser -Scriptblock $JsonBodyParserMiddleware
+    New-PolarisRouteMiddleware -Name JsonBodyParser -Scriptblock $JsonBodyParserMiddleware
+.EXAMPLE
+    New-PolarisRouteMiddleware -Name JsonBodyParser -ScriptPath ./testMiddleware.ps1
 #>
 function New-PolarisRouteMiddleware {
     [CmdletBinding()]
