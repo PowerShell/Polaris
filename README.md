@@ -1,6 +1,6 @@
 # Polaris
 
-[![Join the chat at https://gitter.im/PowerShellPolaris/Lobby](https://badges.gitter.im/PowerShellPolaris/Lobby.svg)](https://gitter.im/PowerShellPolaris/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Join the chat at https://gitter.im/PowerShell/Polaris](https://badges.gitter.im/PowerShell/Polaris.svg)](https://gitter.im/PowerShell/Polaris?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build status](https://ci.appveyor.com/api/projects/status/0ak497mbjn6dibxw/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/polaris/branch/master)
 [![PowerShell Gallery](https://img.shields.io/badge/powershellgallery-0.1.0-blue.svg)](https://www.powershellgallery.com/packages/Polaris)
 
