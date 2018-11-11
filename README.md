@@ -32,7 +32,7 @@ Polaris' differentiation is that it is cross-platform and uses the .NET HttpList
 
 ### Prereqs
 
-* [PowerShell](https://github.com/powershell/powershell)
+- [PowerShell](https://github.com/powershell/powershell)
 
 ### Steps
 
@@ -58,15 +58,21 @@ You can also run all the Pester tests by running `Invoke-Pester` in the `test` d
 
 Check out the [docs folder](https://github.com/PowerShell/Polaris/tree/master/docs) for the API reference.
 
+## Troubleshooting / Questions
+
+**Twitter:** #PSPolaris
+**Slack:** See us in the #Polaris channel of the [PowerShell Slack](http://slack.poshcode.org/)
+**Github Issues:** Submit a bug / new feature idea / or just a question as a new Github issue
+
 ## Roadmap
 
 We have a few paths we are interested in taking. We hope the community helps direct us.
 
-* Expanding on the current implementation using HttpListener to deliver features you'd expect from projects ASP.NET or Expressjs (route parameters, query parameters, middleware, auth etc)
+- Expanding on the current implementation using HttpListener to deliver features you'd expect from projects ASP.NET or Expressjs (route parameters, query parameters, middleware, auth etc)
 
-* Investigating the use of [Kestrel](https://github.com/aspnet/KestrelHttpServer)/[ASP.NET Routing](https://github.com/aspnet/routing) instead of HttpListener
+- Investigating the use of [Kestrel](https://github.com/aspnet/KestrelHttpServer)/[ASP.NET Routing](https://github.com/aspnet/routing) instead of HttpListener
 
-* Creating a routing domain-specific language (DSL) for isolating and running script blocks as routes. Drawing inspiration from [Pester](https://github.com/pester/Pester/).
+- Creating a routing domain-specific language (DSL) for isolating and running script blocks as routes. Drawing inspiration from [Pester](https://github.com/pester/Pester/).
 
 ## Feedback
 
@@ -81,8 +87,8 @@ Polaris is licensed under the MIT License.
 
 ## Maintainers
 
-* [Tyler Leonhardt](https://github.com/tylerl0706) - [@TylerLeonhardt](https://twitter.com/TylerLeonhardt)
-* [Micah Rairdon](https://github.com/tiberriver256) - [@tiberriver256](https://twitter.com/tiberriver256)
+- [Tyler Leonhardt](https://github.com/tylerl0706) - [@TylerLeonhardt](https://twitter.com/TylerLeonhardt)
+- [Micah Rairdon](https://github.com/tiberriver256) - [@tiberriver256](https://twitter.com/tiberriver256)
 
 ## Code of Conduct
 
