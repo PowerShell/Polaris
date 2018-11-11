@@ -1,3 +1,8 @@
+#
+# Copyright (c) Microsoft. All rights reserved.
+# Licensed under the MIT license. See LICENSE file in the project root for full license information.
+#
+
 <#
 .SYNOPSIS
     Start Polaris web server.
@@ -14,6 +19,8 @@
     Defaults to 1.
 .PARAMETER UseJsonBodyParserMiddleware
     When present, JSONBodyParser middleware will be created, if needed.
+.PARAMETER Https
+    Determines if you want to use https as the prefix.
 .PARAMETER Polaris
     A Polaris object
     Defaults to the script scoped Polaris

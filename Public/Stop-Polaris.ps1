@@ -1,3 +1,8 @@
+#
+# Copyright (c) Microsoft. All rights reserved.
+# Licensed under the MIT license. See LICENSE file in the project root for full license information.
+#
+
 <#
 .SYNOPSIS
     Stop Polaris web server.
@@ -6,9 +11,6 @@
 .PARAMETER ServerContext
     Polaris instance to stop.
     Defaults to the global instance.
-.PARAMETER Polaris
-    A Polaris object
-    Defaults to the script scoped Polaris
 .EXAMPLE
     Stop-Polaris
 .EXAMPLE
