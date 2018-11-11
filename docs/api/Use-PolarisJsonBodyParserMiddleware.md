@@ -2,7 +2,7 @@
 external help file: Polaris-help.xml
 layout: default
 Module Name: Polaris
-online version: http://tiberriver256.github.io/Polaris/docs/Use-PolarisJsonBodyParserMiddleware.html
+online version: https://powershell.github.io/Polaris/docs/api/Use-PolarisJsonBodyParserMiddleware.html
 schema: 2.0.0
 title: Use-PolarisJsonBodyParserMiddleware
 type: api

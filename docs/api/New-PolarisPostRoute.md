@@ -2,7 +2,7 @@
 external help file: Polaris-help.xml
 layout: default
 Module Name: Polaris
-online version: http://tiberriver256.github.io/Polaris/docs/New-PolarisPostRoute.html
+online version: https://powershell.github.io/Polaris/docs/api/New-PolarisPostRoute.html
 schema: 2.0.0
 title: New-PolarisPostRoute
 type: api

@@ -2,7 +2,7 @@
 external help file: Polaris-help.xml
 layout: default
 Module Name: Polaris
-online version: http://tiberriver256.github.io/Polaris/docs/New-PolarisStaticRoute.html
+online version: https://powershell.github.io/Polaris/docs/api/New-PolarisStaticRoute.html
 schema: 2.0.0
 title: New-PolarisStaticRoute
 type: api
@@ -78,7 +78,7 @@ Accept wildcard characters: False
 ```
 
 ### -EnableDirectoryBrowser
-{{Fill EnableDirectoryBrowser Description}}
+Enables the directory browser when the user requests a folder
 
 ```yaml
 Type: Boolean

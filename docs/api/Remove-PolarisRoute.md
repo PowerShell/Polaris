@@ -2,7 +2,7 @@
 external help file: Polaris-help.xml
 layout: default
 Module Name: Polaris
-online version: http://tiberriver256.github.io/Polaris/docs/Remove-PolarisRoute.html
+online version: https://powershell.github.io/Polaris/docs/api/Remove-PolarisRoute.html
 schema: 2.0.0
 title: Remove-PolarisRoute
 type: api

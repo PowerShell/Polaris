@@ -2,7 +2,7 @@
 external help file: Polaris-help.xml
 layout: default
 Module Name: Polaris
-online version: http://tiberriver256.github.io/Polaris/docs/New-ScriptblockCallback.html
+online version: https://powershell.github.io/Polaris/docs/api/New-ScriptblockCallback.html
 schema: 2.0.0
 title: New-ScriptblockCallback
 type: api
@@ -11,7 +11,7 @@ type: api
 # New-ScriptblockCallback
 
 ## SYNOPSIS
-{{Fill in the Synopsis}}
+Allows running Scriptblocks via .NET async callbacks.
 
 ## SYNTAX
 
@@ -20,21 +20,34 @@ New-ScriptblockCallback [-Callback] <ScriptBlock> [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-{{Fill in the Description}}
+Allows running Scriptblocks via .NET async callbacks.
+Internally this is
+managed by converting .NET async callbacks into .NET events.
+This enables
+PowerShell 2.0 to run Scriptblocks indirectly through Register-ObjectEvent.
 
 ## EXAMPLES
 
-### Example 1
-```powershell
-PS C:\> {{ Add example code here }}
+### EXAMPLE 1
+```
+You wish to run a scriptblock in reponse to a callback. Here is the .NET
 ```
 
-{{ Add example description here }}
+method signature:
+
+void Bar(AsyncCallback handler, int blah)
+
+ps\> \[foo\]::bar((New-ScriptblockCallback { ...
+}), 42)
 
 ## PARAMETERS
 
 ### -Callback
-{{Fill Callback Description}}
+Specify a Scriptblock to be executed in response to the callback.
+Because the Scriptblock is executed by the eventing subsystem, it only has
+access to global scope.
+Any additional arguments to this function will be
+passed as event MessageData.
 
 ```yaml
 Type: ScriptBlock
@@ -54,11 +67,9 @@ For more information, see about_CommonParameters (http://go.microsoft.com/fwlink
 
 ## INPUTS
 
-### None
-
 ## OUTPUTS
 
-### System.Object
+### A System.AsyncCallback delegate.
 ## NOTES
 
 ## RELATED LINKS

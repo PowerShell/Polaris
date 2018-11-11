@@ -2,7 +2,7 @@
 external help file: Polaris-help.xml
 layout: default
 Module Name: Polaris
-online version: http://tiberriver256.github.io/Polaris/docs/Clear-Polaris.html
+online version: https://powershell.github.io/Polaris/docs/api/Clear-Polaris.html
 schema: 2.0.0
 title: Clear-Polaris
 type: api

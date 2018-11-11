@@ -2,7 +2,7 @@
 external help file: Polaris-help.xml
 layout: default
 Module Name: Polaris
-online version: http://tiberriver256.github.io/Polaris/docs/New-DirectoryBrowser.html
+online version: https://powershell.github.io/Polaris/docs/api/New-DirectoryBrowser.html
 schema: 2.0.0
 title: New-DirectoryBrowser
 type: api
@@ -25,12 +25,15 @@ Creates HTML that can be used as a directory browser
 
 ## EXAMPLES
 
-### Example 1
-```powershell
-PS C:\> {{ Add example code here }}
+### EXAMPLE 1
+```
+New-DirectoryBrowser -RequestedItem $directoryInfo
 ```
 
-{{ Add example description here }}
+### EXAMPLE 2
+```
+New-DirectoryBrowser -RequestedItem $directoryInfo -DirectoryBrowserPath ./MyContent
+```
 
 ## PARAMETERS
 

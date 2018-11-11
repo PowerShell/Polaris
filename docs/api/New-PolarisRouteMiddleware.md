@@ -2,7 +2,7 @@
 external help file: Polaris-help.xml
 layout: default
 Module Name: Polaris
-online version: http://tiberriver256.github.io/Polaris/docs/New-PolarisRouteMiddleware.html
+online version: https://powershell.github.io/Polaris/docs/api/New-PolarisRouteMiddleware.html
 schema: 2.0.0
 title: New-PolarisRouteMiddleware
 type: api
@@ -45,6 +45,11 @@ $JsonBodyParserMiddleware =
     }
 }
 New-PolarisRouteMiddleware -Name JsonBodyParser -Scriptblock $JsonBodyParserMiddleware
+
+### EXAMPLE 2
+```
+New-PolarisRouteMiddleware -Name JsonBodyParser -ScriptPath ./testMiddleware.ps1
+```
 
 ## PARAMETERS
 
