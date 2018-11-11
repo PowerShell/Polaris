@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<SignConfigXML>
+  <job platform="" configuration="" dest="__OUTPATHROOT__\Signed" jobname="PowerShell Editor Services" approvers="vigarg;gstolt">
+    <file src="__INPATHROOT__\release\out\Polaris\Polaris.psd1" signType="Authenticode"
+      dest="__OUTPATHROOT__\Polaris\Polaris.psd1" />
+    <file src="__INPATHROOT__\release\out\Polaris\Polaris.psm1" signType="Authenticode"
+      dest="__OUTPATHROOT__\Polaris\Polaris.psm1" />
+    <file src="__INPATHROOT__\release\out\Polaris\lib\MimeTypes.Class.ps1" signType="Authenticode"
+      dest="__OUTPATHROOT__\Polaris\lib\MimeTypes.Class.ps1" />
+    <file src="__INPATHROOT__\release\out\Polaris\lib\Polaris.Class.ps1" signType="Authenticode"
+      dest="__OUTPATHROOT__\Polaris\lib\Polaris.Class.ps1" />
+    <file src="__INPATHROOT__\release\out\Polaris\lib\PolarisMiddleware.Class.ps1" signType="Authenticode"
+      dest="__OUTPATHROOT__\Polaris\lib\PolarisMiddleware.Class.ps1" />
+    <file src="__INPATHROOT__\release\out\Polaris\lib\PolarisRequest.Class.ps1" signType="Authenticode"
+      dest="__OUTPATHROOT__\Polaris\lib\PolarisRequest.Class.ps1" />
+    <file src="__INPATHROOT__\release\out\Polaris\lib\PolarisResponse.Class.ps1" signType="Authenticode"
+      dest="__OUTPATHROOT__\Polaris\lib\PolarisResponse.Class.ps1" />
+    <file src="__INPATHROOT__\release\out\Polaris\Private\Create-NewPolarisIfNeeded.ps1" signType="Authenticode"
+      dest="__OUTPATHROOT__\Polaris\Private\Create-NewPolarisIfNeeded.ps1" />
+    <file src="__INPATHROOT__\release\out\Polaris\Public\Clear-Polaris.ps1" signType="Authenticode"
+      dest="__OUTPATHROOT__\Polaris\Public\Clear-Polaris.ps1" />
+    <file src="__INPATHROOT__\release\out\Polaris\Public\Get-Polaris.ps1" signType="Authenticode"
+      dest="__OUTPATHROOT__\Polaris\Public\Get-Polaris.ps1" />
+    <file src="__INPATHROOT__\release\out\Polaris\Public\Get-PolarisRoute.ps1" signType="Authenticode"
+      dest="__OUTPATHROOT__\Polaris\Public\Get-PolarisRoute.ps1" />
+    <file src="__INPATHROOT__\release\out\Polaris\Public\Get-PolarisRouteMiddleware.ps1" signType="Authenticode"
+      dest="__OUTPATHROOT__\Polaris\Public\Get-PolarisRouteMiddleware.ps1" />
+    <file src="__INPATHROOT__\release\out\Polaris\Public\New-DirectoryBrowser.ps1" signType="Authenticode"
+      dest="__OUTPATHROOT__\Polaris\Public\New-DirectoryBrowser.ps1" />
+    <file src="__INPATHROOT__\release\out\Polaris\Public\New-PolarisDeleteRoute.ps1" signType="Authenticode"
+      dest="__OUTPATHROOT__\Polaris\Public\New-PolarisDeleteRoute.ps1" />
+    <file src="__INPATHROOT__\release\out\Polaris\Public\New-PolarisGetRoute.ps1" signType="Authenticode"
+      dest="__OUTPATHROOT__\Polaris\Public\New-PolarisGetRoute.ps1" />
+    <file src="__INPATHROOT__\release\out\Polaris\Public\New-PolarisPostRoute.ps1" signType="Authenticode"
+      dest="__OUTPATHROOT__\Polaris\Public\New-PolarisPostRoute.ps1" />
+    <file src="__INPATHROOT__\release\out\Polaris\Public\New-PolarisPutRoute.ps1" signType="Authenticode"
+      dest="__OUTPATHROOT__\Polaris\Public\New-PolarisPutRoute.ps1" />
+    <file src="__INPATHROOT__\release\out\Polaris\Public\New-PolarisRoute.ps1" signType="Authenticode"
+      dest="__OUTPATHROOT__\Polaris\Public\New-PolarisRoute.ps1" />
+    <file src="__INPATHROOT__\release\out\Polaris\Public\New-PolarisRouteMiddleware.ps1" signType="Authenticode"
+      dest="__OUTPATHROOT__\Polaris\Public\New-PolarisRouteMiddleware.ps1" />
+    <file src="__INPATHROOT__\release\out\Polaris\Public\New-PolarisStaticRoute.ps1" signType="Authenticode"
+      dest="__OUTPATHROOT__\Polaris\Public\New-PolarisStaticRoute.ps1" />
+    <file src="__INPATHROOT__\release\out\Polaris\Public\New-ScriptBlockCallback.ps1" signType="Authenticode"
+      dest="__OUTPATHROOT__\Polaris\Public\New-ScriptBlockCallback.ps1" />
+    <file src="__INPATHROOT__\release\out\Polaris\Public\Remove-PolarisRoute.ps1" signType="Authenticode"
+      dest="__OUTPATHROOT__\Polaris\Public\Remove-PolarisRoute.ps1" />
+    <file src="__INPATHROOT__\release\out\Polaris\Public\Remove-PolarisRouteMiddleware.ps1" signType="Authenticode"
+      dest="__OUTPATHROOT__\Polaris\Public\Remove-PolarisRouteMiddleware.ps1" />
+    <file src="__INPATHROOT__\release\out\Polaris\Public\Start-Polaris.ps1" signType="Authenticode"
+      dest="__OUTPATHROOT__\Polaris\Public\Start-Polaris.ps1" />
+    <file src="__INPATHROOT__\release\out\Polaris\Public\Stop-Polaris.ps1" signType="Authenticode"
+      dest="__OUTPATHROOT__\Polaris\Public\Stop-Polaris.ps1" />
+    <file src="__INPATHROOT__\release\out\Polaris\Public\Use-PolarisJsonBodyParserMiddleware.ps1" signType="Authenticode"
+      dest="__OUTPATHROOT__\Polaris\Public\Use-PolarisJsonBodyParserMiddleware.ps1" />
+  </job>
+</SignConfigXML>
+
+
+
+

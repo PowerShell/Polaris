@@ -1,0 +1,41 @@
+image:
+- Visual Studio 2015
+- Ubuntu
+
+build: off
+
+# Version number
+version: 0.0.1.{build}
+
+# Ignore testing a commit if only the README.md file changed
+# Or if various strings are found in the commit message: updated readme, update readme, update docs, update version, update appveyor
+skip_commits:
+  files:
+    - README.md
+  message: /updated readme.*|update readme.*s|update docs.*|update version.*|update appveyor.*/
+
+branches:
+  only:
+    - master
+
+# There's no need to alter the build number for a Pull Request (PR) since they don't modify anything
+pull_requests:
+  do_not_increment_build_number: true
+
+# Install NuGet to interact with the PowerShell Gallery
+install:
+- ps: Install-Module Pester -Scope CurrentUser -Force
+
+# Invoke Pester to run all of the unit tests, then save the results into XML in order to populate the AppVeyor tests section
+# If any of the tests fail, consider the pipeline failed
+test_script:
+  - ps: ./build.ps1 -Test -Package
+  - pwsh: ./build.ps1 -Test -Package
+
+artifacts:
+  - path: out\Polaris
+    name: Polaris
+
+notifications:
+  - provider: Webhook
+    url: https://webhooks.gitter.im/e/7df8f5e3e64fdfe09739

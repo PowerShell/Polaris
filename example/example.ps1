@@ -1,49 +1,64 @@
-if(-not (Test-Path -Path "..\Polaris.psm1")) {
-    Write-Error -Message "Cannot find Polaris.psm1"
-    return;
+#
+# Copyright (c) Microsoft. All rights reserved.
+# Licensed under the MIT license. See LICENSE file in the project root for full license information.
+#
+
+if(-not (Test-Path -Path ..\Polaris.psd1)) {
+    Write-Error -Message "Cannot find Polaris.psd1"
+    return
 }
 
 # Import Polaris
-Import-Module –Name ..\Polaris.psm1
+Import-Module -Name ..\Polaris.psd1
 
-# Hello World passing in the Path, Method & ScriptBlock
-New-WebRoute -Path "/helloworld" -Method "GET" -ScriptBlock {
-    param($request,$response);
-    $response.Send('Hello World');
-}
+$Hey = "What what!"
+# Hello World passing in the Path, Method & Scriptblock
+New-PolarisRoute -Path /helloworld -Method GET -Scriptblock {
+    $Response.Send($Hey)
+} -Force
 
 # Query Parameters are supported
-New-WebRoute -Path "/hellome" -Method "GET" -ScriptBlock {
-    param($request,$response);
-    if ($request.QueryParameters['name']) {
-        $response.Send('Hello ' + $request.QueryParameters['name']);
+New-PolarisRoute -Path /hellome -Method GET -Scriptblock {
+    if ($Request.Query['name']) {
+        $Response.Send('Hello ' + $Request.Query['name'])
     } else {
-        $response.Send('Hello World');
+        $Response.Send('Hello World')
     }
 }
 
 $sbWow = {
-    param($request,$response);
-
     $json = @{
         wow = $true
     }
 
     # .Json helper function that sets content type
-    $response.Json(($json | ConvertTo-Json));
+    $Response.Json(($json | ConvertTo-Json))
 }
 
 # Supports helper functions for Get, Post, Put, Delete
-New-PostRoute -Path "/wow" -ScriptBlock $sbWow
+New-PolarisPostRoute -Path /wow -Scriptblock $sbWow
+
+# Body Parameters are supported if you use the -UseJsonBodyParserMiddleware
+New-PolarisPostRoute -Path /hello -Scriptblock {
+    if ($Request.Body.Name) {
+        $Response.Send('Hello ' + $Request.Body.Name);
+    } else {
+        $Response.Send('Hello World');
+    }
+}
 
 # Pass in script file
-New-WebRoute -Path "/example" -Method "GET" -ScriptPath .\script.ps1
+New-PolarisRoute -Path /example -Method GET -ScriptPath .\script.ps1
 
 # Also support static serving of a directory
-New-StaticRoute -FolderPath "./static" -RoutePath "/public"
+New-PolarisStaticRoute -FolderPath ./static -RoutePath /public -EnableDirectoryBrowser $True
 
 # Start the server
-$app = Start-Polaris -Port 8082 -MinRunspaces 1 -MaxRunspaces 5 # all params are optional
+$app = Start-Polaris -Port 8082 -MinRunspaces 1 -MaxRunspaces 5 -UseJsonBodyParserMiddleware -Verbose # all params are optional
+
+while($app.Listener.IsListening){
+    Wait-Event callbackcomplete
+}
 
 # Stop the server
 #Stop-Polaris
