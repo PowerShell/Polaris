@@ -286,11 +286,6 @@ class Polaris {
             $ListenerPrefix = "http"
         }
 
-        if ($Auth -eq "Basic") {
-            $this.Log("Basic Auth Enabled:")
-            $this.Listener.AuthenticationSchemes = "Basic"
-        }              
-
         # If user is on a non-windows system or windows as administrator
         if ([System.Environment]::OSVersion.Platform -ne [System.PlatformID]::Win32NT -or
             ([System.Environment]::OSVersion.Platform -eq [System.PlatformID]::Win32NT -and
@@ -300,6 +295,26 @@ class Polaris {
         else {
             $this.Listener.Prefixes.Add("$($ListenerPrefix)://localhost:" + $this.Port + "/")
         }
+
+        switch ( $Auth ) {
+            Basic {
+                $this.Listener.AuthenticationSchemes = "Basic"
+            }
+            Negotiate {
+                $this.Listener.AuthenticationSchemes = "Negotiate"
+            }
+            NTLM {
+                $this.Listener.AuthenticationSchemes = "NTLM"
+            }
+            Anonymous {
+                $this.Listener.AuthenticationSchemes = "Anonymous"
+            }
+            default {
+                $this.Listener.AuthenticationSchemes = "Anonymous"
+            }
+        }
+
+        $this.Log("Authentication Scheme set to: $($this.Listener.AuthenticationSchemes)")
 
         $this.Listener.IgnoreWriteExceptions = $true
         if ([System.Environment]::OSVersion.Platform -eq [System.PlatformID]::Win32NT -and $this.Listener.TimeoutManager) {

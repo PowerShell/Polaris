@@ -41,9 +41,9 @@ function Start-Polaris {
         $Https = $False,
 
         [Parameter(ParameterSetName = 'Authentication')]
-        [ValidateSet("None", "Basic")]
+        [ValidateSet('Anonymous', 'Basic', 'Negotiate', 'NTLM')]
         [String]
-        $Auth = "None",        
+        $Auth = 'Anonymous',        
 
         $Polaris = $Script:Polaris
     )
