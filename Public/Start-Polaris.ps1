@@ -46,7 +46,7 @@ function Start-Polaris {
 
         [ValidateSet('Anonymous', 'Basic', 'Digest', 'IntegratedWindowsAuthentication', 'Negotiate', 'NTLM')]
         [ValidateScript( {
-                if ([System.Environment]::OSVersion.Platform -ne [System.PlatformID]::Win32NT -and ($_ -eq 'Basic' -or $_ -eq 'Anonymous')) {
+                if ([System.Environment]::OSVersion.Platform -ne [System.PlatformID]::Win32NT -and !($_ -eq 'Basic' -or $_ -eq 'Anonymous')) {
                     throw "Basic and Anonymous Aathentication are the only supported Auth types on Linux and Mac"
                 }
                 else {
