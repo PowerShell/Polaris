@@ -1,18 +1,10 @@
+# Created by https://www.gitignore.io/api/jekyll
+# Edit at https://www.gitignore.io/?templates=jekyll
 
-# Created by https://www.gitignore.io/api/powershell
+### Jekyll ###
+_site/
+.sass-cache/
+.jekyll-cache/
+.jekyll-metadata
 
-### PowerShell ###
-# Exclude packaged modules
-*.zip
-
-# Exclude .NET assemblies from source
-*.dll
-
-
-# End of https://www.gitignore.io/api/powershell
-
-# Pester output
-TestsResults.xml
-
-# Package output
-out
+# End of https://www.gitignore.io/api/jekyll
