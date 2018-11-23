@@ -296,25 +296,9 @@ class Polaris {
             $this.Listener.Prefixes.Add("$($ListenerPrefix)://localhost:" + $this.Port + "/")
         }
 
-        switch ( $Auth ) {
-            Basic {
-                $this.Listener.AuthenticationSchemes = "Basic"
-            }
-            Negotiate {
-                $this.Listener.AuthenticationSchemes = "Negotiate"
-            }
-            NTLM {
-                $this.Listener.AuthenticationSchemes = "NTLM"
-            }
-            Anonymous {
-                $this.Listener.AuthenticationSchemes = "Anonymous"
-            }
-            default {
-                $this.Listener.AuthenticationSchemes = "Anonymous"
-            }
-        }
+        $this.Listener.AuthenticationSchemes = $Auth
 
-        $this.Log("Authentication Scheme set to: $($this.Listener.AuthenticationSchemes)")
+        $this.Log("Authentication Scheme set to: $Auth")
 
         $this.Listener.IgnoreWriteExceptions = $true
         if ([System.Environment]::OSVersion.Platform -eq [System.PlatformID]::Win32NT -and $this.Listener.TimeoutManager) {
