@@ -45,6 +45,14 @@ function Start-Polaris {
         $Https = $False,
 
         [ValidateSet('Anonymous', 'Basic', 'Digest', 'IntegratedWindowsAuthentication', 'Negotiate', 'NTLM')]
+        [ValidateScript( {
+                if ( $IsWindows -ne $False -and ($_ -ne 'Basic' -or $_ -ne 'Anonymous')) {
+                    throw "Basic and Annoynymous Aathentication are the only supported Auth types on Linux and Mac"
+                }
+                else {
+                    $true
+                }
+            })]         
         [String]
         $Auth = 'Anonymous',        
 
