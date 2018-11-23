@@ -41,6 +41,14 @@ function Start-Polaris {
         [switch]
         $UseJsonBodyParserMiddleware = $False,
 
+        [ValidateScript( {
+            if ([System.Environment]::OSVersion.Platform -ne [System.PlatformID]::Win32NT) {
+                throw "SSL is not supported on Linux and Mac. Please proxy the traffic."
+            }
+            else {
+                $true
+            }               
+        })]            
         [switch]
         $Https = $False,
 
