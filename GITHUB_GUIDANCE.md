@@ -12,7 +12,7 @@ Just head over to the GitHub page and click the "Fork" button. It's just that si
 
 ```shell
 # Clone your fork to your local machine
-git clone git@github.com:USERNAME/FORKED-PROJECT.git
+git clone git@github.com:USERNAME/Polaris.git
 ```
 
 ## Keeping Your Fork Up to Date
@@ -21,7 +21,7 @@ While this isn't an absolutely necessary step, if you plan on doing anything mor
 
 ```shell
 # Add 'upstream' repo to list of remotes
-git remote add upstream https://github.com/UPSTREAM-USER/ORIGINAL-PROJECT.git
+git remote add upstream https://github.com/PowerShell/Polaris.git
 
 # Verify the new remote named 'upstream'
 git remote -v
