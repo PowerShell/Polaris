@@ -14,8 +14,6 @@
     Defaults to 1.
 .PARAMETER UseJsonBodyParserMiddleware
     When present, JSONBodyParser middleware will be created, if needed.
-.PARAMETER Https
-    Polaris listens on Https. This only works on Windows.
 .PARAMETER Auth
     Polaris will use various authentication methods to authenticate requests.
 .PARAMETER Polaris
