@@ -272,7 +272,7 @@ class Polaris {
     [void] InitListener (
         [int]$Port,
         [bool]$Https,
-        [string]$Auth
+        hidden [string]$Auth
     ) {
         $this.Port = $Port
 
