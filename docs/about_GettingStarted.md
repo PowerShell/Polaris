@@ -52,7 +52,7 @@ We'll create the Polaris route like this
 
 ```ps
 New-PolarisGetRoute -Path "/Services" -Scriptblock {
-   $RunningServices = Get-Service | select Name,DisplayName,Status | ConvertTo-Html -Title "Services" | Out-String
+   $RunningServices = Get-Service | Select-Object Name,DisplayName,Status | ConvertTo-Html -Title "Services" | Out-String
    $Response.SetContentType("text/html")
    $Response.Send($RunningServices)
 }
