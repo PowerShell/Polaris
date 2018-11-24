@@ -21,7 +21,10 @@ New-PolarisGetRoute -Path "/" -Scriptblock {
 Start-Polaris
 ```
 
-The application starts a server listening on port 8080 (the default) for connections. It will respond to with "Hello World!" to requests to the root url (/) or **route** it will respond to every other request with a 404 not found.
+The application starts a server listening on port 8080 (the default port) for connections. It will:
+
+- Respond with "Hello World!" to requests to the root url (/)
+- Respond with a 404 not found to any other route (ex. `/DoesNotExist`)
 
 I can get a response from the server by either opening a browser to http://localhost:8080/ or running the following PowerShell command:
 
