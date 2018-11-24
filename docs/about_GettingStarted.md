@@ -26,17 +26,17 @@ The application starts a server listening on port 8080 (the default port) for co
 - Respond with "Hello World!" to requests to the root url (/)
 - Respond with a 404 not found to any other route (ex. `/DoesNotExist`)
 
-I can get a response from the server by either opening a browser to http://localhost:8080/ or running the following PowerShell command:
+I can get a response from the server by either opening a browser to <http://localhost:8080/> or running the following PowerShell command:
 
-**Command**
+Command:
 
 ```ps
 PS> Invoke-RestMethod -Method GET -Uri http://localhost:8080/
 ```
 
-**Output**
+Output:
 
-```
+```ps
 Hello World!
 
 PS>
@@ -62,7 +62,7 @@ We're leveraging PowerShell's built in ConvertTo-HTML command to generate a litt
 
 The second one we'll want to follow suit and create a route for the page called "/Processes" and display the Process Name, CPU, and the Id properties of the process.
 
-```
+```ps
 New-PolarisGetRoute -Path "/Processes" -Scriptblock {
    $RunningProcesses = Get-Process | select ProcessName,CPU,Id | ConvertTo-Html -Title "Processes" | Out-String
    $Response.SetContentType("text/html")
@@ -70,7 +70,7 @@ New-PolarisGetRoute -Path "/Processes" -Scriptblock {
 }
 ```
 
-We're doing the same thing here as we are in the first just leveraging the Get-Process command instead. Now we should be able to open a web browser to either http://localhost:8080/Services or http://localhost:8080/Processes and see a little HTML page with some useful information about our system.
+We're doing the same thing here as we are in the first just leveraging the Get-Process command instead. Now we should be able to open a web browser to either <http://localhost:8080/Services> or <http://localhost:8080/Processes> and see a little HTML page with some useful information about our system.
 
 ## Basic Routing
 
@@ -141,7 +141,7 @@ New-PolarisStaticRoute -RoutePath "/" -FolderPath "C:\MyAwesomeSite"
 
 Now I can just call `Start-Polaris` and the following requests will work from a browser:
 
-```
+```sh
 http://localhost:8080/index.html
 http://localhost:8080/scripts.js
 http://localhost:8080/mystyles.css
@@ -167,4 +167,4 @@ New-PolarisRoute -Method GET -ScriptBlock {
 }
 ```
 
-Open up a browser to http://localhost:8080 and you should see your data in a json response. You can now fetch the data via an HTML page using things like [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)
+Open up a browser to <http://localhost:8080> and you should see your data in a json response. You can now fetch the data via an HTML page using things like [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)
