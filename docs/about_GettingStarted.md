@@ -114,7 +114,7 @@ New-PolarisRoute -Method DELETE -Path "/Process" -ScriptBlock {
 
 See about_Routing for more details on advanced routing
 
-## $Request and$Response
+## $Request and $Response
 
 Polaris will create two automatic variables for you that are available inside the scriptblock for each route.
 
