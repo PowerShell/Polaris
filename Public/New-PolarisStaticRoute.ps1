@@ -1,3 +1,8 @@
+#
+# Copyright (c) Microsoft. All rights reserved.
+# Licensed under the MIT license. See LICENSE file in the project root for full license information.
+#
+
 <#
 .SYNOPSIS
     Creates web routes to recursively serve folder contents
@@ -8,6 +13,8 @@
     Defaults to "/".
 .PARAMETER FolderPath
     Full path and name of the folder to serve.
+.PARAMETER EnableDirectoryBrowser
+    Enables the directory browser when the user requests a folder
 .PARAMETER Force
     Use -Force to overwrite existing web route(s) for the same paths.
 .PARAMETER Polaris

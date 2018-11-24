@@ -19,13 +19,8 @@
 .PARAMETER Polaris
     A Polaris object
     Defaults to the script scoped Polaris
-.EXAMPLE
-    Start-Polaris
-.EXAMPLE
-    Start-Polaris -Port 8081 -MinRunspaces 2 -MaxRunspaces 10 -UseJsonBodyParserMiddleware
-#>
-function Start-Polaris {
-    [CmdletBinding()]
+.PARAMETER Https
+    Determines if you want to use https as the prefix.
     param(
         [Int32]
         $Port = 8080,
@@ -68,6 +63,16 @@ function Start-Polaris {
     if ( -not $Polaris) {
         CreateNewPolarisIfNeeded
         $Polaris = $Script:Polaris
+    }
+
+    if ( $UseJsonBodyParserMiddleware ) {
+        Use-PolarisJsonBodyParserMiddleware -Polaris $Polaris
+    }
+
+    $Polaris.Start( $Port, $Https.IsPresent, $Auth)
+
+    return $Polaris
+}       $Polaris = $Script:Polaris
     }
 
     if ( $UseJsonBodyParserMiddleware ) {
