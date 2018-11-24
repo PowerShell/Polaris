@@ -167,4 +167,4 @@ New-PolarisRoute -Method GET -ScriptBlock {
 }
 ```
 
-Open up a browser to http://localhost:8080 and you should see your data in a json response. You can now fetch the data via an HTML page using things like the [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)
+Open up a browser to http://localhost:8080 and you should see your data in a json response. You can now fetch the data via an HTML page using things like [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)
