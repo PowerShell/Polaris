@@ -162,7 +162,7 @@ Let's create a quick API for showing information about running processes:
 
 ```ps
 New-PolarisRoute -Method GET -ScriptBlock {
-    $ProcessInfo = Get-Process | Select ProcessName,Id,CPU | ConvertTo-Json | Out-String
+    $ProcessInfo = Get-Process | Select ProcessName,Id,CPU | ConvertTo-Json
     $Response.json($ProcessInfo)
 }
 ```
