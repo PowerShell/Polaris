@@ -32,7 +32,7 @@ Polaris' differentiation is that it is cross-platform and uses the .NET HttpList
 
 ### Prereqs
 
--   [PowerShell](https://github.com/powershell/powershell)
+- [PowerShell](https://github.com/powershell/powershell)
 
 ### Steps
 
