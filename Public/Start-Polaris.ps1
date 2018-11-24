@@ -14,13 +14,10 @@
     Defaults to 1.
 .PARAMETER UseJsonBodyParserMiddleware
     When present, JSONBodyParser middleware will be created, if needed.
-.PARAMETER Auth
-    Polaris will use various authentication methods to authenticate requests.
-.PARAMETER Polaris
-    A Polaris object
-    Defaults to the script scoped Polaris
 .PARAMETER Https
     Determines if you want to use https as the prefix.
+.PARAMETER Auth
+    Polaris will use various authentication methods to authenticate requests.
 .PARAMETER Polaris
     A Polaris object
     Defaults to the script scoped Polaris
