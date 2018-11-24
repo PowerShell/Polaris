@@ -21,6 +21,14 @@
     Defaults to the script scoped Polaris
 .PARAMETER Https
     Determines if you want to use https as the prefix.
+.PARAMETER Polaris
+    A Polaris object
+    Defaults to the script scoped Polaris
+.EXAMPLE
+    Start-Polaris
+.EXAMPLE
+    Start-Polaris -Port 8081 -MinRunspaces 2 -MaxRunspaces 10 -UseJsonBodyParserMiddleware
+#>    
     param(
         [Int32]
         $Port = 8080,
