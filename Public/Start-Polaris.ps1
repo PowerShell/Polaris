@@ -29,6 +29,8 @@
 .EXAMPLE
     Start-Polaris -Port 8081 -MinRunspaces 2 -MaxRunspaces 10 -UseJsonBodyParserMiddleware
 #>    
+function Start-Polaris {
+    [CmdletBinding()]
     param(
         [Int32]
         $Port = 8080,
@@ -43,13 +45,13 @@
         $UseJsonBodyParserMiddleware = $False,
 
         [ValidateScript( {
-            if ([System.Environment]::OSVersion.Platform -ne [System.PlatformID]::Win32NT) {
-                throw "SSL is not supported on Linux and Mac. Please proxy the traffic."
-            }
-            else {
-                $true
-            }               
-        })]            
+                if ([System.Environment]::OSVersion.Platform -ne [System.PlatformID]::Win32NT) {
+                    throw "SSL is not supported on Linux and Mac. Please proxy the traffic."
+                }
+                else {
+                    $true
+                }               
+            })]            
         [switch]
         $Https = $False,
 
@@ -71,16 +73,6 @@
     if ( -not $Polaris) {
         CreateNewPolarisIfNeeded
         $Polaris = $Script:Polaris
-    }
-
-    if ( $UseJsonBodyParserMiddleware ) {
-        Use-PolarisJsonBodyParserMiddleware -Polaris $Polaris
-    }
-
-    $Polaris.Start( $Port, $Https.IsPresent, $Auth)
-
-    return $Polaris
-}       $Polaris = $Script:Polaris
     }
 
     if ( $UseJsonBodyParserMiddleware ) {
