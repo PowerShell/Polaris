@@ -14,15 +14,15 @@ A cross-platform, minimalist web framework for PowerShell.
 
 # LONG DESCRIPTION
 
-Polaris can be used by web developers and system administrators alike to build web applications and apis quickly and with very little code.
+Polaris can be used by web developers and system administrators alike to build web applications and APIs quickly and with very little code.
 
 ## Light Weight
 
-One of the best things about Polaris is how light it is. The entire framework is less than 1 MB to download. It leverages the .Net Httplistener class which is shipped with current versions of .Net and .Net Standard.
+One of the best things about Polaris is how light it is. The entire framework is less than 1 MB to download. It leverages the .NET `HttpListener` class which is shipped with current versions of .NET Core and .NET Framework.
 
 ## Cross Platform
 
-Polaris can be run on Windows or Linux or Mac. As long as you can install PowerShell you can run Polaris.
+Polaris can be run on Windows or Linux or Mac. As long as you can install PowerShell, you can run Polaris.
 
 # EXAMPLES
 
