@@ -126,7 +126,7 @@ Polaris will create two automatic variables for you that are available inside th
 
 To serve static files for your site such as javascript, images, css and other assets you can use a static file route. Polaris takes the contents of an entire folder and moves them to a temporary PSDrive to prevent directory traversal and then serves any files in that folder automatically detecting the MIME type for the file to send with the response.
 
-Let's say you have simple static website that you want to serve using Polaris. It's made up of the following files in a folder on the C drive called MyAwesomeSite. The files are as follows:
+Let's say you have a simple static website that you want to serve using Polaris. It's made up of the following files in a folder on the C drive called MyAwesomeSite. The files are as follows:
 
 1. **Index.html** - The home page
 2. **Scripts.js** - A few handy javascript functions
