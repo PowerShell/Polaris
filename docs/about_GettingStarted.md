@@ -36,7 +36,7 @@ PS> Invoke-RestMethod -Method GET -Uri http://localhost:8080/
 
 Output:
 
-```ps
+```None
 Hello World!
 
 PS>
