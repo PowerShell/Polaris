@@ -141,7 +141,7 @@ New-PolarisStaticRoute -RoutePath "/" -FolderPath "C:\MyAwesomeSite"
 
 Now I can just call `Start-Polaris` and the following requests will work from a browser:
 
-```sh
+```None
 http://localhost:8080/index.html
 http://localhost:8080/scripts.js
 http://localhost:8080/mystyles.css
