@@ -7,7 +7,7 @@ Describe "Test Polaris Basic Auth" {
     
     BeforeAll {
         Start-Job -Scriptblock {
-            Import-Module C:\scripts\Polaris\Polaris.psd1
+            Import-Module $using:PSScriptRoot\..\..\Polaris.psd1
 
             New-PolarisRoute -Path /helloworld -Method GET -Scriptblock {
                 $Response.Send('Hello World')
