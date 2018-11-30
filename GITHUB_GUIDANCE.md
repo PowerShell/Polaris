@@ -6,13 +6,23 @@ Whether you're trying to give back to the open source community or collaborating
 
 In an attempt to coallate this information for myself and others, this short tutorial is what I've found to be fairly standard procedure for creating a fork, doing your work, issuing a pull request, and merging that pull request back into the original project.
 
+## Use VSCode for Git
+
+The default editor (which you may not run into very often) is vim. If you're more familiar with VSCode you and set VSCode to be the default editor for interactive commands like `git rebase -i` using the following command:
+
+```
+git config --global core.editor "code --wait"
+```
+
+More information [here](https://code.visualstudio.com/docs/editor/versioncontrol#_vs-code-as-git-editor)
+
 ## Creating a Fork
 
 Just head over to the GitHub page and click the "Fork" button. It's just that simple. Once you've done that, you can use your favorite git client to clone your repo or just head straight to the command line:
 
 ```shell
 # Clone your fork to your local machine
-git clone git@github.com:USERNAME/FORKED-PROJECT.git
+git clone git@github.com:USERNAME/Polaris.git
 ```
 
 ## Keeping Your Fork Up to Date
@@ -21,7 +31,7 @@ While this isn't an absolutely necessary step, if you plan on doing anything mor
 
 ```shell
 # Add 'upstream' repo to list of remotes
-git remote add upstream https://github.com/UPSTREAM-USER/ORIGINAL-PROJECT.git
+git remote add upstream https://github.com/PowerShell/Polaris.git
 
 # Verify the new remote named 'upstream'
 git remote -v
