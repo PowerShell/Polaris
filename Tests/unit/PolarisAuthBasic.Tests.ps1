@@ -13,7 +13,7 @@ Describe "Polaris Authentication" {
                 $Response.Send('Hello World')
             }
 
-            $Polaris = Start-Polaris -MinRunspaces 1 -MaxRunspaces 5 -Auth Basic
+            $Polaris = Start-Polaris -Auth Basic
 
             New-PolarisRoute -Method GET -Path '/' -Force -Scriptblock {
                 $ResponseJson = @{
