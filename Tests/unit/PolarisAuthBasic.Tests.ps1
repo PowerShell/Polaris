@@ -3,7 +3,7 @@
 # Licensed under the MIT license. See LICENSE file in the project root for full license information.
 #
 
-Describe "Test Polaris Basic Auth" {
+Describe "Polaris Authentication" {
     
     BeforeAll {
         Start-Job -Scriptblock {
@@ -33,39 +33,34 @@ Describe "Test Polaris Basic Auth" {
 
         # Give the Polaris Server time to start up in the job
         Start-Sleep -Seconds 5
-    }    
+    }
     
+    It 'Authenticates and passes on Basic authentication credentials, -Username <Username> -Password <Pass>' -TestCases @(
+        @{ Username = 'blah'; Pass = 'hellothere'}
+        @{ Username = 'username'; Pass = 'username'}
+        @{ Username = 'jeremym'; Pass = 'asdasdf@2232!!*%#23'}
+        @{ Username = '!'; Pass = '@'}
+        @{ Username = 'reallong'; Pass = 'a!a!a!a!a!a!a!a!a!a!a!a!a!a!a!a!a!a!a!a!a!a!a!a!a!a!a!a!a!a!a!'}
+    ) {
+        param ($Username, $Pass)
 
-    Context "Test Basic Auth provider" {
-        function Test-BasicAuth {
-            
-            [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingConvertToSecureStringWithPlainText", "")]
-            [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingUserNameAndPassWordParams", "")]
-            [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingPlainTextForPassword", "")]
-            param ($Username, $Password)
-            
-            It ("Username {0} and Password {1} should match request" -f $Username, $Password) {
-                $EncryptedPass = $Password | ConvertTo-SecureString -asPlainText -Force
-                $Credential = New-Object System.Management.Automation.PSCredential($Username, $EncryptedPass)                
+        $BasicAuth = $Username + ":" + $Pass
+        $Base64BasicAuth = [convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes(($BasicAuth)))
 
-                $Result = Invoke-RestMethod -Uri "http://localhost:8080" -Method Get -UseBasicParsing -Credential $Credential
-                $Result.Username | Should Be $Username
-                $Result.Password | Should Be $Password
-            }
+        $Headers = @{}
+        $Headers["Authorization"] = "Basic $Base64BasicAuth"
+
+        $Result = Invoke-RestMethod -Uri "http://localhost:8080" -Method Get -UseBasicParsing -Headers $Headers
+
+        $UsernameAndPasswordMatch = $False
+
+        if ($Result.Username -eq $Username -and $Result.Password -eq $Pass) {
+            $UsernameAndPasswordMatch = $True
         }
-
-        $testCases = @(
-            @{ Username = 'blah'; Password = 'hellothere'}
-            @{ Username = 'username'; Password = 'username'}
-            @{ Username = 'jeremym'; Password = 'asdasdf@2232!!*%#23'}
-            @{ Username = '!'; Password = '@'}
-            @{ Username = 'reallong'; Password = 'a!a!a!a!a!a!a!a!a!a!a!a!a!a!a!a!a!a!a!a!a!a!a!a!a!a!a!a!a!a!a!'}
-        )
-
-        foreach ($testCase in $testCases) {
-            Test-BasicAuth @testCase
-        }        
-    }                   
+        Write-Debug "UsernameAndPasswordMatch: $UsernameAndPasswordMatch"
+        $UsernameAndPasswordMatch | Should -Be $True
+    }
+                   
     AfterAll {
         Get-Job | Stop-Job | Remove-Job
     }
