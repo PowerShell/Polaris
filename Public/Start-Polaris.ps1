@@ -1,8 +1,3 @@
-#
-# Copyright (c) Microsoft. All rights reserved.
-# Licensed under the MIT license. See LICENSE file in the project root for full license information.
-#
-
 <#
 .SYNOPSIS
     Start Polaris web server.
@@ -21,6 +16,8 @@
     When present, JSONBodyParser middleware will be created, if needed.
 .PARAMETER Https
     Determines if you want to use https as the prefix.
+.PARAMETER Auth
+    Polaris will use various authentication methods to authenticate requests.
 .PARAMETER Polaris
     A Polaris object
     Defaults to the script scoped Polaris
@@ -28,7 +25,7 @@
     Start-Polaris
 .EXAMPLE
     Start-Polaris -Port 8081 -MinRunspaces 2 -MaxRunspaces 10 -UseJsonBodyParserMiddleware
-#>
+#>    
 function Start-Polaris {
     [CmdletBinding()]
     param(
@@ -44,8 +41,28 @@ function Start-Polaris {
         [switch]
         $UseJsonBodyParserMiddleware = $False,
 
+        [ValidateScript( {
+                if ([System.Environment]::OSVersion.Platform -ne [System.PlatformID]::Win32NT) {
+                    throw "SSL is not supported on Linux and Mac. Please proxy the traffic."
+                }
+                else {
+                    $true
+                }               
+            })]            
         [switch]
-        $Https = $False,        
+        $Https = $False,
+
+        [ValidateSet('Anonymous', 'Basic', 'Digest', 'IntegratedWindowsAuthentication', 'Negotiate', 'NTLM')]
+        [ValidateScript( {
+                if (($IsMacOS -or $IsLinux) -and !($_ -in @( 'Basic', 'Anonymous'))) {
+                    throw "Basic and Anonymous Aathentication are the only supported Auth types on Linux and Mac"
+                }
+                else {
+                    $true
+                }               
+            })]         
+        [String]
+        $Auth = 'Anonymous',        
 
         $Polaris = $Script:Polaris
     )
@@ -59,7 +76,7 @@ function Start-Polaris {
         Use-PolarisJsonBodyParserMiddleware -Polaris $Polaris
     }
 
-    $Polaris.Start( $Port, $Https.IsPresent )
+    $Polaris.Start( $Port, $Https.IsPresent, $Auth)
 
     return $Polaris
 }
