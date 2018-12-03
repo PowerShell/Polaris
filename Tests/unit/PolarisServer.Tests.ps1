@@ -29,5 +29,16 @@ Describe "Test webserver use" {
                 $Polaris.Listener.IsListening | Should be $true
             }
         }
+
+        It "Allows a custom logger" {
+            $Polaris = Get-Polaris
+            $Polaris.Logger = {
+                param($Word)
+                $Word | Out-File "TestDrive:\test.log" -NoNewline
+            }
+            
+            $Polaris.Log("Hello")
+            Get-Content "TestDrive:\test.log" -Raw | Should be "Hello"
+        }
     }
 }

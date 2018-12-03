@@ -42,7 +42,7 @@ Polaris' differentiation is that it is cross-platform and uses the .NET HttpList
 PS > Install-Module Polaris
 ```
 
-You can now try out the [example above](#example) or checkout [the wiki](https://github.com/PowerShell/Polaris/wiki) for more usage!
+You can now try out the [example above](#example) or checkout [the site](https://PowerShell.github.io/Polaris) for more usage information!
 
 #### From source
 
@@ -50,13 +50,13 @@ You can now try out the [example above](#example) or checkout [the wiki](https:/
 1. Open [PowerShell](https://github.com/powershell/powershell)
 1. At this point, you can now run `Import-Module ./Polaris.psd1`
 
-You can now try out the [example above](#example) or checkout [the wiki](https://github.com/PowerShell/Polaris/wiki) for more usage!
+You can now try out the [example above](#example) or checkout [the site](https://PowerShell.github.io/Polaris) for more usage!
 
 You can also run all the Pester tests by running `Invoke-Pester` in the `test` directory. You will need [Pester](https://github.com/pester/Pester) version [4.1.0](https://github.com/pester/Pester/blob/master/CHANGELOG.md#410-november-15-2017) or higher to run the tests on Linux or MacOS.
 
 ## Documentation
 
-Check out the [docs folder](https://github.com/PowerShell/Polaris/tree/master/docs) for the API reference.
+Check out the [docs folder](https://github.com/PowerShell/Polaris/tree/master/docs) or [the site](https://PowerShell.github.io/Polaris) for a full API reference.
 
 ## Troubleshooting / Questions
 
