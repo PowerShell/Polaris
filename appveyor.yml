@@ -5,7 +5,7 @@ image:
 build: off
 
 # Version number
-version: 0.0.1.{build}
+version: 0.0.2.{build}
 
 # Ignore testing a commit if only the README.md file changed
 # Or if various strings are found in the commit message: updated readme, update readme, update docs, update version, update appveyor
