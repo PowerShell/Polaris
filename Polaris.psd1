@@ -118,9 +118,11 @@
     
             # ReleaseNotes of this module
             ReleaseNotes = @'
-# 0.1.0
+# 0.2.0
 
-Initial Release.
+* HTTPS support on Windows
+* HttpListener authentication support
+* misc bug fixes and improvements
 '@
     
         } # End of PSData hashtable
