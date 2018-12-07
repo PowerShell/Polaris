@@ -2,7 +2,7 @@
 
 [![Join the chat at https://gitter.im/PowerShell/Polaris](https://badges.gitter.im/PowerShell/Polaris.svg)](https://gitter.im/PowerShell/Polaris?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build status](https://ci.appveyor.com/api/projects/status/0ak497mbjn6dibxw/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/polaris/branch/master)
-[![PowerShell Gallery](https://img.shields.io/badge/powershellgallery-0.1.0-blue.svg)](https://www.powershellgallery.com/packages/Polaris)
+[![PowerShell Gallery](https://img.shields.io/powershellgallery/v/polaris.svg)](https://www.powershellgallery.com/packages/Polaris)
 
 A cross-platform, minimalist web framework for [PowerShell](https://github.com/powershell/powershell).
 
@@ -10,7 +10,7 @@ A cross-platform, minimalist web framework for [PowerShell](https://github.com/p
 
 Polaris is currently an **unsupported, experimental, proof-of-concept**. There is no current plan to turn it into a supported Microsoft product.
 
-That being said, we do plan on continuing to experiment within this repository for the forseeable future.
+That being said, we do plan on continuing to experiment within this repository for the foreseeable future.
 
 ## Example
 
@@ -62,7 +62,7 @@ Check out the [docs folder](https://github.com/PowerShell/Polaris/tree/master/do
 
 **Twitter:** #PSPolaris
 **Slack:** See us in the #Polaris channel of the [PowerShell Slack](http://slack.poshcode.org/)
-**Github Issues:** Submit a bug / new feature idea / or just a question as a new Github issue
+**GitHub Issues:** Submit a bug / new feature idea / or just a question as a new GitHub issue
 
 ## Roadmap
 
