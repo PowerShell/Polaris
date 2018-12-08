@@ -184,6 +184,11 @@ Hello World"
             { Invoke-WebRequest -Uri "http://localhost:$Port/error" -UseBasicParsing } | Should Throw
         }
 
+        It "should have an error response matching the thrown server error" {
+            { Invoke-WebRequest -Uri "http://localhost:$Port/error" -UseBasicParsing }
+            ($Error[0].ErrorDetails.Message -split "`n").Count | Should Be 5
+        }
+
         AfterAll {
             Get-Job | Stop-Job | Remove-Job
         }
