@@ -91,7 +91,6 @@ class Polaris {
                         $ErrorsBody += $_.Exception.ToString()
                         $ErrorsBody += $_.InvocationInfo.PositionMessage + "`n`n"
                         $Response.Send($ErrorsBody)
-                        $ErrorsBody = ''
                         $Polaris.Log($_)
                         $Response.SetStatusCode(500)
                     }
