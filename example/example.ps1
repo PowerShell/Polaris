@@ -1,3 +1,8 @@
+#
+# Copyright (c) Microsoft. All rights reserved.
+# Licensed under the MIT license. See LICENSE file in the project root for full license information.
+#
+
 if(-not (Test-Path -Path ..\Polaris.psd1)) {
     Write-Error -Message "Cannot find Polaris.psd1"
     return

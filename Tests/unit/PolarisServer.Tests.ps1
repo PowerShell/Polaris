@@ -1,3 +1,8 @@
+#
+# Copyright (c) Microsoft. All rights reserved.
+# Licensed under the MIT license. See LICENSE file in the project root for full license information.
+#
+
 Import-Module -Name $PSScriptRoot\..\..\Polaris.psd1
 
 Describe "Test webserver use" {
@@ -23,6 +28,17 @@ Describe "Test webserver use" {
                 $Polaris = Start-Polaris -Port 9998
                 $Polaris.Listener.IsListening | Should be $true
             }
+        }
+
+        It "Allows a custom logger" {
+            $Polaris = Get-Polaris
+            $Polaris.Logger = {
+                param($Word)
+                $Word | Out-File "TestDrive:\test.log" -NoNewline
+            }
+            
+            $Polaris.Log("Hello")
+            Get-Content "TestDrive:\test.log" -Raw | Should be "Hello"
         }
     }
 }

@@ -1,3 +1,8 @@
+#
+# Copyright (c) Microsoft. All rights reserved.
+# Licensed under the MIT license. See LICENSE file in the project root for full license information.
+#
+
 class Polaris {
 
     [int]$Port
@@ -29,12 +34,11 @@ class Polaris {
             $Polaris.Listener.BeginGetContext($Polaris.ContextHandler, $Polaris)
 
             [System.Net.HttpListenerRequest]$RawRequest = $Context.Request
-            [System.Net.HttpListenerResponse]$RawResponse = $Context.Response
 
             $Polaris.Log("request came in: " + $RawRequest.HttpMethod + " " + $RawRequest.RawUrl)
 
-            [PolarisRequest]$Request = [PolarisRequest]::new($RawRequest)
-            [PolarisResponse]$Response = [PolarisResponse]::new()
+            [PolarisRequest]$Request = [PolarisRequest]::new($RawRequest, $Context.User)
+            [PolarisResponse]$Response = [PolarisResponse]::new($Context.Response)
 
 
             [string]$Route = $RawRequest.Url.AbsolutePath
@@ -48,11 +52,11 @@ class Polaris {
                 # Run middleware in the order in which it was added
                 foreach ($Middleware in $Polaris.RouteMiddleware) {
                     $InformationVariable += $Polaris.InvokeRoute(
-                            $Middleware.Scriptblock,
-                            $Null,
-                            $Request,
-                            $Response
-                        )
+                        $Middleware.Scriptblock,
+                        $Null,
+                        $Request,
+                        $Response
+                    )
                 }
 
                 $Polaris.Log("Parsed Route: $Route")
@@ -118,16 +122,17 @@ class Polaris {
                     $Response.ByteResponse.CopyTo($Bytes, $LogBytes.Length)
                     $Response.ByteResponse = $Bytes
                 }
-                [Polaris]::Send($RawResponse, $Response)
+                [Polaris]::Send($Response)
 
             }
             catch {
                 $Polaris.Log(($_ | Out-String))
                 $Response.SetStatusCode(500)
                 $Response.Send($_)
-                try{
-                    [Polaris]::Send($RawResponse, $Response)
-                } catch {
+                try {
+                    [Polaris]::Send($Response)
+                }
+                catch {
                     $Polaris.Log($_)
                 }
                 $Polaris.Log($_)
@@ -193,7 +198,7 @@ class Polaris {
         }
     }
 
-    static [string] SanitizePath([string]$Path){
+    static [string] SanitizePath([string]$Path) {
         $SanitizedPath = $Path.TrimEnd('/')
 
         if ([string]::IsNullOrEmpty($SanitizedPath)) { $SanitizedPath = "/" }
@@ -201,7 +206,7 @@ class Polaris {
         return $SanitizedPath
     }
 
-    static [RegEx] ConvertPathToRegex([string]$Path){
+    static [RegEx] ConvertPathToRegex([string]$Path) {
         Write-Debug "Path: $path"
         # Replacing all periods with an escaped period to prevent regex wildcard
         $path = $path -replace '\.', '\.'
@@ -224,7 +229,7 @@ class Polaris {
         return [RegEx]::New($path)
     }
 
-    static [RegEx] ConvertPathToRegex([RegEx]$Path){
+    static [RegEx] ConvertPathToRegex([RegEx]$Path) {
         Write-Debug "Path is a RegEx"
         return $Path
     }
@@ -253,10 +258,11 @@ class Polaris {
 
     [void] Start (
         [int]$Port = 3000,
-        [bool]$Https
+        [bool]$Https,
+        [string]$Auth
     ) {
         $this.StopServer = $false
-        $this.InitListener($Port,$Https)
+        $this.InitListener($Port, $Https, $Auth)
         $this.Listener.BeginGetContext($this.ContextHandler, $this)
         $this.Log("App listening on Port: " + $Port + "!")
     }
@@ -270,18 +276,20 @@ class Polaris {
     }
     [void] InitListener (
         [int]$Port,
-        [bool]$Https
+        [bool]$Https,
+        [string]$Auth
     ) {
         $this.Port = $Port
 
         $this.Listener = [System.Net.HttpListener]::new()
 
-        if($Https){
+        if ($Https) {
             $this.Log("Using HTTPS:")
             $ListenerPrefix = "https"
-        }else{
+        }
+        else {
             $ListenerPrefix = "http"
-        }        
+        }
 
         # If user is on a non-windows system or windows as administrator
         if ([System.Environment]::OSVersion.Platform -ne [System.PlatformID]::Win32NT -or
@@ -293,8 +301,12 @@ class Polaris {
             $this.Listener.Prefixes.Add("$($ListenerPrefix)://localhost:" + $this.Port + "/")
         }
 
+        $this.Listener.AuthenticationSchemes = $Auth
+
+        $this.Log("Authentication Scheme set to: $Auth")
+
         $this.Listener.IgnoreWriteExceptions = $true
-        if([System.Environment]::OSVersion.Platform -eq [System.PlatformID]::Win32NT -and $this.Listener.TimeoutManager){
+        if ([System.Environment]::OSVersion.Platform -eq [System.PlatformID]::Win32NT -and $this.Listener.TimeoutManager) {
             $this.Listener.TimeoutManager.RequestQueue = [timespan]::FromMinutes(5)
             $this.Listener.TimeoutManager.IdleConnection = [timespan]::FromSeconds(45)
             $this.Listener.TimeoutManager.EntityBody = [timespan]::FromSeconds(50)
@@ -305,12 +317,11 @@ class Polaris {
     }
 
     static [void] Send (
-        [System.Net.HttpListenerResponse]$RawResponse, 
         [PolarisResponse]$Response
     ) {
         if ($Response.StreamResponse) {
             [Polaris]::Send(
-                $RawResponse,
+                $Response.RawResponse,
                 $Response.StreamResponse,
                 $Response.StatusCode,
                 $Response.ContentType,
@@ -319,7 +330,7 @@ class Polaris {
         }
         else {
             [Polaris]::Send(
-                $RawResponse,
+                $Response.RawResponse,
                 $Response.ByteResponse,
                 $Response.StatusCode,
                 $Response.ContentType,
@@ -368,7 +379,7 @@ class Polaris {
 
     [void] Log ([string]$LogString) {
         try {
-            $this.Logger($LogString)
+            $this.Logger.Invoke($LogString)
         }
         catch {
             Write-Host $_.Message

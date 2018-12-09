@@ -1,35 +1,37 @@
+#
+# Copyright (c) Microsoft. All rights reserved.
+# Licensed under the MIT license. See LICENSE file in the project root for full license information.
+#
+
+<#
+.SYNOPSIS
+    Allows running Scriptblocks via .NET async callbacks.
+.DESCRIPTION
+    Allows running Scriptblocks via .NET async callbacks. Internally this is
+    managed by converting .NET async callbacks into .NET events. This enables
+    PowerShell 2.0 to run Scriptblocks indirectly through Register-ObjectEvent.         
+.PARAMETER Callback
+    Specify a Scriptblock to be executed in response to the callback.
+    Because the Scriptblock is executed by the eventing subsystem, it only has
+    access to global scope. Any additional arguments to this function will be
+    passed as event MessageData.
+.EXAMPLE
+    You wish to run a scriptblock in reponse to a callback. Here is the .NET
+    method signature:
+
+    void Bar(AsyncCallback handler, int blah)
+
+    ps> [foo]::bar((New-ScriptblockCallback { ... }), 42)                        
+.OUTPUTS
+    A System.AsyncCallback delegate.
+#>
 function New-ScriptblockCallback {
     param(
         [parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [scriptblock]$Callback
     )
-<#
-    .SYNOPSIS
-        Allows running Scriptblocks via .NET async callbacks.
- 
-    .DESCRIPTION
-        Allows running Scriptblocks via .NET async callbacks. Internally this is
-        managed by converting .NET async callbacks into .NET events. This enables
-        PowerShell 2.0 to run Scriptblocks indirectly through Register-ObjectEvent.         
- 
-    .PARAMETER Callback
-        Specify a Scriptblock to be executed in response to the callback.
-        Because the Scriptblock is executed by the eventing subsystem, it only has
-        access to global scope. Any additional arguments to this function will be
-        passed as event MessageData.
-         
-    .EXAMPLE
-        You wish to run a scriptblock in reponse to a callback. Here is the .NET
-        method signature:
-         
-        void Bar(AsyncCallback handler, int blah)
-         
-        ps> [foo]::bar((New-ScriptblockCallback { ... }), 42)                        
- 
-    .OUTPUTS
-        A System.AsyncCallback delegate.
-#>
+
     # is this type already defined?    
     if (-not ("CallbackEventBridge" -as [type])) {
         Add-Type @"
