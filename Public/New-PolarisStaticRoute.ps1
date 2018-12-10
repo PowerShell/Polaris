@@ -17,6 +17,11 @@
     Full path and name of the folder to serve.
 .PARAMETER EnableDirectoryBrowser
     Enables the directory browser when the user requests a folder
+.PARAMETER ServeDefaultFile
+    Polaris will look for a default file matching one of the file names specified in the 
+    StandardHTMLFiles parameter and, if found, will serve that file when no specific file is requested
+.PARAMETER StandardHTMLFiles
+    List of file names that Polaris will look for when ServeDefaultFile is $True
 .PARAMETER Force
     Use -Force to overwrite existing web route(s) for the same paths.
 .PARAMETER Polaris
@@ -50,7 +55,7 @@ function New-PolarisStaticRoute {
         $Force,
 
         [string[]]
-        $StandardHTMLFiles = @("index.html","index.htm","default.html","default.htm"),
+        $StandardHTMLFiles = @("index.html", "index.htm", "default.html", "default.htm"),
 
         [bool]
         $ServeDefaultFile = $False,
@@ -72,19 +77,19 @@ function New-PolarisStaticRoute {
         Write-Error -Exception FileNotFoundException -Message "Folder does not exist at path $FolderPath"
     }
     
-        $NewDrive = (New-PSDrive -Name "PolarisStaticFileServer$([guid]::NewGuid().guid)" `
-                -PSProvider FileSystem `
-                -Root $FolderPath `
-                -Scope Global).Name
+    $NewDrive = (New-PSDrive -Name "PolarisStaticFileServer$([guid]::NewGuid().guid)" `
+            -PSProvider FileSystem `
+            -Root $FolderPath `
+            -Scope Global).Name
     
     $Scriptblock = {
         $Content = ""
 
         $LocalPath = $Request.Parameters.FilePath
-        if(-not $LocalPath -and $ServeDefaultFile) {
-            foreach($FileName in $StandardHTMLFiles){
+        if (-not $LocalPath -and $ServeDefaultFile) {
+            foreach ($FileName in $StandardHTMLFiles) {
                 $FilePath = Join-Path "$($NewDrive):" -ChildPath "$FileName"
-                if(Test-Path -Path $FilePath){
+                if (Test-Path -Path $FilePath) {
                     $LocalPath = $FileName
                     break
                 }
@@ -135,13 +140,13 @@ function New-PolarisStaticRoute {
         }
     }
 
-    $Parameters =   "`$RoutePath = '$($RoutePath.TrimStart("/"))'`r`n" +
-                    "`$NewDrive = '$NewDrive'`r`n"
+    $Parameters = "`$RoutePath = '$($RoutePath.TrimStart("/"))'`r`n" +
+    "`$NewDrive = '$NewDrive'`r`n"
 
-    if($EnableDirectoryBrowser){
+    if ($EnableDirectoryBrowser) {
         $Parameters += "`$EnableDirectoryBrowser = `$$EnableDirectoryBrowser`r`n"
     }
-    if($ServeDefaultFile){
+    if ($ServeDefaultFile) {
         $Parameters += "`$ServeDefaultFile = `$$ServeDefaultFile`r`n"
         $Parameters += "`$StandardHTMLFiles = @('$( $StandardHTMLFiles -join "','" )')`r`n"
     }
