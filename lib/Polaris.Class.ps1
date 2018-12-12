@@ -87,6 +87,7 @@ class Polaris {
                         
                     }
                     catch {
+                        $ErrorsBody = ''
                         $ErrorsBody += $_.Exception.ToString()
                         $ErrorsBody += $_.InvocationInfo.PositionMessage + "`n`n"
                         $Response.Send($ErrorsBody)
