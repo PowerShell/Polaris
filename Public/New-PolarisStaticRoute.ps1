@@ -76,7 +76,7 @@ function New-PolarisStaticRoute {
     if ( -not ( Test-Path -Path $FolderPath ) ) {
         Write-Error -Exception FileNotFoundException -Message "Folder does not exist at path $FolderPath"
     }
-    
+
     $NewDrive = (New-PSDrive -Name "PolarisStaticFileServer$([guid]::NewGuid().guid)" `
             -PSProvider FileSystem `
             -Root $FolderPath `
