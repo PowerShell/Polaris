@@ -58,7 +58,7 @@ function New-PolarisStaticRoute {
         $StandardHTMLFiles = @("index.html", "index.htm", "default.html", "default.htm"),
 
         [bool]
-        $ServeDefaultFile = $False,
+        $ServeDefaultFile = $True,
         
         $Polaris = $Script:Polaris
     )
