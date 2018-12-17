@@ -31,11 +31,11 @@ Describe "New-PolarisStaticRoute (E2E)" {
         $File1Uri = "http://localhost:$Port/$RootPath/File1.txt"
         $File1Content = 'File1Content'
         $File1Content | Out-File -FilePath $File1 -Encoding ascii -NoNewline
+        'Hello!' | Out-File -FilePath "$TestPath\default.html" -Encoding ascii -NoNewline
 
         
 
         Start-Job -Scriptblock {
-
             #  Import module
             Import-Module $using:PSScriptRoot\..\..\Polaris.psd1
 
@@ -43,7 +43,7 @@ Describe "New-PolarisStaticRoute (E2E)" {
             Remove-PolarisRoute
 
             ####  Create static routes
-            New-PolarisStaticRoute -RoutePath $using:RootPath -FolderPath $using:TestPath
+            New-PolarisStaticRoute -RoutePath $using:RootPath -FolderPath $using:TestPath -ServeDefaultFile $True
             Write-Output "RootPath: $using:RootPath  --- FolderPath: $using:TestPath"
 
             ####  Create a static route at the root
@@ -78,8 +78,15 @@ Describe "New-PolarisStaticRoute (E2E)" {
     It "Should serve a directory browser when enabled" {
 
         #  Confirm file can be downloaded
-        $Download = Invoke-WebRequest -Uri "http://localhost:$Port/" -UseBasicParsing
+        $Download = Invoke-WebRequest -Uri "http://localhost:$Port/Sub1" -UseBasicParsing
         $Download.Content | Should BeLike "*Polaris Static File Server*"
+    }
+
+    It "Should serve a default file when enabled" {
+
+        #  Confirm file can be downloaded
+        $Download = Invoke-WebRequest -Uri "http://localhost:$Port/$RootPath/" -UseBasicParsing
+        $Download.Content | Should BeLike "*Hello*"
     }
 
     AfterAll {
