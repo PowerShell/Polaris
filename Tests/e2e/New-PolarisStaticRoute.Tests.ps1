@@ -78,7 +78,7 @@ Describe "New-PolarisStaticRoute (E2E)" {
     It "Should serve a directory browser when enabled" {
 
         #  Confirm file can be downloaded
-        $Download = Invoke-WebRequest -Uri "http://localhost:$Port/" -UseBasicParsing
+        $Download = Invoke-WebRequest -Uri "http://localhost:$Port/Sub1" -UseBasicParsing
         $Download.Content | Should BeLike "*Polaris Static File Server*"
     }
 
