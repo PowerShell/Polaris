@@ -44,11 +44,11 @@ function Remove-PolarisRoute {
         [Parameter( ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True )]
         [string[]]
-        $Path = '*',
+        $Path = @('*'),
 
         [Parameter( ValueFromPipelineByPropertyName = $True )]
         [string[]]
-        $Method = '*',
+        $Method = @('*'),
 
         
         $Polaris = $Script:Polaris

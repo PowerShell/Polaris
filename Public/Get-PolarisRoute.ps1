@@ -44,36 +44,21 @@ function Get-PolarisRoute {
         [Parameter( ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True )]
         [string[]]
-        $Path = '*',
+        $Path = @('*'),
 
         [Parameter( ValueFromPipelineByPropertyName = $True )]
         [string[]]
-        $Method = '*',
+        $Method = @('*'),
 
-        
         $Polaris = $Script:Polaris
     )
     
     process {
         if ( $Polaris ) {
-            $WebRoutes = [System.Collections.ArrayList]@()
+            $MatchingRoutes = foreach ($Pattern in $Path) { $Polaris.Routes | where { $_.Path -like "/$($Pattern.TrimStart("/"))" } }
+            $MatchMethodAndRoutes = foreach ($Pattern in $Method) { $MatchingRoutes | where { $_.Method -like $Pattern } }
 
-            ForEach ( $Route in $Polaris.ScriptblockRoutes.GetEnumerator() ) {
-                ForEach ( $RouteMethod in $Route.Value.GetEnumerator() ) {
-                    $Null = $WebRoutes.Add( [pscustomobject]@{ Path = $Route.Key; Method = $RouteMethod.Key; Scriptblock = $RouteMethod.Value } )
-                }
-            }
-
-            $Filter = [scriptblock]::Create( (
-                    '( ' + 
-                    ( $Path.ForEach( {   "`$_.Path   -like `"/$($_.TrimStart("/"))`"" } ) -join ' -or ' ) + 
-                    ' ) -and ( ' +
-                    ( $Method.ForEach( { "`$_.Method -like `"$($_)`"" } ) -join ' -or ' ) +
-                    ' )' ) )
-
-            $WebRoutes = $WebRoutes.Where( $Filter )
-
-            return $WebRoutes
+            return $MatchMethodAndRoutes | Sort-Object -Property Path, Method -Unique
         }
     }
 }

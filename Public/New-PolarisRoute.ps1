@@ -9,7 +9,11 @@
 .DESCRIPTION
     Create web route for server to serve.
 .PARAMETER Path
-    Path (path/route/endpoint) of the web route to to be serviced.
+    The path for which the given scriptblock or script is invoked; can be any of:
+        * A string representing a path.
+        * A path pattern.
+        * A regular expression to match paths.
+    For examples, see Path examples.
 .PARAMETER Method
     HTTP verb/method to be serviced.
     Valid values are GET, HEAD, POST, PUT, DELETE, CONNECT, OPTIONS, TRACE
@@ -25,6 +29,16 @@
 .EXAMPLE
     New-PolarisRoute -Path "helloworld" -Method "GET" -Scriptblock { $Response.Send( 'Hello World' ) }
     To view results:
+    Start-Polaris
+    Start-Process http://localhost:8080/helloworld
+.EXAMPLE
+    New-PolarisRoute -Path "helloworld" -Method "GET" -ScriptPath D:\Scripts\Example.ps1
+    To view results, assuming default port:
+    Start-Polaris
+    Start-Process http://localhost:8080/helloworld
+.EXAMPLE
+    New-PolarisRoute -Path "helloworld" -Method "GET" -ScriptPath D:\Scripts\Example.ps1
+    To view results, assuming default port:
     Start-Polaris
     Start-Process http://localhost:8080/helloworld
 .EXAMPLE
@@ -61,7 +75,7 @@ function New-PolarisRoute {
                 }
                 return $true 
             })]
-        [System.IO.FileInfo]
+        [String]
         $ScriptPath,
         
         [switch]
@@ -100,7 +114,7 @@ function New-PolarisRoute {
         $Polaris = $Script:Polaris
     }
 
-    if ( -not $Path.StartsWith( '/' ) ) {
+    if ( $Path.GetType().Name -eq "String" -and -not $Path.StartsWith( '/' ) ) {
         $Path = '/' + $Path
     }
 

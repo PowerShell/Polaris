@@ -14,11 +14,7 @@ Describe "Test route creation" {
         $defaultStaticDirectory = "$PSScriptRoot/../resources/static"
 
         function RouteExists ($Path, $Method) {
-            [string]$SanitizedPath = $Path.TrimEnd('/')
-
-            if ( [string]::IsNullOrEmpty($SanitizedPath) ) { $SanitizedPath = "/" }
-
-            return $null -ne (Get-Polaris).ScriptblockRoutes[$SanitizedPath][$Method] 
+            return $null -ne (Get-PolarisRoute -Path $Path -Method $Method)
         }
     }
     Context "Using New-PolarisRoute" {
@@ -128,6 +124,9 @@ Describe "Test route creation" {
     }
 
     Context "Using Get-PolarisRoute and Remove-PolarisRoute" {
+        BeforeEach {
+            New-PolarisRoute -Path "/test" -Method "GET" -Scriptblock $defaultScriptblock
+        }
         It "Will get the object with the routes" {
             ( Get-PolarisRoute -Path "/test" -Method "GET" ).Scriptblock |
                 Should Be $defaultScriptblock.ToString()
@@ -135,9 +134,6 @@ Describe "Test route creation" {
         It "will remove the routes" {
             Remove-PolarisRoute -Path "/test" -Method "GET"
             (Get-PolarisRoute).Count | Should Be 0
-        }
-        BeforeEach {
-            New-PolarisRoute -Path "/test" -Method "GET" -Scriptblock $defaultScriptblock
         }
         AfterEach {
             Clear-Polaris
