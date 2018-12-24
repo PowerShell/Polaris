@@ -37,7 +37,6 @@ function New-PolarisRoute {
     [CmdletBinding()]
     param(
         [Parameter( Mandatory = $True, Position = 0 )]
-        [string]
         $Path,
 
         [Parameter( Mandatory = $True, Position = 1 )]
@@ -61,47 +60,56 @@ function New-PolarisRoute {
     $Method = $Method.ToUpper()
     $ExistingWebRoute = Get-PolarisRoute -Path $Path -Method $Method
 
-    if ( $ExistingWebRoute -and $Force ) {
-        Remove-PolarisRoute -Path $Path -Method $Method
-        $ExistingWebRoute = Get-PolarisRoute -Path $Path -Method $Method
-    }
-
     if ( $ExistingWebRoute ) {
-        $PSCmdlet.WriteError( (
-                New-Object -TypeName System.Management.Automation.ErrorRecord -ArgumentList @(
-                    [System.Exception]'WebRoute already exists.'
-                    $Null
-                    [System.Management.Automation.ErrorCategory]::ResourceExists
-                    "$Path,$Method" ) ) )
-    }
-    else {
-        CreateNewPolarisIfNeeded
-        if( -not $Polaris){
-            $Polaris = $Script:Polaris
+        if ( $Force ) {
+            # If $Force is specified and there is an existing webroute we remove it
+            Remove-PolarisRoute -Path $Path -Method $Method
         }
-
-        if ( -not $Path.StartsWith( '/' ) ) {
-            $Path = '/' + $Path
-        }
-
-        switch ( $PSCmdlet.ParameterSetName ) {
-            'Scriptblock' {
-                $Polaris.AddRoute( $Path, $Method, $Scriptblock )
-            }
-            'ScriptPath' {
-                if ( Test-Path -Path $ScriptPath ) {
-                    $Script = Get-Content -Path $ScriptPath -Raw
-                    $Polaris.AddRoute( $Path, $Method, [scriptblock]::Create($Script) )
-                }
-                else {
-                    $PSCmdlet.WriteError( (
-                            New-Object -TypeName System.Management.Automation.ErrorRecord -ArgumentList @(
-                                [System.Exception]'ScriptPath not found.'
-                                $Null
-                                [System.Management.Automation.ErrorCategory]::ObjectNotFound
-                                $ScriptPath ) ) )
-                }
-            }
+        else {
+            # If $Force is not specified we throw a terminating error
+            $Exception = [System.Exception]'WebRoute already exists.'
+            $ErrorId = "Polaris.Webroute.RouteAlreadyExists"
+            $ErrorCategory = [System.Management.Automation.ErrorCategory]::ResourceExists
+            $TargetObject = "$Path,$Method"
+    
+            $WebRouteExistsError = [System.Management.Automation.ErrorRecord]::new(
+                $Exception,
+                $ErrorId,
+                $ErrorCategory,
+                $TargetObject
+            )
+    
+            throw $WebRouteExistsError
         }
     }
+
+    CreateNewPolarisIfNeeded
+    if ( -not $Polaris) {
+        $Polaris = $Script:Polaris
+    }
+
+    if ( -not $Path.StartsWith( '/' ) ) {
+        $Path = '/' + $Path
+    }
+
+    switch ( $PSCmdlet.ParameterSetName ) {
+        'Scriptblock' {
+            $Polaris.AddRoute( $Path, $Method, $Scriptblock )
+        }
+        'ScriptPath' {
+            if ( Test-Path -Path $ScriptPath ) {
+                $Script = Get-Content -Path $ScriptPath -Raw
+                $Polaris.AddRoute( $Path, $Method, [scriptblock]::Create($Script) )
+            }
+            else {
+                $PSCmdlet.WriteError( (
+                        New-Object -TypeName System.Management.Automation.ErrorRecord -ArgumentList @(
+                            [System.Exception]'ScriptPath not found.'
+                            $Null
+                            [System.Management.Automation.ErrorCategory]::ObjectNotFound
+                            $ScriptPath ) ) )
+            }
+        }
+    }
+    
 }
