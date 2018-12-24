@@ -49,7 +49,19 @@ function New-PolarisRoute {
         $Scriptblock,
 
         [Parameter( Mandatory = $True, ParameterSetName = 'ScriptPath' )]
-        [string]
+        [ValidateScript( {
+                if (-Not ($_ | Test-Path) ) {
+                    throw "File does not exist"
+                }
+                if (-Not ($_ | Test-Path -PathType Leaf) ) {
+                    throw "The Path argument must be a file. Folder paths are not allowed."
+                }
+                if ($_ -notmatch "\.ps1") {
+                    throw "The file specified in the path argument must be of type .ps1"
+                }
+                return $true 
+            })]
+        [System.IO.FileInfo]
         $ScriptPath,
         
         [switch]
@@ -97,18 +109,8 @@ function New-PolarisRoute {
             $Polaris.AddRoute( $Path, $Method, $Scriptblock )
         }
         'ScriptPath' {
-            if ( Test-Path -Path $ScriptPath ) {
-                $Script = Get-Content -Path $ScriptPath -Raw
-                $Polaris.AddRoute( $Path, $Method, [scriptblock]::Create($Script) )
-            }
-            else {
-                $PSCmdlet.WriteError( (
-                        New-Object -TypeName System.Management.Automation.ErrorRecord -ArgumentList @(
-                            [System.Exception]'ScriptPath not found.'
-                            $Null
-                            [System.Management.Automation.ErrorCategory]::ObjectNotFound
-                            $ScriptPath ) ) )
-            }
+            $Script = Get-Content -Path $ScriptPath -Raw
+            $Polaris.AddRoute( $Path, $Method, [scriptblock]::Create($Script) )
         }
     }
     
