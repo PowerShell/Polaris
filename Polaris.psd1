@@ -44,17 +44,6 @@
     # Modules that must be imported into the global environment prior to importing this module
     # RequiredModules = @()
     
-    # Script files (.ps1) that are run in the caller's environment prior to importing this module.
-    ScriptsToProcess     = @(
-        "Public\New-ScriptblockCallback.ps1",
-        "lib\MimeTypes.Class.ps1",
-        "lib\PolarisRequest.Class.ps1",
-        "lib\PolarisResponse.Class.ps1",
-        "lib\PolarisMiddleware.Class.ps1",
-        "lib\PolarisRoute.Class.ps1",
-        "lib\Polaris.Class.ps1"
-    )
-    
     # Type files (.ps1xml) to be loaded when importing this module
     # TypesToProcess = @()
     
