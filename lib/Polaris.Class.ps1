@@ -312,12 +312,23 @@ class Polaris {
         [string]$ContentType, 
         [System.Net.WebHeaderCollection]$Headers
     ) {
-        $RawResponse.StatusCode = $StatusCode;
-        $RawResponse.Headers = $Headers;
-        $RawResponse.ContentType = $ContentType;
-        $RawResponse.ContentLength64 = $ByteResponse.Length;
-        $RawResponse.OutputStream.Write($ByteResponse, 0, $ByteResponse.Length);
-        $RawResponse.OutputStream.Close();
+        if (-not ($ByteResponse.Count -eq 1 -and $ByteResponse[0] -eq 0)) {
+            Write-Debug "`$ByteResponse: $ByteResponse"
+            Write-Debug "`$ByteResponse.Length: $($ByteResponse.Length)"
+            $RawResponse.StatusCode = $StatusCode;
+            $RawResponse.Headers = $Headers;
+            $RawResponse.ContentType = $ContentType;
+            $RawResponse.ContentLength64 = $ByteResponse.Length;
+            $RawResponse.OutputStream.Write($ByteResponse, 0, $ByteResponse.Length);
+            $RawResponse.OutputStream.Close();
+        }
+        else {
+            Write-Debug "Sending empty response"
+            $RawResponse.StatusCode = $StatusCode;
+            $RawResponse.Headers = $Headers
+            $RawResponse.SendChunked = $False
+            $RawResponse.Close()
+        }
     }
     
     static [void] Send (

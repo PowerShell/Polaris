@@ -32,6 +32,12 @@ Describe "Test webserver use (E2E)" {
                 $Response.Send('Hello World')
             }
 
+            # Empty Response
+            New-PolarisGetRoute -Path /empty -Scriptblock {
+                $Response.StatusCode = 204
+                $Response.Send()
+            }
+
             # Hello World passing in the Path, Method & Scriptblock
             New-PolarisRoute -Path /hellome -Method GET -Scriptblock {
                 if ($Request.Query['name']) {
@@ -91,6 +97,12 @@ Describe "Test webserver use (E2E)" {
             $Result = Invoke-WebRequest -Uri "http://localhost:$Port/helloworld?test=true&another=one" -UseBasicParsing
             $Result.Content | Should Be 'Hello World'
             $Result.StatusCode | Should Be 200
+        }
+
+        It "test /empty route should return 204 empty" {
+            $Result = Invoke-WebRequest -Uri "http://localhost:$Port/empty" -UseBasicParsing
+            [string]::IsNullOrEmpty($Result.Content) | Should -Be $True
+            $Result.StatusCode | Should -Be 204
         }
 
 
