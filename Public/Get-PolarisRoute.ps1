@@ -55,7 +55,7 @@ function Get-PolarisRoute {
     
     process {
         if ( $Polaris ) {
-            $MatchingRoutes = foreach ($Pattern in $Path) { $Polaris.Routes | where { $_.Path -like "/$($Pattern.TrimStart("/"))" } }
+            $MatchingRoutes = foreach ($Pattern in $Path) { $Polaris.Routes | where { $_.Path -like $Pattern -or $_.Path -like "/$Pattern" } }
             $MatchMethodAndRoutes = foreach ($Pattern in $Method) { $MatchingRoutes | where { $_.Method -like $Pattern } }
 
             return $MatchMethodAndRoutes | Sort-Object -Property Path, Method -Unique
