@@ -35,7 +35,6 @@ Describe "Test webserver use (E2E)" {
             # Empty Response
             New-PolarisGetRoute -Path /empty -Scriptblock {
                 $Response.StatusCode = 204
-                $Response.Send()
             }
 
             # Hello World passing in the Path, Method & Scriptblock
