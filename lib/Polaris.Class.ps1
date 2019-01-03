@@ -287,12 +287,12 @@ class Polaris {
         $this.Listener = [System.Net.HttpListener]::new()
 
         if ($Https) {
-            $this.Log("Using HTTPS:")
             $ListenerPrefix = "https"
         }
         else {
             $ListenerPrefix = "http"
         }
+        
         $this.UriPrefix = $ListenerPrefix + '://' + $HostName + ':' + $this.Port + '/'
 
         $this.Listener.Prefixes.Add($this.UriPrefix)
