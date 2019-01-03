@@ -13,6 +13,7 @@ class Polaris {
     hidden [bool]$StopServer = $False
     [string]$GetLogsString = "PolarisLogs"
     [string]$ClassDefinitions = $Script:ClassDefinitions
+    [string]$UriPrefix
     $ContextHandler = (New-ScriptblockCallback -Callback {
 
             param(
@@ -260,12 +261,12 @@ class Polaris {
     [void] Start (
         [int]$Port = 3000,
         [bool]$Https,
-        [string]$Auth
+        [string]$Auth,
+        [string]$HostName
     ) {
         $this.StopServer = $false
-        $this.InitListener($Port, $Https, $Auth)
+        $this.InitListener($Port, $Https, $Auth, $HostName)
         $this.Listener.BeginGetContext($this.ContextHandler, $this)
-        $this.Log("App listening on Port: " + $Port + "!")
     }
 
     [void] Stop () {
@@ -278,7 +279,8 @@ class Polaris {
     [void] InitListener (
         [int]$Port,
         [bool]$Https,
-        [string]$Auth
+        [string]$Auth,
+        [string]$HostName
     ) {
         $this.Port = $Port
 
@@ -291,16 +293,11 @@ class Polaris {
         else {
             $ListenerPrefix = "http"
         }
+        $this.UriPrefix = $ListenerPrefix + '://' + $HostName + ':' + $this.Port + '/'
 
-        # If user is on a non-windows system or windows as administrator
-        if ([System.Environment]::OSVersion.Platform -ne [System.PlatformID]::Win32NT -or
-            ([System.Environment]::OSVersion.Platform -eq [System.PlatformID]::Win32NT -and
-                ([System.Security.Principal.WindowsPrincipal]::new([System.Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([System.Security.Principal.WindowsBuiltInRole]::Administrator))) {
-            $this.Listener.Prefixes.Add("$($ListenerPrefix)://+:" + $this.Port + "/")
-        }
-        else {
-            $this.Listener.Prefixes.Add("$($ListenerPrefix)://localhost:" + $this.Port + "/")
-        }
+        $this.Listener.Prefixes.Add($this.UriPrefix)
+
+        $this.Log("URI Prefix set to: $this.UriPrefix")
 
         $this.Listener.AuthenticationSchemes = $Auth
 

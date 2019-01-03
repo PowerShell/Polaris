@@ -51,6 +51,9 @@ function Start-Polaris {
             })]            
         [switch]
         $Https = $False,
+        
+        [String]
+        $HostName = 'localhost',
 
         [ValidateSet('Anonymous', 'Basic', 'Digest', 'IntegratedWindowsAuthentication', 'Negotiate', 'NTLM')]
         [ValidateScript( {
@@ -76,7 +79,7 @@ function Start-Polaris {
         Use-PolarisJsonBodyParserMiddleware -Polaris $Polaris
     }
 
-    $Polaris.Start( $Port, $Https.IsPresent, $Auth)
+    $Polaris.Start( $Port, $Https.IsPresent, $Auth, $HostName)
 
     return $Polaris
 }
