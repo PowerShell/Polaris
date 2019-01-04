@@ -16,6 +16,9 @@
     When present, JSONBodyParser middleware will be created, if needed.
 .PARAMETER Https
     Determines if you want to use https as the prefix.
+.PARAMETER HostName
+    Determines the hostname used in the URL prefix. 
+    Defaults to localhost.
 .PARAMETER Auth
     Polaris will use various authentication methods to authenticate requests.
 .PARAMETER Polaris
