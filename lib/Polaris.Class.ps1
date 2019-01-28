@@ -292,12 +292,12 @@ class Polaris {
         else {
             $ListenerPrefix = "http"
         }
-        
+
         $this.UriPrefix = $ListenerPrefix + '://' + $HostName + ':' + $this.Port + '/'
 
         $this.Listener.Prefixes.Add($this.UriPrefix)
 
-        $this.Log("URI Prefix set to: $this.UriPrefix")
+        $this.Log("URI Prefix set to: $($this.UriPrefix)")
 
         $this.Listener.AuthenticationSchemes = $Auth
 
