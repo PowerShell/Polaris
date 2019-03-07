@@ -16,6 +16,9 @@
     When present, JSONBodyParser middleware will be created, if needed.
 .PARAMETER Https
     Determines if you want to use https as the prefix.
+.PARAMETER HostName
+    Determines the hostname used in the URL prefix. 
+    Defaults to localhost.
 .PARAMETER Auth
     Polaris will use various authentication methods to authenticate requests.
 .PARAMETER Polaris
@@ -51,6 +54,9 @@ function Start-Polaris {
             })]            
         [switch]
         $Https = $False,
+        
+        [String]
+        $HostName = 'localhost',
 
         [ValidateSet('Anonymous', 'Basic', 'Digest', 'IntegratedWindowsAuthentication', 'Negotiate', 'NTLM')]
         [ValidateScript( {
@@ -76,7 +82,7 @@ function Start-Polaris {
         Use-PolarisJsonBodyParserMiddleware -Polaris $Polaris
     }
 
-    $Polaris.Start( $Port, $Https.IsPresent, $Auth)
+    $Polaris.Start( $Port, $Https.IsPresent, $Auth, $HostName)
 
     return $Polaris
 }
