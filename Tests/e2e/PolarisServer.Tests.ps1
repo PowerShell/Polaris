@@ -98,7 +98,7 @@ Describe "Test webserver use (E2E)" {
             $Result.StatusCode | Should Be 200
         }
 
-        It "test /empty route should return 204 empty" {
+         It "test /empty route should return 204 No Content" {
             $Result = Invoke-WebRequest -Uri "http://localhost:$Port/empty" -UseBasicParsing
             [string]::IsNullOrEmpty($Result.Content) | Should -Be $True
             $Result.StatusCode | Should -Be 204
