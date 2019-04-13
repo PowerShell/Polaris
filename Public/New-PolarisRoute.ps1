@@ -104,7 +104,7 @@ function New-PolarisRoute {
         $Polaris = $Script:Polaris
     }
 
-    if ( $Path.GetType().Name -eq "String" -and -not $Path.StartsWith( '/' ) ) {
+     if ( $Path.GetType() -eq [string] -and -not $Path.StartsWith( '/' ) ) {
         $Path = '/' + $Path
     }
 
