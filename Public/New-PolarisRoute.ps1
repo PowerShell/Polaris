@@ -36,16 +36,6 @@
     To view results, assuming default port:
     Start-Polaris
     Start-Process http://localhost:8080/helloworld
-.EXAMPLE
-    New-PolarisRoute -Path "helloworld" -Method "GET" -ScriptPath D:\Scripts\Example.ps1
-    To view results, assuming default port:
-    Start-Polaris
-    Start-Process http://localhost:8080/helloworld
-.EXAMPLE
-    New-PolarisRoute -Path "helloworld" -Method "GET" -ScriptPath D:\Scripts\Example.ps1
-    To view results, assuming default port:
-    Start-Polaris
-    Start-Process http://localhost:8080/helloworld
 #>
 function New-PolarisRoute {
     [CmdletBinding()]
