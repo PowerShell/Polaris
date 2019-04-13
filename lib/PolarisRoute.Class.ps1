@@ -3,7 +3,6 @@
 # Licensed under the MIT license. See LICENSE file in the project root for full license information.
 #
 
-
 class PolarisRoute {
     
     [string]
@@ -15,7 +14,7 @@ class PolarisRoute {
     [string]
     hidden $_Path
     
-    [regex]
+    [RegEx]
     hidden $_Regex
 
     PolarisRoute([string]$Method, $Path, [scriptblock]$Scriptblock) {
@@ -70,11 +69,11 @@ class PolarisRoute {
 
     hidden static [RegEx] ConvertPathToRegex([string]$Path) {
         Write-Debug "Path: $path"
-        # Replacing all periods with an escaped period to prevent regex wildcard
+        # Replacing all periods with an escaped period to prevent RegEx wildcard
         $path = $path -replace '\.', '\.'
         # Replacing all - with \- to escape the dash
         $path = $path -replace '-', '\-'
-        # Replacing the wildcard character * with a regex aggressive match .*
+        # Replacing the wildcard character * with a RegEx aggressive match .*
         $path = $path -replace '\*', '.*'
         # Creating a strictly matching regular expression that must match beginning (^) to end ($)
         $path = "^$path$"
@@ -104,7 +103,7 @@ class PolarisRoute {
         return $SanitizedPath
     }
 
-    hidden static [string] SanitizePath([regex]$Path) {
+    hidden static [string] SanitizePath([RegEx]$Path) {
         return $Path
     }
 }
