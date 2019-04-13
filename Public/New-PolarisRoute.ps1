@@ -117,5 +117,4 @@ function New-PolarisRoute {
             $Polaris.AddRoute( $Path, $Method, [scriptblock]::Create($Script) )
         }
     }
-    
 }
