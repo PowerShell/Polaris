@@ -52,7 +52,7 @@ function New-PolarisRoute {
         [Parameter( Mandatory = $True, ParameterSetName = 'ScriptPath' )]
         [string]
         $ScriptPath,
-        
+
         [switch]
         $Force,
 

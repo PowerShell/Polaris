@@ -8,7 +8,7 @@ There are a couple of ways you can help us out.
 
 ## Issues
 ### Standard issues
-Opening issues is very easy. Head to our [Issues tab](https://github.com/automatedlab/automatedlab/issues) and open one if it does not exist already. If an issue exists that might have something to do with yours, e.g. is the basis for something your are requesting, please link this issue to yours.  
+Opening issues is very easy. Head to our [Issues tab](https://github.com/automatedlab/automatedlab/issues) and open one if it does not exist already. If an issue exists that might have something to do with yours, e.g. is the basis for something your are requesting, please link this issue to yours.
 ### Bugs, errors and catastrophies
 If you encounter an error during usage of Polaris, there are some basic details we need to be able to help you.
 1. The script you used. Feel free to strip out any incriminating details, but it must be able to be executed
@@ -27,7 +27,7 @@ We are using GitHub's internal capabilites for our code reviews. Either we, the 
 ## Breaking Changes
 We would like to avoid making breaking changes where possible. Any time you need to make modifications to an end-to-end test or a unit test you are breaking the contract of functionality developers expect from Polaris and it is classified as a breaking change. If you feel a breaking change needs to happen or should be proposed we will use the following process:
 
-1. Breaking changes should be proposed in an issue labled RFC ###. 
+1. Breaking changes should be proposed in an issue labled RFC ###.
 2. The RFC should sit available for review and comment by the community for at least **two weeks** before a pull request corresponding to the change can be merged.
 3. The description of the breaking change and the new version number should be added to **Breaking-Changes.md** for in the pull request for future record.
 4. Not everyone checks Github every day, get some visibility to the RFC by announcing it in powershell.slack.com and/or twitter.

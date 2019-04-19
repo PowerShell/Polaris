@@ -4,7 +4,7 @@
 #
 
 Describe "Polaris Authentication" {
-    
+
     BeforeAll {
         Start-Job -Scriptblock {
             Import-Module $using:PSScriptRoot\..\..\Polaris.psd1
@@ -20,7 +20,7 @@ Describe "Polaris Authentication" {
                     Username = $Request.User.identity.Name
                     Password = $Request.User.identity.Password
                 } | ConvertTo-Json
-                
+
                 $Response.SetContentType("application/json")
                 $Response.Send($ResponseJson)
             }
@@ -34,7 +34,7 @@ Describe "Polaris Authentication" {
         # Give the Polaris Server time to start up in the job
         Start-Sleep -Seconds 5
     }
-    
+
     It 'Authenticates and passes on Basic authentication credentials, -Username <Username> -Password <Pass>' -TestCases @(
         @{ Username = 'blah'; Pass = 'hellothere'}
         @{ Username = 'username'; Pass = 'username'}
@@ -60,7 +60,7 @@ Describe "Polaris Authentication" {
         Write-Debug "UsernameAndPasswordMatch: $UsernameAndPasswordMatch"
         $UsernameAndPasswordMatch | Should -Be $True
     }
-                   
+
     AfterAll {
         Get-Job | Stop-Job | Remove-Job
     }

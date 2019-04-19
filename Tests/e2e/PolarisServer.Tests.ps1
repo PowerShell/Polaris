@@ -6,7 +6,7 @@
 Describe "Test webserver use (E2E)" {
 
     BeforeAll {
-        
+
         $Port = Get-Random -Minimum 8000 -Maximum 8999
         $IsUnix = $PSVersionTable.Platform -eq "Unix"
 

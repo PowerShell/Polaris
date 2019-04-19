@@ -7,8 +7,8 @@
 .SYNOPSIS
     Creates web routes to recursively serve folder contents
 .DESCRIPTION
-    Creates web routes to recursively serve folder contents. Perfect for static websites. 
-    Also if a default file (for example index.html) is detected, A route pointing to the 
+    Creates web routes to recursively serve folder contents. Perfect for static websites.
+    Also if a default file (for example index.html) is detected, A route pointing to the
     value of the parameter "Routepath" will be created.
 .PARAMETER RoutePath
     Root route that the folder path will be served to.
@@ -18,7 +18,7 @@
 .PARAMETER EnableDirectoryBrowser
     Enables the directory browser when the user requests a folder
 .PARAMETER ServeDefaultFile
-    Polaris will look for a default file matching one of the file names specified in the 
+    Polaris will look for a default file matching one of the file names specified in the
     StandardHTMLFiles parameter and, if found, will serve that file when no specific file is requested
 .PARAMETER StandardHTMLFiles
     List of file names that Polaris will look for when ServeDefaultFile is $True
@@ -50,7 +50,7 @@ function New-PolarisStaticRoute {
 
         [bool]
         $EnableDirectoryBrowser = $True,
-        
+
         [switch]
         $Force,
 
@@ -59,20 +59,20 @@ function New-PolarisStaticRoute {
 
         [bool]
         $ServeDefaultFile = $True,
-        
+
         $Polaris = $Script:Polaris
     )
-    
+
     $ErrorAction = $PSBoundParameters["ErrorAction"]
     If ( -not $ErrorAction ) {
         $ErrorAction = $ErrorActionPreference
     }
-    
+
     CreateNewPolarisIfNeeded
     if ( -not $Polaris) {
         $Polaris = $Script:Polaris
     }
-    
+
     if ( -not ( Test-Path -Path $FolderPath ) ) {
         Write-Error -Exception FileNotFoundException -Message "Folder does not exist at path $FolderPath"
     }
@@ -81,7 +81,7 @@ function New-PolarisStaticRoute {
             -PSProvider FileSystem `
             -Root $FolderPath `
             -Scope Global).Name
-    
+
     $Scriptblock = {
         $Content = ""
 
@@ -95,13 +95,13 @@ function New-PolarisStaticRoute {
                 }
             }
         }
-        Write-Debug "Parsed local path: $LocalPath" 
+        Write-Debug "Parsed local path: $LocalPath"
         try {
 
             $RequestedItem = Get-Item -LiteralPath "$NewDrive`:$LocalPath" -Force -ErrorAction Stop
-            
+
             Write-Debug "Requested Item: $RequestedItem"
-             
+
             if ($RequestedItem.PSIsContainer) {
 
                 if ($EnableDirectoryBrowser) {

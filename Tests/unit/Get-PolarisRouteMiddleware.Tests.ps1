@@ -6,7 +6,7 @@
 Describe "Get-PolarisRouteMiddleware" {
 
     BeforeAll {
-        
+
         #  Import module
         Import-Module $PSScriptRoot\..\..\Polaris.psd1
 

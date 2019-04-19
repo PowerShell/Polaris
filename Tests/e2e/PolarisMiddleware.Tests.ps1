@@ -17,7 +17,7 @@ Describe "Test middleware creation/usage (E2E)" {
             }
 
             $Polaris = Start-Polaris -Port $using:Port -MinRunspaces 1 -MaxRunspaces 5 -UseJsonBodyParserMiddleware
-            
+
             $defaultMiddleware = {
                 if ($Request.BodyString -ne $null) {
                     $Request.Body | Add-Member -Name NewProperty -Value "Manipulated" -MemberType NoteProperty

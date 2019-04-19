@@ -44,11 +44,11 @@ function New-PolarisPostRoute {
         [Parameter( Mandatory = $True, ParameterSetName = 'ScriptPath' )]
         [string]
         $ScriptPath,
-        
+
         [switch]
         $Force,
 
-        
+
         $Polaris = $Script:Polaris
     )
 
