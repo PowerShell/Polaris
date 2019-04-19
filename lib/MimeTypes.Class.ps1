@@ -1003,14 +1003,14 @@ class MimeTypes{
 	# <param name="fileName">The name of the file.</param>
 	# <returns>The MIME-type for the given file name.</returns>
 	static [string] GetMimeType ([string]$FileName = "") {
-		$DotIndex = $FileName.LastIndexOf('.');
+		$DotIndex = $FileName.LastIndexOf('.')
 
 		if ($DotIndex -ne -1 -and $FileName.Length -gt $DotIndex + 1) {
 			if ([string]$Result = [MimeTypes]::TypeMap[$FileName.Substring($DotIndex + 1)]) {
-				return $Result;
+				return $Result
 			}
 		}
 
-		return [MimeTypes]::FallbackMimeType;
+		return [MimeTypes]::FallbackMimeType
 	}
 }

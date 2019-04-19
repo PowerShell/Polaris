@@ -3,7 +3,7 @@
 # Licensed under the MIT license. See LICENSE file in the project root for full license information.
 #
 
-if(-not (Test-Path -Path ..\Polaris.psd1)) {
+if (-not (Test-Path -Path ..\Polaris.psd1)) {
     Write-Error -Message "Cannot find Polaris.psd1"
     return
 }
@@ -21,7 +21,8 @@ New-PolarisRoute -Path /helloworld -Method GET -Scriptblock {
 New-PolarisRoute -Path /hellome -Method GET -Scriptblock {
     if ($Request.Query['name']) {
         $Response.Send('Hello ' + $Request.Query['name'])
-    } else {
+    }
+    else {
         $Response.Send('Hello World')
     }
 }
@@ -41,9 +42,10 @@ New-PolarisPostRoute -Path /wow -Scriptblock $sbWow
 # Body Parameters are supported if you use the -UseJsonBodyParserMiddleware
 New-PolarisPostRoute -Path /hello -Scriptblock {
     if ($Request.Body.Name) {
-        $Response.Send('Hello ' + $Request.Body.Name);
-    } else {
-        $Response.Send('Hello World');
+        $Response.Send('Hello ' + $Request.Body.Name)    
+    }
+    else {
+        $Response.Send('Hello World')    
     }
 }
 
@@ -56,7 +58,7 @@ New-PolarisStaticRoute -FolderPath ./static -RoutePath /public -EnableDirectoryB
 # Start the server
 $app = Start-Polaris -Port 8082 -MinRunspaces 1 -MaxRunspaces 5 -UseJsonBodyParserMiddleware -Verbose # all params are optional
 
-while($app.Listener.IsListening){
+while ($app.Listener.IsListening) {
     Wait-Event callbackcomplete
 }
 

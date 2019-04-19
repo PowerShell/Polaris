@@ -35,8 +35,7 @@ Describe "New-PolarisRoute" {
         New-PolarisRoute -Path /108 -Method get -Scriptblock {
 
             $line = "<h1>this is H1</h1>"
-            $response.SetContentType("text/html");
-            $response.send($line)
+            $response.SetContentType("text/html")            $response.send($line)
         } -force
 
         (Get-PolarisRoute -Path 108).Method | should be 'GET'
@@ -109,7 +108,7 @@ Describe "New-PolarisRoute" {
 
         #  Create route
         { New-PolarisRoute -Path $Path -Method $Method -ScriptPath $ScriptPath -ErrorAction Stop } |
-            Should Throw
+        Should Throw
     }
 
     It "Should create route with matching Path but new Method" {
@@ -145,7 +144,7 @@ Describe "New-PolarisRoute" {
 
         #  Create route
         { New-PolarisRoute -Path $Path -Method $Method -Scriptblock $Scriptblock -ErrorAction Stop } |
-            Should Throw
+        Should Throw
     }
 
     It "Should overwrite route with matching Path and Method with Force switch" {

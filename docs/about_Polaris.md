@@ -31,8 +31,7 @@ A quick example of an API is the below command which will start Polaris listenin
 ```ps
 Install-Module Polaris
 New-PolarisGetRoute -Path "/helloworld" -Scriptblock {
-    $Response.Send('Hello World!');
-}
+    $Response.Send('Hello World!')}
 
 Start-Polaris
 ```
