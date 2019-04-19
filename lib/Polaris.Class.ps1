@@ -85,7 +85,7 @@ class Polaris {
                             $Request,
                             $Response
                         )
-                        
+
                     }
                     catch {
                         $ErrorsBody = ''
@@ -346,12 +346,14 @@ class Polaris {
     ) {
         $RawResponse.StatusCode = $StatusCode;
         $RawResponse.Headers = $Headers;
-        $RawResponse.ContentType = $ContentType;
+        if ($ByteResponse.Length -gt 0) {
+            $RawResponse.ContentType = $ContentType
+        }
         $RawResponse.ContentLength64 = $ByteResponse.Length;
         $RawResponse.OutputStream.Write($ByteResponse, 0, $ByteResponse.Length);
         $RawResponse.OutputStream.Close();
     }
-    
+
     static [void] Send (
         [System.Net.HttpListenerResponse]$RawResponse, 
         [System.IO.Stream]$StreamResponse, 
