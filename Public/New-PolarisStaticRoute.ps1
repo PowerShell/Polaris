@@ -133,7 +133,7 @@ function New-PolarisStaticRoute {
             $Response.StatusCode = 404
             $Response.ContentType = "text/html"
             $Content = "<h1>404 - Page not found $LocalPath</h1>"
-            $Response.Send($Content);
+            $Response.Send($Content)
         }
         catch {
             Throw $_

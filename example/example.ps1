@@ -41,9 +41,9 @@ New-PolarisPostRoute -Path /wow -Scriptblock $sbWow
 # Body Parameters are supported if you use the -UseJsonBodyParserMiddleware
 New-PolarisPostRoute -Path /hello -Scriptblock {
     if ($Request.Body.Name) {
-        $Response.Send('Hello ' + $Request.Body.Name);
+        $Response.Send('Hello ' + $Request.Body.Name)
     } else {
-        $Response.Send('Hello World');
+        $Response.Send('Hello World')
     }
 }
 

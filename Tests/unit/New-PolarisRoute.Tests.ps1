@@ -35,7 +35,7 @@ Describe "New-PolarisRoute" {
         New-PolarisRoute -Path /108 -Method get -Scriptblock {
 
             $line = "<h1>this is H1</h1>"
-            $response.SetContentType("text/html");
+            $response.SetContentType("text/html")
             $response.send($line)
         } -force
 

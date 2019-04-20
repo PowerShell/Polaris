@@ -35,17 +35,17 @@ function New-ScriptblockCallback {
     # is this type already defined?
     if (-not ("CallbackEventBridge" -as [type])) {
         Add-Type @"
-            using System;
+            using System
 
             public sealed class CallbackEventBridge
             {
-                public event AsyncCallback CallbackComplete = delegate { };
+                public event AsyncCallback CallbackComplete = delegate { }
 
                 private CallbackEventBridge() {}
 
                 private void CallbackInternal(IAsyncResult result)
                 {
-                    CallbackComplete(result);
+                    CallbackComplete(result)
                 }
 
                 public AsyncCallback Callback
@@ -55,7 +55,7 @@ function New-ScriptblockCallback {
 
                 public static CallbackEventBridge Create()
                 {
-                    return new CallbackEventBridge();
+                    return new CallbackEventBridge()
                 }
             }
 "@

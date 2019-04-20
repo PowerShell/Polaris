@@ -344,14 +344,14 @@ class Polaris {
         [string]$ContentType,
         [System.Net.WebHeaderCollection]$Headers
     ) {
-        $RawResponse.StatusCode = $StatusCode;
-        $RawResponse.Headers = $Headers;
+        $RawResponse.StatusCode = $StatusCode
+        $RawResponse.Headers = $Headers
         if ($ByteResponse.Length -gt 0) {
             $RawResponse.ContentType = $ContentType
         }
-        $RawResponse.ContentLength64 = $ByteResponse.Length;
-        $RawResponse.OutputStream.Write($ByteResponse, 0, $ByteResponse.Length);
-        $RawResponse.OutputStream.Close();
+        $RawResponse.ContentLength64 = $ByteResponse.Length
+        $RawResponse.OutputStream.Write($ByteResponse, 0, $ByteResponse.Length)
+        $RawResponse.OutputStream.Close()
     }
 
     static [void] Send (
@@ -361,11 +361,11 @@ class Polaris {
         [string]$ContentType,
         [System.Net.WebHeaderCollection]$Headers
     ) {
-        $RawResponse.StatusCode = $StatusCode;
-        $RawResponse.Headers = $Headers;
-        $RawResponse.ContentType = $ContentType;
-        $StreamResponse.CopyTo($RawResponse.OutputStream);
-        $RawResponse.OutputStream.Close();
+        $RawResponse.StatusCode = $StatusCode
+        $RawResponse.Headers = $Headers
+        $RawResponse.ContentType = $ContentType
+        $StreamResponse.CopyTo($RawResponse.OutputStream)
+        $RawResponse.OutputStream.Close()
     }
 
     static [void] Send (
