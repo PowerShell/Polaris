@@ -16,7 +16,8 @@ That being said, we do plan on continuing to experiment within this repository f
 
 ```PowerShell
 New-PolarisGetRoute -Path "/helloworld" -Scriptblock {
-    $Response.Send('Hello World!')}
+    $Response.Send('Hello World!');
+}
 
 Start-Polaris
 ```

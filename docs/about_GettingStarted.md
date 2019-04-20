@@ -15,7 +15,8 @@ Here is a super simple Polaris application to get you started
 ```ps
 Import-Module Polaris
 New-PolarisGetRoute -Path "/" -Scriptblock {
-    $Response.Send('Hello World!')}
+    $Response.Send('Hello World!');
+}
 
 Start-Polaris
 ```
