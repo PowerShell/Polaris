@@ -96,10 +96,6 @@ class Polaris {
                             $Request,
                             $Response
                         )
-                        <<<<<<< HEAD
-                        =======
-
-                        >>>>>>> upstream/master
                     }
                     catch {
                         $ErrorsBody = ''
