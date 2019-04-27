@@ -44,11 +44,11 @@ function New-PolarisGetRoute {
         [Parameter( Mandatory = $True, ParameterSetName = 'ScriptPath' )]
         [string]
         $ScriptPath,
-        
+
         [switch]
         $Force,
 
-        
+
         $Polaris = $Script:Polaris
     )
 

@@ -6,7 +6,7 @@
 Describe "Polaris Routing (e2e)" {
 
     BeforeAll {
-        
+
         $Port = Get-Random -Minimum 8000 -Maximum 8999
         $IsUnix = $PSVersionTable.Platform -eq "Unix"
 
@@ -76,7 +76,7 @@ Describe "Polaris Routing (e2e)" {
         # Giving server job time to start up
         Start-Sleep -seconds 8
     }
-    
+
     It "should match and extract named parameters anywhere in the route" {
         $Result = Invoke-RestMethod -Uri "http://localhost:$Port/users/12/books/123" -UseBasicParsing -TimeoutSec 2
         $Result.bookId | Should Be '123'
@@ -109,7 +109,7 @@ Describe "Polaris Routing (e2e)" {
 
         $Result = Invoke-WebRequest -Uri "http://localhost:$Port/about" -UseBasicParsing -TimeoutSec 2
         $Result.Content | Should Be 'about'
-        
+
         $Result = Invoke-WebRequest -Uri "http://localhost:$Port/random.text" -UseBasicParsing -TimeoutSec 2
         $Result.Content | Should Be 'random.text'
     }

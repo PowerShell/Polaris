@@ -23,11 +23,11 @@ Describe "New-PolarisRoute" {
 
         #  Create route
         New-PolarisRoute -Path $Path -Method $Method -Scriptblock $Scriptblock
-        
+
         #  Test route
         ( Get-PolarisRoute -Path $Path -Method $Method ).Scriptblock | Should Be $Path
     }
-    
+
     ## Fix for bug n°108 - Creating route with a lowercase 'get'
 
     It "Should create route with lower case parameters" {
@@ -35,13 +35,13 @@ Describe "New-PolarisRoute" {
         New-PolarisRoute -Path /108 -Method get -Scriptblock {
 
             $line = "<h1>this is H1</h1>"
-            $response.SetContentType("text/html");  
+            $response.SetContentType("text/html")
             $response.send($line)
         } -force
 
         (Get-PolarisRoute -Path 108).Method | should be 'GET'
     }
-    
+
     It "Should create POST route" {
 
         #  Define route
@@ -51,7 +51,7 @@ Describe "New-PolarisRoute" {
 
         #  Create route
         New-PolarisRoute -Path $Path -Method $Method -Scriptblock $Scriptblock
-        
+
         #  Test route
         ( Get-PolarisRoute -Path $Path -Method $Method ).Scriptblock | Should Be $Path
     }
@@ -65,7 +65,7 @@ Describe "New-PolarisRoute" {
 
         #  Create route
         New-PolarisRoute -Path $Path -Method $Method -Scriptblock $Scriptblock
-        
+
         #  Test route
         ( Get-PolarisRoute -Path $Path -Method $Method ).Scriptblock | Should Be $Path
     }
@@ -79,7 +79,7 @@ Describe "New-PolarisRoute" {
 
         #  Create route
         New-PolarisRoute -Path $Path -Method $Method -Scriptblock $Scriptblock
-        
+
         #  Test route
         ( Get-PolarisRoute -Path $Path -Method $Method ).Scriptblock | Should Be $Path
     }
@@ -95,7 +95,7 @@ Describe "New-PolarisRoute" {
 
         #  Create route
         New-PolarisRoute -Path $Path -Method $Method -ScriptPath $ScriptPath
-        
+
         #  Test route
         ( Get-PolarisRoute -Path $Path -Method $Method ).Scriptblock | Should Be $Path
     }
@@ -161,7 +161,7 @@ Describe "New-PolarisRoute" {
         #  Create route
         New-PolarisRoute -Path $Path -Method $Method -Scriptblock $Scriptblock -Force
 
-        
+
         #  Test route
         ( Get-PolarisRoute -Path $Path -Method $Method ).Scriptblock | Should Be $NewContent
     }

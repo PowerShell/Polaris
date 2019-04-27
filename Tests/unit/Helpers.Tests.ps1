@@ -6,7 +6,7 @@
 Describe "Helper functions" {
 
     BeforeAll {
-        
+
         #  Import module
         Import-Module $PSScriptRoot\..\..\Polaris.psd1
 
@@ -120,7 +120,7 @@ Describe "Helper functions" {
 
             #  Create route
             New-PolarisDeleteRoute -Path $Path -Scriptblock $Scriptblock
- 
+
             #  Test route
            ( Get-PolarisRoute -Path $Path -Method $Method ).Scriptblock | Should Be $Path
             }

@@ -19,7 +19,7 @@ Describe "Test Polaris Auth Errors" {
             It "Should throw an Error with IntegratedWindowsAuthentication auth on Mac/Linux" {
                 { Start-Polaris -Auth IntegratedWindowsAuthentication } | Should Throw
                 Stop-Polaris
-            }   
+            }
             It "Should throw an Error with Digest auth on Mac/Linux" {
                 { Start-Polaris -Auth Digest } | Should Throw
                 Stop-Polaris
@@ -45,7 +45,7 @@ Describe "Test Polaris Auth Errors" {
             It "Should not throw an Error with IntegratedWindowsAuthentication auth on Windows" {
                 { Start-Polaris -Auth IntegratedWindowsAuthentication } | Should not Throw
                 Stop-Polaris
-            }   
+            }
             It "Should not throw an Error with Digest auth on Windows" {
                 { Start-Polaris -Auth Digest } | Should not Throw
                 Stop-Polaris
@@ -59,5 +59,5 @@ Describe "Test Polaris Auth Errors" {
                 Stop-Polaris
             }
         }
-    }   
+    }
 }

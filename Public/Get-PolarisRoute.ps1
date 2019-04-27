@@ -52,7 +52,7 @@ function Get-PolarisRoute {
 
         $Polaris = $Script:Polaris
     )
-    
+
     process {
         if ( $Polaris ) {
             $MatchingRoutes = foreach ($Pattern in $Path) { $Polaris.Routes | where { $_.Path -like $Pattern -or $_.Path -like "/$Pattern" } }

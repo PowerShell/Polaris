@@ -33,7 +33,7 @@ Describe "New-PolarisStaticRoute (E2E)" {
         $File1Content | Out-File -FilePath $File1 -Encoding ascii -NoNewline
         'Hello!' | Out-File -FilePath "$TestPath\default.html" -Encoding ascii -NoNewline
 
-        
+
 
         Start-Job -Scriptblock {
             #  Import module

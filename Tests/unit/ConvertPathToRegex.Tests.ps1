@@ -7,7 +7,7 @@ Import-Module $PSScriptRoot\..\..\Polaris.psd1
 
 InModuleScope Polaris {
     Describe "[PolarisRoute]::ConvertPathToRegex" {
-    
+
         It "should match and extract named parameters anywhere in the route" {
             $RegEx = [PolarisRoute]::ConvertPathToRegex("/users/:userId/books/:bookId")
             "/users/34/books/8989" -cmatch $RegEx | Should Be $true

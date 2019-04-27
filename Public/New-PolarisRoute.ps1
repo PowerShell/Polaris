@@ -67,7 +67,7 @@ function New-PolarisRoute {
             })]
         [String]
         $ScriptPath,
-        
+
         [switch]
         $Force,
 

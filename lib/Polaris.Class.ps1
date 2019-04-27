@@ -43,7 +43,7 @@ class Polaris {
 
 
             [string]$RequestedRoute = $RawRequest.Url.AbsolutePath
-            
+
             [System.Management.Automation.InformationRecord[]]$InformationVariable = @()
 
             if ([string]::IsNullOrEmpty($RequestedRoute)) { $RequestedRoute = "/" }
@@ -96,6 +96,10 @@ class Polaris {
                             $Request,
                             $Response
                         )
+                        <<<<<<< HEAD
+                        =======
+
+                        >>>>>>> upstream/master
                     }
                     catch {
                         $ErrorsBody = ''
@@ -169,7 +173,7 @@ class Polaris {
             -ArgumentList @($Parameters, $Request, $Response) `
             -InformationVariable InformationVariable `
             -ErrorAction Stop
-            
+
         return $InformationVariable
     }
 
@@ -184,7 +188,7 @@ class Polaris {
         }
 
         $this.Routes += [PolarisRoute]::new($Method, $Path, $Scriptblock)
-        $this.Routes = $this.Routes | Sort-Object -Property {$_.Path.Length} -Descending
+        $this.Routes = $this.Routes | Sort-Object -Property { $_.Path.Length } -Descending
     }
 
     RemoveRoute (
@@ -239,7 +243,7 @@ class Polaris {
         $this.Listener.Close()
         $this.Listener.Dispose()
         $this.Log("Server Stopped.")
-        
+
     }
     [void] InitListener (
         [int]$Port,
@@ -303,32 +307,34 @@ class Polaris {
     }
 
     static [void] Send (
-        [System.Net.HttpListenerResponse]$RawResponse, 
-        [byte[]]$ByteResponse, 
-        [int]$StatusCode, 
-        [string]$ContentType, 
+        [System.Net.HttpListenerResponse]$RawResponse,
+        [byte[]]$ByteResponse,
+        [int]$StatusCode,
+        [string]$ContentType,
         [System.Net.WebHeaderCollection]$Headers
     ) {
-        $RawResponse.StatusCode = $StatusCode;
-        $RawResponse.Headers = $Headers;
-        $RawResponse.ContentType = $ContentType;
-        $RawResponse.ContentLength64 = $ByteResponse.Length;
-        $RawResponse.OutputStream.Write($ByteResponse, 0, $ByteResponse.Length);
-        $RawResponse.OutputStream.Close();
+        $RawResponse.StatusCode = $StatusCode
+        $RawResponse.Headers = $Headers
+        if ($ByteResponse.Length -gt 0) {
+            $RawResponse.ContentType = $ContentType
+        }
+        $RawResponse.ContentLength64 = $ByteResponse.Length
+        $RawResponse.OutputStream.Write($ByteResponse, 0, $ByteResponse.Length)
+        $RawResponse.OutputStream.Close()
     }
-    
+
     static [void] Send (
-        [System.Net.HttpListenerResponse]$RawResponse, 
-        [System.IO.Stream]$StreamResponse, 
-        [int]$StatusCode, 
-        [string]$ContentType, 
+        [System.Net.HttpListenerResponse]$RawResponse,
+        [System.IO.Stream]$StreamResponse,
+        [int]$StatusCode,
+        [string]$ContentType,
         [System.Net.WebHeaderCollection]$Headers
     ) {
-        $RawResponse.StatusCode = $StatusCode;
-        $RawResponse.Headers = $Headers;
-        $RawResponse.ContentType = $ContentType;
-        $StreamResponse.CopyTo($RawResponse.OutputStream);
-        $RawResponse.OutputStream.Close();
+        $RawResponse.StatusCode = $StatusCode
+        $RawResponse.Headers = $Headers
+        $RawResponse.ContentType = $ContentType
+        $StreamResponse.CopyTo($RawResponse.OutputStream)
+        $RawResponse.OutputStream.Close()
     }
 
     static [void] Send (

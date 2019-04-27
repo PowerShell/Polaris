@@ -136,10 +136,10 @@ Describe "Test route creation" {
         }
         It "Will get the object with the routes" {
             ( Get-PolarisRoute -Path "/test" -Method "GET" ).Scriptblock |
-                Should Be $defaultScriptblock.ToString()
+            Should Be $defaultScriptblock.ToString()
 
             ( Get-PolarisRoute -Path "/testRegex" -Method "GET" ).Scriptblock |
-                Should Be $defaultScriptblock.ToString()
+            Should Be $defaultScriptblock.ToString()
         }
         It "will remove the routes" {
             Remove-PolarisRoute -Path "/test" -Method "GET"
