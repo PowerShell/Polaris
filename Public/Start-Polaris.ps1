@@ -17,7 +17,7 @@
 .PARAMETER Https
     Determines if you want to use https as the prefix.
 .PARAMETER HostName
-    Determines the hostname used in the URL prefix. 
+    Determines the hostname used in the URL prefix.
     Defaults to localhost.
 .PARAMETER Auth
     Polaris will use various authentication methods to authenticate requests.
@@ -28,7 +28,7 @@
     Start-Polaris
 .EXAMPLE
     Start-Polaris -Port 8081 -MinRunspaces 2 -MaxRunspaces 10 -UseJsonBodyParserMiddleware
-#>    
+#>
 function Start-Polaris {
     [CmdletBinding()]
     param(
@@ -50,11 +50,11 @@ function Start-Polaris {
                 }
                 else {
                     $true
-                }               
-            })]            
+                }
+            })]
         [switch]
         $Https = $False,
-        
+
         [String]
         $HostName = 'localhost',
 
@@ -65,10 +65,10 @@ function Start-Polaris {
                 }
                 else {
                     $true
-                }               
-            })]         
+                }
+            })]
         [String]
-        $Auth = 'Anonymous',        
+        $Auth = 'Anonymous',
 
         $Polaris = $Script:Polaris
     )

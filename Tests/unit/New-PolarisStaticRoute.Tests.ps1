@@ -82,7 +82,7 @@ Describe "New-PolarisStaticRoute" {
         #  Verify generated scriptblock has the correct string
         $Routes = Get-PolarisRoute
         $Routes[0].Scriptblock | Should BeLike "*'foo/foo/foo'*"
-        
+
     }
 
     It "Should overwrite matching route with Force switch" {

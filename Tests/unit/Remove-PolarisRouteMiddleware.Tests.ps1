@@ -85,12 +85,12 @@ Describe "Remove-PolarisRouteMiddleware" {
         }
 
     It "Should delete middleware" {
-        
+
         Test-RemoveMiddleware -Name '/Test1'
         }
 
     It "Should do nothing when no middleware match" {
-        
+
         Test-RemoveMiddleware -Name 'DoesNotExist'
         }
 

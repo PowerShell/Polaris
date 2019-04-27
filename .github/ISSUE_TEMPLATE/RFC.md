@@ -18,7 +18,7 @@ Not everyone checks Github every day, get some visibility to the RFC by announci
 See [RFC 001](https://github.com/PowerShell/Polaris/issues/120) for a sample.
 
 - [ ] Added RFC lable to Github Issue
-- [ ] Title matches format **RFC #xxx: Description**  
+- [ ] Title matches format **RFC #xxx: Description**
 - [ ] Full description of exactly what the breaking changes will be
 - [ ] Full description of why the change will be valuable
 - [ ] Code samples (before and after changes)

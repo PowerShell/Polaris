@@ -45,11 +45,11 @@ function New-PolarisRouteMiddleware {
         [Parameter( Mandatory = $True, ParameterSetName = 'ScriptPath' )]
         [string]
         $ScriptPath,
-        
+
         [switch]
         $Force,
 
-        
+
         $Polaris = $Script:Polaris
     )
     # Checking if middleware already exists

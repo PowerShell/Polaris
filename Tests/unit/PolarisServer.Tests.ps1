@@ -10,7 +10,7 @@ Describe "Test webserver use" {
     BeforeAll {
 
         $IsUnix = $PSVersionTable.Platform -eq "Unix"
-        
+
         $Port = Get-Random -Minimum 8000 -Maximum 8999
 
         # Start the app
@@ -36,7 +36,7 @@ Describe "Test webserver use" {
                 param($Word)
                 $Word | Out-File "TestDrive:\test.log" -NoNewline
             }
-            
+
             $Polaris.Log("Hello")
             Get-Content "TestDrive:\test.log" -Raw | Should be "Hello"
         }

@@ -50,10 +50,10 @@ function Get-PolarisRoute {
         [string[]]
         $Method = '*',
 
-        
+
         $Polaris = $Script:Polaris
     )
-    
+
     process {
         if ( $Polaris ) {
             $WebRoutes = [System.Collections.ArrayList]@()
@@ -65,8 +65,8 @@ function Get-PolarisRoute {
             }
 
             $Filter = [scriptblock]::Create( (
-                    '( ' + 
-                    ( $Path.ForEach( {   "`$_.Path   -like `"/$($_.TrimStart("/"))`"" } ) -join ' -or ' ) + 
+                    '( ' +
+                    ( $Path.ForEach( {   "`$_.Path   -like `"/$($_.TrimStart("/"))`"" } ) -join ' -or ' ) +
                     ' ) -and ( ' +
                     ( $Method.ForEach( { "`$_.Method -like `"$($_)`"" } ) -join ' -or ' ) +
                     ' )' ) )

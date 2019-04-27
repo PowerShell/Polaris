@@ -37,10 +37,10 @@ function Remove-PolarisRouteMiddleware {
         [string[]]
         $Name = '*',
 
-        
+
         $Polaris = $Script:Polaris
     )
-    
+
     process {
         if ( $Polaris  ) {
             $Middleware = Get-PolarisRouteMiddleware -Name $Name

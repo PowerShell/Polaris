@@ -15,8 +15,17 @@ class PolarisResponse {
         $this.RawResponse = $RawResponse
     }
 
+    Send () {
+        $this.ByteResponse = [byte[]]::new(0)
+    }
+
     Send ([string]$stringResponse) {
-        $this.ByteResponse = [System.Text.Encoding]::UTF8.GetBytes($stringResponse)
+        if ([string]::IsNullOrEmpty($stringResponse)) {
+            $this.ByteResponse = [byte[]]::new(0)
+        }
+        else {
+            $this.ByteResponse = [System.Text.Encoding]::UTF8.GetBytes($stringResponse)
+        }
     }
 
     SendBytes ([byte[]]$byteArray) {
@@ -24,7 +33,12 @@ class PolarisResponse {
     }
 
     Json ([string]$stringResponse) {
-        $this.ByteResponse = [System.Text.Encoding]::UTF8.GetBytes($stringResponse)
+        if ([string]::IsNullOrEmpty($stringResponse)) {
+            $this.ByteResponse = [byte[]]::new(0)
+        }
+        else {
+            $this.ByteResponse = [System.Text.Encoding]::UTF8.GetBytes($stringResponse)
+        }
         $this.ContentType = "application/json"
     }
 
@@ -39,7 +53,7 @@ class PolarisResponse {
     SetContentType ([string]$ContentType) {
         $this.ContentType = $ContentType
     }
-	
+
     SetStream ([System.IO.Stream]$Stream) {
         $this.StreamResponse = $Stream
     }

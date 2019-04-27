@@ -18,7 +18,7 @@ Describe "Test route creation" {
 
             if ( [string]::IsNullOrEmpty($SanitizedPath) ) { $SanitizedPath = "/" }
 
-            return $null -ne (Get-Polaris).ScriptblockRoutes[$SanitizedPath][$Method] 
+            return $null -ne (Get-Polaris).ScriptblockRoutes[$SanitizedPath][$Method]
         }
     }
     Context "Using New-PolarisRoute" {

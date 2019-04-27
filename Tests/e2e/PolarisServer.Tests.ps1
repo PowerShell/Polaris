@@ -6,7 +6,7 @@
 Describe "Test webserver use (E2E)" {
 
     BeforeAll {
-        
+
         $Port = Get-Random -Minimum 8000 -Maximum 8999
         $IsUnix = $PSVersionTable.Platform -eq "Unix"
 
@@ -57,14 +57,26 @@ Describe "Test webserver use (E2E)" {
             # Pass in script file
             New-PolarisRoute -Path /example -Method GET -ScriptPath $using:PSScriptRoot\..\resources\test.ps1
 
-            # Also support static serving of a directory
+            # Support static serving of a directory
             New-PolarisStaticRoute -FolderPath $using:PSScriptRoot/../resources/static -RoutePath /public
 
             New-PolarisGetRoute -Path /error -Scriptblock {
-                $params = @{}
+                $params = @{ }
                 Write-Host "asdf"
                 throw "Error"
                 $Response.Send("this should not show up in response")
+            }
+
+            # Support sending empty response
+
+            New-PolarisGetRoute -path /empty -Scriptblock {
+                $Response.StatusCode = 204
+                $Response.Send()
+            }
+
+            New-PolarisGetRoute -path /empty-string -Scriptblock {
+                $Response.StatusCode = 204
+                $Response.Send('')
             }
 
             # Start the app
@@ -74,6 +86,7 @@ Describe "Test webserver use (E2E)" {
             while ($Polaris.Listener.IsListening) {
                 Wait-Event callbackeventbridge.callbackcomplete
             }
+
         }
 
         # Giving server job time to start up
@@ -126,11 +139,11 @@ Hello World"
         }
 
         It "test /hellomenew should respond 404" {
-            {$Result = Invoke-RestMethod -Uri "http://localhost:$Port/hellomenew?name=PowerShell" -UseBasicParsing} | Should Throw
+            { $Result = Invoke-RestMethod -Uri "http://localhost:$Port/hellomenew?name=PowerShell" -UseBasicParsing } | Should Throw
         }
 
         It "test /hellome/new should respond 404" {
-            {$Result = Invoke-RestMethod -Uri "http://localhost:$Port/hellome/new?name=PowerShell" -UseBasicParsing} | Should Throw
+            { $Result = Invoke-RestMethod -Uri "http://localhost:$Port/hellome/new?name=PowerShell" -UseBasicParsing } | Should Throw
         }
 
         It "test /hellome route without query param" {
@@ -170,7 +183,7 @@ Hello World"
 
         It "test /public/index.html static route" {
             $expectedHtml = Get-Content -Raw "$PSScriptRoot/../resources/static/index.html"
-            
+
             $Result = Invoke-WebRequest -Uri "http://localhost:$Port/public/index.html" -UseBasicParsing
             $Result.Content | Should Be $expectedHtml
             $Result.StatusCode | Should Be 200
@@ -187,6 +200,16 @@ Hello World"
         It "should have an error response matching the thrown server error" {
             { Invoke-WebRequest -Uri "http://localhost:$Port/error" -UseBasicParsing }
             ($Error[0].ErrorDetails.Message -split "`n").Count | Should Be 5
+        }
+
+        It "should return an empty response" {
+            [Microsoft.PowerShell.Commands.WebResponseObject]$Response = Invoke-WebRequest -Uri "http://localhost:$Port/empty" -UseBasicParsing
+            $Response.Content.length | Should Be 0
+            $Response.Headers.Keys -contains "Content-Type" | Should Be $False
+
+            $Response = Invoke-WebRequest -Uri "http://localhost:$Port/empty-string" -UseBasicParsing
+            $Response.Content.length | Should Be 0
+            $Response.Headers.Keys -contains "Content-Type" | Should Be $False
         }
 
         AfterAll {

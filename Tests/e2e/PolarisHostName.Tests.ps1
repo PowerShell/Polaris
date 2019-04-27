@@ -6,7 +6,7 @@
 Describe "Hostname Parameter" {
 
     BeforeAll {
-        
+
         #Start the server with a function to not repeat code
         function New-PolarisHostTest {
             Param
@@ -44,7 +44,7 @@ Describe "Hostname Parameter" {
             Get-Job | Stop-Job -PassThru | Remove-Job
         }
     }
-    
+
     Context "Using localhost as hostname" {
         New-PolarisHostTest -hostname "localhost"
 
