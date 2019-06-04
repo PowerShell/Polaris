@@ -14,7 +14,7 @@ Start Polaris web server.
 
 ```
 Start-Polaris [[-Port] <Int32>] [[-MinRunspaces] <Int32>] [[-MaxRunspaces] <Int32>]
- [-UseJsonBodyParserMiddleware] [[-Polaris] <Object>] [<CommonParameters>]
+ [-UseJsonBodyParserMiddleware] [-Https] [[-Polaris] <Object>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -84,6 +84,21 @@ Accept wildcard characters: False
 
 ### -UseJsonBodyParserMiddleware
 When present, JSONBodyParser middleware will be created, if needed.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Https
+Determines if you want to use https as the prefix.
 
 ```yaml
 Type: SwitchParameter

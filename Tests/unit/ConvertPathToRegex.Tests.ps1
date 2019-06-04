@@ -1,8 +1,13 @@
+#
+# Copyright (c) Microsoft. All rights reserved.
+# Licensed under the MIT license. See LICENSE file in the project root for full license information.
+#
+
 Import-Module $PSScriptRoot\..\..\Polaris.psd1
 
 InModuleScope Polaris {
     Describe "[Polaris]::ConvertPathToRegex" {
-    
+
         It "should match and extract named parameters anywhere in the route" {
             $RegEx = [Polaris]::ConvertPathToRegex("/users/:userId/books/:bookId")
             "/users/34/books/8989" -cmatch $RegEx | Should Be $true

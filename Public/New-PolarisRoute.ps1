@@ -1,3 +1,8 @@
+#
+# Copyright (c) Microsoft. All rights reserved.
+# Licensed under the MIT license. See LICENSE file in the project root for full license information.
+#
+
 <#
 .SYNOPSIS
     Add web route.
@@ -47,7 +52,7 @@ function New-PolarisRoute {
         [Parameter( Mandatory = $True, ParameterSetName = 'ScriptPath' )]
         [string]
         $ScriptPath,
-        
+
         [switch]
         $Force,
 

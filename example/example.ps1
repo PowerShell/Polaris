@@ -1,3 +1,8 @@
+#
+# Copyright (c) Microsoft. All rights reserved.
+# Licensed under the MIT license. See LICENSE file in the project root for full license information.
+#
+
 if(-not (Test-Path -Path ..\Polaris.psd1)) {
     Write-Error -Message "Cannot find Polaris.psd1"
     return
@@ -36,9 +41,9 @@ New-PolarisPostRoute -Path /wow -Scriptblock $sbWow
 # Body Parameters are supported if you use the -UseJsonBodyParserMiddleware
 New-PolarisPostRoute -Path /hello -Scriptblock {
     if ($Request.Body.Name) {
-        $Response.Send('Hello ' + $Request.Body.Name);
+        $Response.Send('Hello ' + $Request.Body.Name)
     } else {
-        $Response.Send('Hello World');
+        $Response.Send('Hello World')
     }
 }
 

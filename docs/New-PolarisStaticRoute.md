@@ -13,7 +13,7 @@ Creates web routes to recursively serve folder contents
 ## SYNTAX
 
 ```
-New-PolarisStaticRoute [[-RoutePath] <String>] [-FolderPath] <String> [[-EnableDirectoryBrowser] <Boolean>]
+New-PolarisStaticRoute [[-RoutePath] <String>] [[-FolderPath] <String>] [[-EnableDirectoryBrowser] <Boolean>]
  [-Force] [[-Polaris] <Object>] [<CommonParameters>]
 ```
 
@@ -67,7 +67,7 @@ Type: String
 Parameter Sets: (All)
 Aliases:
 
-Required: True
+Required: False
 Position: 2
 Default value: ./
 Accept pipeline input: False

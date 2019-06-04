@@ -1,3 +1,8 @@
+#
+# Copyright (c) Microsoft. All rights reserved.
+# Licensed under the MIT license. See LICENSE file in the project root for full license information.
+#
+
 <#
 .SYNOPSIS
     Add web route with method POST
@@ -39,11 +44,11 @@ function New-PolarisPostRoute {
         [Parameter( Mandatory = $True, ParameterSetName = 'ScriptPath' )]
         [string]
         $ScriptPath,
-        
+
         [switch]
         $Force,
 
-        
+
         $Polaris = $Script:Polaris
     )
 

@@ -1,7 +1,12 @@
-﻿Describe "Helper functions" {
+#
+# Copyright (c) Microsoft. All rights reserved.
+# Licensed under the MIT license. See LICENSE file in the project root for full license information.
+#
+
+Describe "Helper functions" {
 
     BeforeAll {
-        
+
         #  Import module
         Import-Module $PSScriptRoot\..\..\Polaris.psd1
 
@@ -115,7 +120,7 @@
 
             #  Create route
             New-PolarisDeleteRoute -Path $Path -Scriptblock $Scriptblock
- 
+
             #  Test route
            ( Get-PolarisRoute -Path $Path -Method $Method ).Scriptblock | Should Be $Path
             }

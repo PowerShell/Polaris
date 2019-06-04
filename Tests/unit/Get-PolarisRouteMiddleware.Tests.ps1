@@ -1,7 +1,12 @@
-﻿Describe "Get-PolarisRouteMiddleware" {
+#
+# Copyright (c) Microsoft. All rights reserved.
+# Licensed under the MIT license. See LICENSE file in the project root for full license information.
+#
+
+Describe "Get-PolarisRouteMiddleware" {
 
     BeforeAll {
-        
+
         #  Import module
         Import-Module $PSScriptRoot\..\..\Polaris.psd1
 

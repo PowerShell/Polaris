@@ -17,7 +17,7 @@ Clear-Polaris [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-Clears the internal Polaris .NET Standard object. 
+Clears the internal Polaris .NET Standard object.
 The instance will be reinstantiated in other module calls.
 
 ## EXAMPLES

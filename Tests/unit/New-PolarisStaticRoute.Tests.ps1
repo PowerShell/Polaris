@@ -1,4 +1,9 @@
-﻿Describe "New-PolarisStaticRoute" {
+#
+# Copyright (c) Microsoft. All rights reserved.
+# Licensed under the MIT license. See LICENSE file in the project root for full license information.
+#
+
+Describe "New-PolarisStaticRoute" {
 
     BeforeAll {
 
@@ -77,7 +82,7 @@
         #  Verify generated scriptblock has the correct string
         $Routes = Get-PolarisRoute
         $Routes[0].Scriptblock | Should BeLike "*'foo/foo/foo'*"
-        
+
     }
 
     It "Should overwrite matching route with Force switch" {

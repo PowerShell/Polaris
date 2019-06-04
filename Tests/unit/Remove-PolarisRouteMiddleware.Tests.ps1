@@ -1,4 +1,9 @@
-﻿Describe "Remove-PolarisRouteMiddleware" {
+#
+# Copyright (c) Microsoft. All rights reserved.
+# Licensed under the MIT license. See LICENSE file in the project root for full license information.
+#
+
+Describe "Remove-PolarisRouteMiddleware" {
 
     BeforeAll {
 
@@ -80,12 +85,12 @@
         }
 
     It "Should delete middleware" {
-        
+
         Test-RemoveMiddleware -Name '/Test1'
         }
 
     It "Should do nothing when no middleware match" {
-        
+
         Test-RemoveMiddleware -Name 'DoesNotExist'
         }
 

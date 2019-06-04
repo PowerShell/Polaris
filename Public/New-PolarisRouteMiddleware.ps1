@@ -1,3 +1,8 @@
+#
+# Copyright (c) Microsoft. All rights reserved.
+# Licensed under the MIT license. See LICENSE file in the project root for full license information.
+#
+
 <#
 .SYNOPSIS
     Add new route middleware.
@@ -16,13 +21,15 @@
     A Polaris object
     Defaults to the script scoped Polaris
 .EXAMPLE
-$JsonBodyParserMiddleware =
-{
-    if ($Request.BodyString -ne $null) {
-        $Request.Body = $Request.BodyString | ConvertFrom-Json
+    $JsonBodyParserMiddleware =
+    {
+        if ($Request.BodyString -ne $null) {
+            $Request.Body = $Request.BodyString | ConvertFrom-Json
+        }
     }
-}
-New-PolarisRouteMiddleware -Name JsonBodyParser -Scriptblock $JsonBodyParserMiddleware
+    New-PolarisRouteMiddleware -Name JsonBodyParser -Scriptblock $JsonBodyParserMiddleware
+.EXAMPLE
+    New-PolarisRouteMiddleware -Name JsonBodyParser -ScriptPath ./testMiddleware.ps1
 #>
 function New-PolarisRouteMiddleware {
     [CmdletBinding()]
@@ -38,11 +45,11 @@ function New-PolarisRouteMiddleware {
         [Parameter( Mandatory = $True, ParameterSetName = 'ScriptPath' )]
         [string]
         $ScriptPath,
-        
+
         [switch]
         $Force,
 
-        
+
         $Polaris = $Script:Polaris
     )
     # Checking if middleware already exists

@@ -1,19 +1,26 @@
-function New-DirectoryBrowser {
+#
+# Copyright (c) Microsoft. All rights reserved.
+# Licensed under the MIT license. See LICENSE file in the project root for full license information.
+#
 
-    <#
-    .SYNOPSIS
-        Renders a directory browser in HTML
-    .DESCRIPTION
-        Creates HTML that can be used as a directory browser
-    .PARAMETER RequestedItem
-        The directory you would like to generate HTML for
-    .PARAMETER HeaderName
-        The name you would like displayed at the top of the directory browser
-    .PARAMETER DirectoryBrowserPath
-        The current path in the directory browser relative to the root of the directory
-        browser (not the root of the site).
+<#
+.SYNOPSIS
+    Renders a directory browser in HTML
+.DESCRIPTION
+    Creates HTML that can be used as a directory browser
+.PARAMETER RequestedItem
+    The directory you would like to generate HTML for
+.PARAMETER HeaderName
+    The name you would like displayed at the top of the directory browser
+.PARAMETER DirectoryBrowserPath
+    The current path in the directory browser relative to the root of the directory
+    browser (not the root of the site).
+.EXAMPLE
+    New-DirectoryBrowser -RequestedItem $directoryInfo
+.EXAMPLE
+    New-DirectoryBrowser -RequestedItem $directoryInfo -DirectoryBrowserPath ./MyContent
 #>
-
+function New-DirectoryBrowser {
     param (
 
         [Parameter(

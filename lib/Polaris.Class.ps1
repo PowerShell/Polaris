@@ -1,3 +1,8 @@
+#
+# Copyright (c) Microsoft. All rights reserved.
+# Licensed under the MIT license. See LICENSE file in the project root for full license information.
+#
+
 class Polaris {
 
     [int]$Port
@@ -8,6 +13,7 @@ class Polaris {
     hidden [bool]$StopServer = $False
     [string]$GetLogsString = "PolarisLogs"
     [string]$ClassDefinitions = $Script:ClassDefinitions
+    [string]$UriPrefix
     $ContextHandler = (New-ScriptblockCallback -Callback {
 
             param(
@@ -29,16 +35,15 @@ class Polaris {
             $Polaris.Listener.BeginGetContext($Polaris.ContextHandler, $Polaris)
 
             [System.Net.HttpListenerRequest]$RawRequest = $Context.Request
-            [System.Net.HttpListenerResponse]$RawResponse = $Context.Response
 
             $Polaris.Log("request came in: " + $RawRequest.HttpMethod + " " + $RawRequest.RawUrl)
 
-            [PolarisRequest]$Request = [PolarisRequest]::new($RawRequest)
-            [PolarisResponse]$Response = [PolarisResponse]::new()
+            [PolarisRequest]$Request = [PolarisRequest]::new($RawRequest, $Context.User)
+            [PolarisResponse]$Response = [PolarisResponse]::new($Context.Response)
 
 
             [string]$Route = $RawRequest.Url.AbsolutePath
-            
+
             [System.Management.Automation.InformationRecord[]]$InformationVariable = @()
 
             if ([string]::IsNullOrEmpty($Route)) { $Route = "/" }
@@ -48,11 +53,11 @@ class Polaris {
                 # Run middleware in the order in which it was added
                 foreach ($Middleware in $Polaris.RouteMiddleware) {
                     $InformationVariable += $Polaris.InvokeRoute(
-                            $Middleware.Scriptblock,
-                            $Null,
-                            $Request,
-                            $Response
-                        )
+                        $Middleware.Scriptblock,
+                        $Null,
+                        $Request,
+                        $Response
+                    )
                 }
 
                 $Polaris.Log("Parsed Route: $Route")
@@ -80,9 +85,10 @@ class Polaris {
                             $Request,
                             $Response
                         )
-                        
+
                     }
                     catch {
+                        $ErrorsBody = ''
                         $ErrorsBody += $_.Exception.ToString()
                         $ErrorsBody += $_.InvocationInfo.PositionMessage + "`n`n"
                         $Response.Send($ErrorsBody)
@@ -118,16 +124,17 @@ class Polaris {
                     $Response.ByteResponse.CopyTo($Bytes, $LogBytes.Length)
                     $Response.ByteResponse = $Bytes
                 }
-                [Polaris]::Send($RawResponse, $Response)
+                [Polaris]::Send($Response)
 
             }
             catch {
                 $Polaris.Log(($_ | Out-String))
                 $Response.SetStatusCode(500)
                 $Response.Send($_)
-                try{
-                    [Polaris]::Send($RawResponse, $Response)
-                } catch {
+                try {
+                    [Polaris]::Send($Response)
+                }
+                catch {
                     $Polaris.Log($_)
                 }
                 $Polaris.Log($_)
@@ -152,7 +159,7 @@ class Polaris {
             -ArgumentList @($Parameters, $Request, $Response) `
             -InformationVariable InformationVariable `
             -ErrorAction Stop
-            
+
         return $InformationVariable
     }
 
@@ -193,7 +200,7 @@ class Polaris {
         }
     }
 
-    static [string] SanitizePath([string]$Path){
+    static [string] SanitizePath([string]$Path) {
         $SanitizedPath = $Path.TrimEnd('/')
 
         if ([string]::IsNullOrEmpty($SanitizedPath)) { $SanitizedPath = "/" }
@@ -201,7 +208,7 @@ class Polaris {
         return $SanitizedPath
     }
 
-    static [RegEx] ConvertPathToRegex([string]$Path){
+    static [RegEx] ConvertPathToRegex([string]$Path) {
         Write-Debug "Path: $path"
         # Replacing all periods with an escaped period to prevent regex wildcard
         $path = $path -replace '\.', '\.'
@@ -224,7 +231,7 @@ class Polaris {
         return [RegEx]::New($path)
     }
 
-    static [RegEx] ConvertPathToRegex([RegEx]$Path){
+    static [RegEx] ConvertPathToRegex([RegEx]$Path) {
         Write-Debug "Path is a RegEx"
         return $Path
     }
@@ -253,12 +260,13 @@ class Polaris {
 
     [void] Start (
         [int]$Port = 3000,
-        [bool]$Https
+        [bool]$Https,
+        [string]$Auth,
+        [string]$HostName
     ) {
         $this.StopServer = $false
-        $this.InitListener($Port,$Https)
+        $this.InitListener($Port, $Https, $Auth, $HostName)
         $this.Listener.BeginGetContext($this.ContextHandler, $this)
-        $this.Log("App listening on Port: " + $Port + "!")
     }
 
     [void] Stop () {
@@ -266,35 +274,37 @@ class Polaris {
         $this.Listener.Close()
         $this.Listener.Dispose()
         $this.Log("Server Stopped.")
-        
+
     }
     [void] InitListener (
         [int]$Port,
-        [bool]$Https
+        [bool]$Https,
+        [string]$Auth,
+        [string]$HostName
     ) {
         $this.Port = $Port
 
         $this.Listener = [System.Net.HttpListener]::new()
 
-        if($Https){
-            $this.Log("Using HTTPS:")
+        if ($Https) {
             $ListenerPrefix = "https"
-        }else{
-            $ListenerPrefix = "http"
-        }        
-
-        # If user is on a non-windows system or windows as administrator
-        if ([System.Environment]::OSVersion.Platform -ne [System.PlatformID]::Win32NT -or
-            ([System.Environment]::OSVersion.Platform -eq [System.PlatformID]::Win32NT -and
-                ([System.Security.Principal.WindowsPrincipal]::new([System.Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([System.Security.Principal.WindowsBuiltInRole]::Administrator))) {
-            $this.Listener.Prefixes.Add("$($ListenerPrefix)://+:" + $this.Port + "/")
         }
         else {
-            $this.Listener.Prefixes.Add("$($ListenerPrefix)://localhost:" + $this.Port + "/")
+            $ListenerPrefix = "http"
         }
 
+        $this.UriPrefix = $ListenerPrefix + '://' + $HostName + ':' + $this.Port + '/'
+
+        $this.Listener.Prefixes.Add($this.UriPrefix)
+
+        $this.Log("URI Prefix set to: $($this.UriPrefix)")
+
+        $this.Listener.AuthenticationSchemes = $Auth
+
+        $this.Log("Authentication Scheme set to: $Auth")
+
         $this.Listener.IgnoreWriteExceptions = $true
-        if([System.Environment]::OSVersion.Platform -eq [System.PlatformID]::Win32NT -and $this.Listener.TimeoutManager){
+        if ([System.Environment]::OSVersion.Platform -eq [System.PlatformID]::Win32NT -and $this.Listener.TimeoutManager) {
             $this.Listener.TimeoutManager.RequestQueue = [timespan]::FromMinutes(5)
             $this.Listener.TimeoutManager.IdleConnection = [timespan]::FromSeconds(45)
             $this.Listener.TimeoutManager.EntityBody = [timespan]::FromSeconds(50)
@@ -305,12 +315,11 @@ class Polaris {
     }
 
     static [void] Send (
-        [System.Net.HttpListenerResponse]$RawResponse, 
         [PolarisResponse]$Response
     ) {
         if ($Response.StreamResponse) {
             [Polaris]::Send(
-                $RawResponse,
+                $Response.RawResponse,
                 $Response.StreamResponse,
                 $Response.StatusCode,
                 $Response.ContentType,
@@ -319,7 +328,7 @@ class Polaris {
         }
         else {
             [Polaris]::Send(
-                $RawResponse,
+                $Response.RawResponse,
                 $Response.ByteResponse,
                 $Response.StatusCode,
                 $Response.ContentType,
@@ -329,32 +338,34 @@ class Polaris {
     }
 
     static [void] Send (
-        [System.Net.HttpListenerResponse]$RawResponse, 
-        [byte[]]$ByteResponse, 
-        [int]$StatusCode, 
-        [string]$ContentType, 
+        [System.Net.HttpListenerResponse]$RawResponse,
+        [byte[]]$ByteResponse,
+        [int]$StatusCode,
+        [string]$ContentType,
         [System.Net.WebHeaderCollection]$Headers
     ) {
-        $RawResponse.StatusCode = $StatusCode;
-        $RawResponse.Headers = $Headers;
-        $RawResponse.ContentType = $ContentType;
-        $RawResponse.ContentLength64 = $ByteResponse.Length;
-        $RawResponse.OutputStream.Write($ByteResponse, 0, $ByteResponse.Length);
-        $RawResponse.OutputStream.Close();
+        $RawResponse.StatusCode = $StatusCode
+        $RawResponse.Headers = $Headers
+        if ($ByteResponse.Length -gt 0) {
+            $RawResponse.ContentType = $ContentType
+        }
+        $RawResponse.ContentLength64 = $ByteResponse.Length
+        $RawResponse.OutputStream.Write($ByteResponse, 0, $ByteResponse.Length)
+        $RawResponse.OutputStream.Close()
     }
-    
+
     static [void] Send (
-        [System.Net.HttpListenerResponse]$RawResponse, 
-        [System.IO.Stream]$StreamResponse, 
-        [int]$StatusCode, 
-        [string]$ContentType, 
+        [System.Net.HttpListenerResponse]$RawResponse,
+        [System.IO.Stream]$StreamResponse,
+        [int]$StatusCode,
+        [string]$ContentType,
         [System.Net.WebHeaderCollection]$Headers
     ) {
-        $RawResponse.StatusCode = $StatusCode;
-        $RawResponse.Headers = $Headers;
-        $RawResponse.ContentType = $ContentType;
-        $StreamResponse.CopyTo($RawResponse.OutputStream);
-        $RawResponse.OutputStream.Close();
+        $RawResponse.StatusCode = $StatusCode
+        $RawResponse.Headers = $Headers
+        $RawResponse.ContentType = $ContentType
+        $StreamResponse.CopyTo($RawResponse.OutputStream)
+        $RawResponse.OutputStream.Close()
     }
 
     static [void] Send (
@@ -368,7 +379,7 @@ class Polaris {
 
     [void] Log ([string]$LogString) {
         try {
-            $this.Logger($LogString)
+            $this.Logger.Invoke($LogString)
         }
         catch {
             Write-Host $_.Message

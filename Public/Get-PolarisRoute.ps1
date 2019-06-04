@@ -1,3 +1,8 @@
+#
+# Copyright (c) Microsoft. All rights reserved.
+# Licensed under the MIT license. See LICENSE file in the project root for full license information.
+#
+
 <#
 .SYNOPSIS
     Get web routes.
@@ -45,10 +50,10 @@ function Get-PolarisRoute {
         [string[]]
         $Method = '*',
 
-        
+
         $Polaris = $Script:Polaris
     )
-    
+
     process {
         if ( $Polaris ) {
             $WebRoutes = [System.Collections.ArrayList]@()
@@ -60,8 +65,8 @@ function Get-PolarisRoute {
             }
 
             $Filter = [scriptblock]::Create( (
-                    '( ' + 
-                    ( $Path.ForEach( {   "`$_.Path   -like `"/$($_.TrimStart("/"))`"" } ) -join ' -or ' ) + 
+                    '( ' +
+                    ( $Path.ForEach( {   "`$_.Path   -like `"/$($_.TrimStart("/"))`"" } ) -join ' -or ' ) +
                     ' ) -and ( ' +
                     ( $Method.ForEach( { "`$_.Method -like `"$($_)`"" } ) -join ' -or ' ) +
                     ' )' ) )

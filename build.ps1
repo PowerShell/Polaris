@@ -1,4 +1,8 @@
 #!/usr/bin/env pwsh
+#
+# Copyright (c) Microsoft. All rights reserved.
+# Licensed under the MIT license. See LICENSE file in the project root for full license information.
+#
 
 param(
     [Parameter()]
@@ -42,14 +46,14 @@ function hasMissingTools () {
 if ($Bootstrap) {
     $string = "Here is what your environment is missing:`n"
     $missingTools = getMissingTools
-    
+
     if (($missingTools).Count -eq 0) {
         $string += "* nothing!`n`n Run this script without a flag to build or a -Clean to clean."
     }
     else {
         $missingTools | ForEach-Object {$string += "* $_`n"}
     }
-    
+
     Write-Output "`n$string`n"
 }
 elseif (hasMissingTools) {
@@ -60,20 +64,20 @@ else {
         Push-Location $PSScriptRoot\Tests
         $res = Invoke-Pester -OutputFormat NUnitXml -OutputFile TestsResults.xml -PassThru
         if ($env:APPVEYOR) {
-            (New-Object System.Net.WebClient).UploadFile("https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\TestsResults.xml));
+            (New-Object System.Net.WebClient).UploadFile("https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\TestsResults.xml))
         }
         if ($res.FailedCount -gt 0) { throw "$($res.FailedCount) tests failed."}
         Pop-Location
     }
-    
+
     if ($Package) {
         if ((Test-Path "$PSScriptRoot\out")) {
             Remove-Item -Path $PSScriptRoot\out -Recurse -Force
         }
-    
+
         New-Item -ItemType directory -Path $PSScriptRoot\out
         New-Item -ItemType directory -Path $PSScriptRoot\out\Polaris
-    
+
         Copy-Item -Path "$PSScriptRoot\Polaris.ps*1" -Destination "$PSScriptRoot\out\Polaris\" -Force
         Copy-Item -Path "$PSScriptRoot\README.md" -Destination "$PSScriptRoot\out\Polaris\" -Force
         Copy-Item -Path "$PSScriptRoot\LICENSE.txt" -Destination "$PSScriptRoot\out\Polaris\" -Force

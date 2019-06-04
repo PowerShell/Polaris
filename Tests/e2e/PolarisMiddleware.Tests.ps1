@@ -1,3 +1,8 @@
+#
+# Copyright (c) Microsoft. All rights reserved.
+# Licensed under the MIT license. See LICENSE file in the project root for full license information.
+#
+
 Describe "Test middleware creation/usage (E2E)" {
 
     BeforeAll {
@@ -12,7 +17,7 @@ Describe "Test middleware creation/usage (E2E)" {
             }
 
             $Polaris = Start-Polaris -Port $using:Port -MinRunspaces 1 -MaxRunspaces 5 -UseJsonBodyParserMiddleware
-            
+
             $defaultMiddleware = {
                 if ($Request.BodyString -ne $null) {
                     $Request.Body | Add-Member -Name NewProperty -Value "Manipulated" -MemberType NoteProperty

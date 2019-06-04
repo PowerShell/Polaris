@@ -1,3 +1,8 @@
+#
+# Copyright (c) Microsoft. All rights reserved.
+# Licensed under the MIT license. See LICENSE file in the project root for full license information.
+#
+
 <#
 .SYNOPSIS
     Remove route middleware.
@@ -32,10 +37,10 @@ function Remove-PolarisRouteMiddleware {
         [string[]]
         $Name = '*',
 
-        
+
         $Polaris = $Script:Polaris
     )
-    
+
     process {
         if ( $Polaris  ) {
             $Middleware = Get-PolarisRouteMiddleware -Name $Name

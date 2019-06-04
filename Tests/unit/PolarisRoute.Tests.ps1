@@ -1,3 +1,8 @@
+#
+# Copyright (c) Microsoft. All rights reserved.
+# Licensed under the MIT license. See LICENSE file in the project root for full license information.
+#
+
 Describe "Test route creation" {
     BeforeAll {
         Import-Module $PSScriptRoot\..\..\Polaris.psd1
@@ -13,7 +18,7 @@ Describe "Test route creation" {
 
             if ( [string]::IsNullOrEmpty($SanitizedPath) ) { $SanitizedPath = "/" }
 
-            return $null -ne (Get-Polaris).ScriptblockRoutes[$SanitizedPath][$Method] 
+            return $null -ne (Get-Polaris).ScriptblockRoutes[$SanitizedPath][$Method]
         }
     }
     Context "Using New-PolarisRoute" {
