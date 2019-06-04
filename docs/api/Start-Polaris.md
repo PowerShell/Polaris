@@ -17,7 +17,8 @@ Start Polaris web server.
 
 ```
 Start-Polaris [[-Port] <Int32>] [[-MinRunspaces] <Int32>] [[-MaxRunspaces] <Int32>]
- [-UseJsonBodyParserMiddleware] [-Https] [[-Polaris] <Object>] [<CommonParameters>]
+ [-UseJsonBodyParserMiddleware] [-Https] [[-HostName] <String>] [[-Auth] <String>] [[-Polaris] <Object>]
+ [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -115,6 +116,37 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
+### -HostName
+Determines the hostname used in the URL prefix.
+Defaults to localhost.
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 4
+Default value: Localhost
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Auth
+Polaris will use various authentication methods to authenticate requests.
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 5
+Default value: Anonymous
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
 ### -Polaris
 A Polaris object
 Defaults to the script scoped Polaris
@@ -125,15 +157,14 @@ Parameter Sets: (All)
 Aliases:
 
 Required: False
-Position: 4
+Position: 6
 Default value: $Script:Polaris
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
 ### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable.
-For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 

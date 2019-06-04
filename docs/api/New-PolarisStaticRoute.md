@@ -17,12 +17,15 @@ Creates web routes to recursively serve folder contents
 
 ```
 New-PolarisStaticRoute [[-RoutePath] <String>] [[-FolderPath] <String>] [[-EnableDirectoryBrowser] <Boolean>]
- [-Force] [[-Polaris] <Object>] [<CommonParameters>]
+ [-Force] [[-StandardHTMLFiles] <String[]>] [[-ServeDefaultFile] <Boolean>] [[-Polaris] <Object>]
+ [<CommonParameters>]
 ```
 
 ## DESCRIPTION
 Creates web routes to recursively serve folder contents.
 Perfect for static websites.
+Also if a default file (for example index.html) is detected, A route pointing to the
+value of the parameter "Routepath" will be created.
 
 ## EXAMPLES
 
@@ -107,6 +110,37 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
+### -StandardHTMLFiles
+List of file names that Polaris will look for when ServeDefaultFile is $True
+
+```yaml
+Type: String[]
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 4
+Default value: @("index.html", "index.htm", "default.html", "default.htm")
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ServeDefaultFile
+Polaris will look for a default file matching one of the file names specified in the
+StandardHTMLFiles parameter and, if found, will serve that file when no specific file is requested
+
+```yaml
+Type: Boolean
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 5
+Default value: True
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
 ### -Polaris
 A Polaris object
 Defaults to the script scoped Polaris
@@ -117,15 +151,14 @@ Parameter Sets: (All)
 Aliases:
 
 Required: False
-Position: 4
+Position: 6
 Default value: $Script:Polaris
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
 ### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable.
-For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 
