@@ -12,7 +12,7 @@ type: about
 
 Here is a super simple Polaris application to get you started
 
-```ps
+```powershell
 Import-Module Polaris
 New-PolarisGetRoute -Path "/" -Scriptblock {
     $Response.Send('Hello World!')
@@ -30,7 +30,7 @@ I can get a response from the server by either opening a browser to <http://loca
 
 Command:
 
-```ps
+```powershell
 PS> Invoke-RestMethod -Method GET -Uri http://localhost:8080/
 ```
 
@@ -50,7 +50,7 @@ For the first one our route to the page will be "/Services" and we'll just want 
 
 We'll create the Polaris route like this
 
-```ps
+```powershell
 New-PolarisGetRoute -Path "/Services" -Scriptblock {
    $RunningServices = Get-Service | Select-Object Name,DisplayName,Status | ConvertTo-Html -Title "Services" | Out-String
    $Response.SetContentType("text/html")
@@ -62,7 +62,7 @@ We're leveraging PowerShell's built in ConvertTo-HTML command to generate a litt
 
 The second one we'll want to follow suit and create a route for the page called "/Processes" and display the Process Name, CPU, and the Id properties of the process.
 
-```ps
+```powershell
 New-PolarisGetRoute -Path "/Processes" -Scriptblock {
    $RunningProcesses = Get-Process | select ProcessName,CPU,Id | ConvertTo-Html -Title "Processes" | Out-String
    $Response.SetContentType("text/html")
@@ -82,7 +82,7 @@ Let's show you some basic routes here.
 
 Respond 'Hello World!' on the homepage or root:
 
-```ps
+```powershell
 New-PolarisRoute -Method GET -Path "/" -ScriptBlock {
     $Response.Send('Hello World!')
 }
@@ -90,7 +90,7 @@ New-PolarisRoute -Method GET -Path "/" -ScriptBlock {
 
 New POST route at the root of the application:
 
-```ps
+```powershell
 New-PolarisRoute -Method POST -Path "/" -ScriptBlock {
     $Respond.Send('Received POST request')
 }
@@ -98,7 +98,7 @@ New-PolarisRoute -Method POST -Path "/" -ScriptBlock {
 
 New PUT route to the /Process route:
 
-```ps
+```powershell
 New-PolarisRoute -Method PUT -Path "/Process" -ScriptBlock {
     $Response.Send('Received a PUT request at the /Process route')
 }
@@ -106,7 +106,7 @@ New-PolarisRoute -Method PUT -Path "/Process" -ScriptBlock {
 
 New DELETE route at the /Process route:
 
-```ps
+```powershell
 New-PolarisRoute -Method DELETE -Path "/Process" -ScriptBlock {
     $Response.Send('Received a DELETE request at the /Process route')
 }
@@ -135,7 +135,7 @@ Let's say you have a simple static website that you want to serve using Polaris.
 
 I can serve all of these files automatically using the following command:
 
-```ps
+```powershell
 New-PolarisStaticRoute -RoutePath "/" -FolderPath "C:\MyAwesomeSite"
 ```
 
@@ -150,7 +150,7 @@ http://localhost:8080/favicon.ico
 
 Polaris also has a built-in directory browser you can enable that can be used to set up a simple file server:
 
-```ps
+```powershell
 New-PolarisStaticRoute -RoutePath "/" -FolderPath "C:\MyFolderOfFiles" -EnableDirectoryBrowser $True
 ```
 
@@ -160,7 +160,7 @@ APIs are all the rage today and working with them from a browser means you are g
 
 Let's create a quick API for showing information about running processes:
 
-```ps
+```powershell
 New-PolarisRoute -Method GET -ScriptBlock {
     $ProcessInfo = Get-Process | Select ProcessName,Id,CPU | ConvertTo-Json
     $Response.json($ProcessInfo)

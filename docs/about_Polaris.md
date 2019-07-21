@@ -28,7 +28,7 @@ Polaris can be run on Windows or Linux or Mac. As long as you can install PowerS
 
 A quick example of an API is the below command which will start Polaris listening on http://localhost:8080 for a GET request to the /helloworld path.
 
-```ps
+```powershell
 Install-Module Polaris
 New-PolarisGetRoute -Path "/helloworld" -Scriptblock {
     $Response.Send('Hello World!')
@@ -41,7 +41,7 @@ I can get a response from the server by either opening a browser to http://local
 
 **Command**
 
-```ps
+```powershell
 PS> Invoke-RestMethod -Method GET -Uri http://localhost:8080/helloworld
 ```
 
