@@ -11,7 +11,9 @@ if ($IsWindows -or $PSVersionTable.PSVersion.Major -lt 6) {
 }
 
 # Needed for build and docs gen eventually...
-Install-Module PlatyPS -RequiredVersion 0.9.0 -Scope CurrentUser
+Install-Module PlatyPS -Scope CurrentUser -Force
+Install-Module Pester -Scope CurrentUser -Force
 
-Push-Location $PSScriptRoot/..
+Push-Location (Join-Path $PSScriptRoot '..')
 ./build.ps1 -Test -Package
+Pop-Location
