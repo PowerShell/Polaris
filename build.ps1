@@ -83,7 +83,7 @@ else {
         Copy-Item -Path "$PSScriptRoot\Private" -Destination "$PSScriptRoot\out\Polaris\" -Force -Recurse
 
         if ($null -ne $env:TF_BUILD) {
-            Compress-Archive "$PSScriptRoot/out/Polaris/" "$env:BUILD_ARTIFACTSTAGINGDIRECTORY"
+            Compress-Archive "$PSScriptRoot/out/Polaris/" (Join-Path $env:BUILD_ARTIFACTSTAGINGDIRECTORY Polaris.zip)
         }
     }
 }
