@@ -51,7 +51,7 @@ if ($Bootstrap) {
         $string += "* nothing!`n`n Run this script without a flag to build or a -Clean to clean."
     }
     else {
-        $missingTools | ForEach-Object {$string += "* $_`n"}
+        $missingTools | ForEach-Object { $string += "* $_`n" }
     }
 
     Write-Output "`n$string`n"
@@ -63,10 +63,7 @@ else {
     if ($Test) {
         Push-Location $PSScriptRoot\Tests
         $res = Invoke-Pester -OutputFormat NUnitXml -OutputFile TestsResults.xml -PassThru
-        if ($env:APPVEYOR) {
-            (New-Object System.Net.WebClient).UploadFile("https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\TestsResults.xml))
-        }
-        if ($res.FailedCount -gt 0) { throw "$($res.FailedCount) tests failed."}
+        if ($res.FailedCount -gt 0) { throw "$($res.FailedCount) tests failed." }
         Pop-Location
     }
 
@@ -84,5 +81,9 @@ else {
         Copy-Item -Path "$PSScriptRoot\lib" -Destination "$PSScriptRoot\out\Polaris\" -Force -Recurse
         Copy-Item -Path "$PSScriptRoot\Public" -Destination "$PSScriptRoot\out\Polaris\" -Force -Recurse
         Copy-Item -Path "$PSScriptRoot\Private" -Destination "$PSScriptRoot\out\Polaris\" -Force -Recurse
+
+        if ($null -ne $env:TF_BUILD) {
+            Compress-Archive "$PSScriptRoot/out/Polaris/" "$env:BUILD_ARTIFACTSTAGINGDIRECTORY"
+        }
     }
 }
