@@ -10,6 +10,7 @@ class PolarisResponse {
     [int]$StatusCode = 200
     [System.IO.Stream]$StreamResponse
     [System.Net.HttpListenerResponse]$RawResponse
+    [bool]$Sent = $false
 
     PolarisResponse ([System.Net.HttpListenerResponse]$RawResponse) {
         $this.RawResponse = $RawResponse
@@ -17,6 +18,7 @@ class PolarisResponse {
 
     Send () {
         $this.ByteResponse = [byte[]]::new(0)
+        $this.Sent = $true
     }
 
     Send ([string]$stringResponse) {
@@ -26,10 +28,12 @@ class PolarisResponse {
         else {
             $this.ByteResponse = [System.Text.Encoding]::UTF8.GetBytes($stringResponse)
         }
+        $this.Sent = $true
     }
 
     SendBytes ([byte[]]$byteArray) {
         $this.ByteResponse = $byteArray
+        $this.Sent = $true
     }
 
     Json ([string]$stringResponse) {
@@ -40,6 +44,7 @@ class PolarisResponse {
             $this.ByteResponse = [System.Text.Encoding]::UTF8.GetBytes($stringResponse)
         }
         $this.ContentType = "application/json"
+        $this.Sent = $true
     }
 
     SetHeader ([string]$headerName, [string]$headerValue) {

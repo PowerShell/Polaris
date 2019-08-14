@@ -52,57 +52,61 @@ class Polaris {
 
                 # Run middleware in the order in which it was added
                 foreach ($Middleware in $Polaris.RouteMiddleware) {
-                    $InformationVariable += $Polaris.InvokeRoute(
-                        $Middleware.Scriptblock,
-                        $Null,
-                        $Request,
-                        $Response
-                    )
-                }
-
-                $Polaris.Log("Parsed Route: $Route")
-                $Polaris.Log("Request Method: $($RawRequest.HttpMethod)")
-                $Routes = $Polaris.ScriptblockRoutes
-
-                #
-                # Searching for the first route that matches by the most specific route paths first.
-                #
-                $MatchingRoute = $Routes.keys | Sort-Object -Property Length -Descending | Where-Object { $Route -match [Polaris]::ConvertPathToRegex($_) } | Select-Object -First 1
-                $Request.Parameters = ([PSCustomObject]$Matches)
-                Write-Debug "Parameters: $Parameters"
-                $MatchingMethod = $false
-
-                if ($MatchingRoute) {
-                    $MatchingMethod = $Routes[$MatchingRoute].keys -contains $Request.Method
-                }
-
-                if ($MatchingRoute -and $MatchingMethod) {
-                    try {
-
+                    if ($Response.Sent -eq $false) {
                         $InformationVariable += $Polaris.InvokeRoute(
-                            $Routes[$MatchingRoute][$Request.Method],
-                            $Parameters,
+                            $Middleware.Scriptblock,
+                            $Null,
                             $Request,
                             $Response
                         )
-
-                    }
-                    catch {
-                        $ErrorsBody = ''
-                        $ErrorsBody += $_.Exception.ToString()
-                        $ErrorsBody += $_.InvocationInfo.PositionMessage + "`n`n"
-                        $Response.Send($ErrorsBody)
-                        $Polaris.Log($_)
-                        $Response.SetStatusCode(500)
                     }
                 }
-                elseif ($MatchingRoute) {
-                    $Response.Send("Method not allowed")
-                    $Response.SetStatusCode(405)
-                }
-                else {
-                    $Response.Send("Not found")
-                    $Response.SetStatusCode(404)
+                
+                if ($Response.Sent -eq $false) {
+                    $Polaris.Log("Parsed Route: $Route")
+                    $Polaris.Log("Request Method: $($RawRequest.HttpMethod)")
+                    $Routes = $Polaris.ScriptblockRoutes
+    
+                    #
+                    # Searching for the first route that matches by the most specific route paths first.
+                    #
+                    $MatchingRoute = $Routes.keys | Sort-Object -Property Length -Descending | Where-Object { $Route -match [Polaris]::ConvertPathToRegex($_) } | Select-Object -First 1
+                    $Request.Parameters = ([PSCustomObject]$Matches)
+                    Write-Debug "Parameters: $Parameters"
+                    $MatchingMethod = $false
+    
+                    if ($MatchingRoute) {
+                        $MatchingMethod = $Routes[$MatchingRoute].keys -contains $Request.Method
+                    }
+    
+                    if ($MatchingRoute -and $MatchingMethod) {
+                        try {
+    
+                            $InformationVariable += $Polaris.InvokeRoute(
+                                $Routes[$MatchingRoute][$Request.Method],
+                                $Parameters,
+                                $Request,
+                                $Response
+                            )
+    
+                        }
+                        catch {
+                            $ErrorsBody = ''
+                            $ErrorsBody += $_.Exception.ToString()
+                            $ErrorsBody += $_.InvocationInfo.PositionMessage + "`n`n"
+                            $Response.Send($ErrorsBody)
+                            $Polaris.Log($_)
+                            $Response.SetStatusCode(500)
+                        }
+                    }
+                    elseif ($MatchingRoute) {
+                        $Response.Send("Method not allowed")
+                        $Response.SetStatusCode(405)
+                    }
+                    else {
+                        $Response.Send("Not found")
+                        $Response.SetStatusCode(404)
+                    }
                 }
 
                 # Handle logs
@@ -345,7 +349,9 @@ class Polaris {
         [System.Net.WebHeaderCollection]$Headers
     ) {
         $RawResponse.StatusCode = $StatusCode
-        $RawResponse.Headers = $Headers
+        foreach ($Header in $Headers.Keys) {
+            $RawResponse.AddHeader($Header, $Headers.Get($Header))
+        }
         if ($ByteResponse.Length -gt 0) {
             $RawResponse.ContentType = $ContentType
         }
