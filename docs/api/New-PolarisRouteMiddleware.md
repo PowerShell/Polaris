@@ -37,14 +37,14 @@ manipulate request and response objects and run before web route scripts.
 ### EXAMPLE 1
 ```
 $JsonBodyParserMiddleware =
-```
-
 {
     if ($Request.BodyString -ne $null) {
         $Request.Body = $Request.BodyString | ConvertFrom-Json
     }
 }
+
 New-PolarisRouteMiddleware -Name JsonBodyParser -Scriptblock $JsonBodyParserMiddleware
+```
 
 ### EXAMPLE 2
 ```
