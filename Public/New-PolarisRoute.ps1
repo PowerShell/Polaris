@@ -1,4 +1,4 @@
-#
+﻿#
 # Copyright (c) Microsoft. All rights reserved.
 # Licensed under the MIT license. See LICENSE file in the project root for full license information.
 #
@@ -60,12 +60,12 @@ function New-PolarisRoute {
                 if (-Not ($_ | Test-Path -PathType Leaf) ) {
                     throw "The Path argument must be a file. Folder paths are not allowed."
                 }
-                if ($_ -notmatch "\.ps1") {
+                if ([System.IO.Path]::GetExtension($_) -ne ".ps1") {
                     throw "The file specified in the path argument must be of type .ps1"
                 }
-                return $true 
+                return $true
             })]
-        [String]
+        [string]
         $ScriptPath,
 
         [switch]
@@ -77,26 +77,23 @@ function New-PolarisRoute {
     $ExistingWebRoute = Get-PolarisRoute -Path $Path -Method $Method
 
     if ( $ExistingWebRoute ) {
-        if ( $Force ) {
-            # If $Force is specified and there is an existing webroute we remove it
-            Remove-PolarisRoute -Path $Path -Method $Method
-        }
-        else {
-            # If $Force is not specified we throw a terminating error
+        if ( -not $Force ) {
             $Exception = [System.Exception]'WebRoute already exists.'
             $ErrorId = "Polaris.Webroute.RouteAlreadyExists"
             $ErrorCategory = [System.Management.Automation.ErrorCategory]::ResourceExists
             $TargetObject = "$Path,$Method"
-    
+
             $WebRouteExistsError = [System.Management.Automation.ErrorRecord]::new(
                 $Exception,
                 $ErrorId,
                 $ErrorCategory,
                 $TargetObject
             )
-    
+
             throw $WebRouteExistsError
+            # If $Force is specified and there is an existing webroute we remove it
         }
+        Remove-PolarisRoute -Path $Path -Method $Method
     }
 
     CreateNewPolarisIfNeeded
@@ -104,7 +101,7 @@ function New-PolarisRoute {
         $Polaris = $Script:Polaris
     }
 
-     if ( $Path -is [string] -and -not $Path.StartsWith( '/' ) ) {
+    if ( $Path -is [string] -and -not $Path.StartsWith( '/' ) ) {
         $Path = '/' + $Path
     }
 

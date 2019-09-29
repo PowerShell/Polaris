@@ -75,13 +75,12 @@ class Polaris {
                     Write-Debug "`$IsMatchingMethod = `$Route.Method($($Route.Method)) -eq `$Request.Method($($Request.Method))"
                     $IsMatchingRoute = $RequestedRoute -match $Route.Regex
                     Write-Debug "`$IsMatchingRoute = `$RequestedRoute($($RequestedRoute)) -match `$Route.Regex($($Route.Regex))"
-                    if ( $IsMatchingMethod -and $IsMatchingRoute ) {
+                    if ( $IsMatchingRoute ) {
                         $MatchingRoute = $Route
-                        $HasMatchingMethod = $true
-                        break
-                    }
-                    elseif ( $IsMatchingRoute ) {
-                        $MatchingRoute = $Route
+                        if ( $IsMatchingMethod ) {
+                            $HasMatchingMethod = $true
+                            break
+                        }
                     }
                 }
 

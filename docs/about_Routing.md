@@ -10,7 +10,6 @@ type: about
 
 #  SHORT DESCRIPTION
 
-
 **Routing** refers to determining how an application responds to a client request to a particular endpoint, which is a URI (or path) and a specific HTTP request method (GET, POST, and so on).
 
 Polaris routes are declared using the `New-PolarisRoute` cmdlet as follows:
@@ -43,8 +42,6 @@ An HTTP request using the GET method to the following uri `/hello/Bobby/Dylan` w
 
 # LONG DESCRIPTION
 
-
-
 ## Examples of basic simple route matching
 
 This route path will match requests to the root route, /.
@@ -61,10 +58,10 @@ New-PolarisRoute -Path "/about" -ScriptBlock {
 }
 ```
 
-This route path will match requests to /random.text.
+This route path will match requests to /random.txt.
 ```ps
-New-PolarisRoute -Path "/random.text" -ScriptBlock {
-   $Response.Send('random.text')
+New-PolarisRoute -Path "/random.txt" -ScriptBlock {
+   $Response.Send('random.txt')
 }
 ```
 
