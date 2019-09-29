@@ -53,6 +53,7 @@ class Polaris {
                 # Run middleware in the order in which it was added
                 foreach ($Middleware in $Polaris.RouteMiddleware) {
                     if ($Response.Sent -eq $false) {
+                        Write-Debug "Executing middleware: $( $Middlware | ConvertTo-Json )"
                         $InformationVariable += $Polaris.InvokeRoute(
                             $Middleware.Scriptblock,
                             $Null,
@@ -62,79 +63,42 @@ class Polaris {
                     }
                 }
 
-                $Polaris.Log("Parsed Route: $RequestedRoute")
-                $Polaris.Log("Request Method: $($RawRequest.HttpMethod)")
-                $Routes = $Polaris.Routes
-
-                #
-                # Searching for the first route that matches by the most specific route paths first.
-                #
-                $MatchingRoute = $Null
-                $HasMatchingMethod = $false
-                foreach ($Route in $Routes) {
-                    Write-Debug "Testing Route: `n`n $( $Route | ConvertTo-Json )"
-                    $IsMatchingMethod = $Route.Method -eq $Request.Method
-                    Write-Debug "`$IsMatchingMethod = `$Route.Method($($Route.Method)) -eq `$Request.Method($($Request.Method))"
-                    $IsMatchingRoute = $RequestedRoute -match $Route.Regex
-                    Write-Debug "`$IsMatchingRoute = `$RequestedRoute($($RequestedRoute)) -match `$Route.Regex($($Route.Regex))"
-                    if ( $IsMatchingRoute ) {
-                        $MatchingRoute = $Route
-                        if ( $IsMatchingMethod ) {
-                            $HasMatchingMethod = $true
-                            break
-                        }
-                    }
-                }
-
-                $Request.Parameters = ([PSCustomObject]$Matches)
-                Write-Debug "Parameters: $($Request.Parameters)"
-
-                if ($MatchingRoute -and $HasMatchingMethod) {
-                    try {
-                        $InformationVariable += $Polaris.InvokeRoute(
-                            $MatchingRoute.ScriptBlock,
-                            $Parameters,
-                            $Request,
-                            $Response
-                        )
-                    }
-                    catch {
-                        $ErrorsBody = ''
-                        $ErrorsBody += $_.Exception.ToString()
-                        $ErrorsBody += $_.InvocationInfo.PositionMessage + "`n`n"
-                        $Response.Send($ErrorsBody)
-                        $Polaris.Log($_)
-                        $Response.SetStatusCode(500)
-                    }
-                }
-
                 if ($Response.Sent -eq $false) {
-                    $Polaris.Log("Parsed Route: $Route")
+                    $Polaris.Log("Parsed Route: $RequestedRoute")
                     $Polaris.Log("Request Method: $($RawRequest.HttpMethod)")
-                    $Routes = $Polaris.ScriptblockRoutes
+                    $Routes = $Polaris.Routes
 
                     #
                     # Searching for the first route that matches by the most specific route paths first.
                     #
-                    $MatchingRoute = $Routes.keys | Sort-Object -Property Length -Descending | Where-Object { $Route -match [Polaris]::ConvertPathToRegex($_) } | Select-Object -First 1
-                    $Request.Parameters = ([PSCustomObject]$Matches)
-                    Write-Debug "Parameters: $Parameters"
-                    $MatchingMethod = $false
-
-                    if ($MatchingRoute) {
-                        $MatchingMethod = $Routes[$MatchingRoute].keys -contains $Request.Method
+                    $MatchingRoute = $Null
+                    $HasMatchingMethod = $false
+                    foreach ($Route in $Routes) {
+                        Write-Debug "Testing Route: `n`n $( $Route | ConvertTo-Json )"
+                        $IsMatchingMethod = $Route.Method -eq $Request.Method
+                        Write-Debug "`$IsMatchingMethod = `$Route.Method($($Route.Method)) -eq `$Request.Method($($Request.Method))"
+                        $IsMatchingRoute = $RequestedRoute -match $Route.Regex
+                        Write-Debug "`$IsMatchingRoute = `$RequestedRoute($($RequestedRoute)) -match `$Route.Regex($($Route.Regex))"
+                        if ( $IsMatchingRoute ) {
+                            $MatchingRoute = $Route
+                            if ( $IsMatchingMethod ) {
+                                $HasMatchingMethod = $true
+                                break
+                            }
+                        }
                     }
 
-                    if ($MatchingRoute -and $MatchingMethod) {
-                        try {
+                    $Request.Parameters = ([PSCustomObject]$Matches)
+                    Write-Debug "Parameters: $($Request.Parameters)"
 
+                    if ($MatchingRoute -and $HasMatchingMethod) {
+                        try {
                             $InformationVariable += $Polaris.InvokeRoute(
-                                $Routes[$MatchingRoute][$Request.Method],
+                                $MatchingRoute.ScriptBlock,
                                 $Parameters,
                                 $Request,
                                 $Response
                             )
-
                         }
                         catch {
                             $ErrorsBody = ''

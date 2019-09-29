@@ -21,7 +21,7 @@ function Use-PolarisJsonBodyParserMiddleware {
     )
 
     New-PolarisRouteMiddleware -Name JsonBodyParser -Scriptblock {
-        if ( $Null -ne $nequest.BodyString ) {
+        if ( $Null -ne $Request.BodyString ) {
             $Request.Body = $Request.BodyString | ConvertFrom-Json
         }
     } -Force -Polaris $Polaris
