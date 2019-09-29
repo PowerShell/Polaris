@@ -1,4 +1,4 @@
-#
+﻿#
 # Copyright (c) Microsoft. All rights reserved.
 # Licensed under the MIT license. See LICENSE file in the project root for full license information.
 #
@@ -21,7 +21,7 @@ function Use-PolarisJsonBodyParserMiddleware {
     )
 
     New-PolarisRouteMiddleware -Name JsonBodyParser -Scriptblock {
-        if ( $Request.BodyString -ne $Null ) {
+        if ( $Null -ne $nequest.BodyString ) {
             $Request.Body = $Request.BodyString | ConvertFrom-Json
         }
     } -Force -Polaris $Polaris
