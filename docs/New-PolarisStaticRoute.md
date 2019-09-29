@@ -25,7 +25,7 @@ Perfect for static websites.
 
 ### EXAMPLE 1
 ```
-New-PolarisStaticRoute -RoutePath 'public' -Path D:\FolderShares\public
+New-PolarisStaticRoute -RoutePath 'public' -FolderPath D:\FolderShares\public
 ```
 
 Creates web routes for GET method for each file recursively within D:\FolderShares\public
