@@ -14,11 +14,7 @@ Describe "Test route creation" {
         $defaultStaticDirectory = "$PSScriptRoot/../resources/static"
 
         function RouteExists ($Path, $Method) {
-            [string]$SanitizedPath = $Path.TrimEnd('/')
-
-            if ( [string]::IsNullOrEmpty($SanitizedPath) ) { $SanitizedPath = "/" }
-
-            return $null -ne (Get-Polaris).ScriptblockRoutes[$SanitizedPath][$Method]
+            return $null -ne (Get-PolarisRoute -Path $Path -Method $Method)
         }
     }
     Context "Using New-PolarisRoute" {
@@ -28,10 +24,12 @@ Describe "Test route creation" {
             @{ Path = '/test'; Method = 'POST'; ScriptPath = $null; Scriptblock = $defaultScriptblock }
             @{ Path = '/test'; Method = 'PUT'; ScriptPath = $null; Scriptblock = $defaultScriptblock }
             @{ Path = '/test'; Method = 'DELETE'; ScriptPath = $null; Scriptblock = $defaultScriptblock }
+            @{ Path = [Regex]::new("/testRegex"); Method = 'GET'; ScriptPath = $null; Scriptblock = $defaultScriptblock }
             @{ Path = '/test'; Method = 'GET'; ScriptPath = $defaultScriptPath; Scriptblock = $null }
             @{ Path = '/test'; Method = 'POST'; ScriptPath = $defaultScriptPath; Scriptblock = $null }
             @{ Path = '/test'; Method = 'PUT'; ScriptPath = $defaultScriptPath; Scriptblock = $null }
             @{ Path = '/test'; Method = 'DELETE'; ScriptPath = $defaultScriptPath; Scriptblock = $null }
+            @{ Path = [Regex]::new("/testRegex"); Method = 'GET'; ScriptPath = $defaultScriptPath; Scriptblock = $null }
         ) {
             param ($Path, $Method, $ScriptPath, $Scriptblock)
             if ($ScriptPath) {
@@ -49,6 +47,7 @@ Describe "Test route creation" {
             -TestCases @(
             @{ Path = '/test'; ScriptPath = $defaultScriptPath; Scriptblock = $null }
             @{ Path = '/test'; ScriptPath = $null; Scriptblock = $defaultScriptblock }
+            @{ Path = [Regex]::new("/testRegex"); ScriptPath = $null; Scriptblock = $defaultScriptblock }
         ) {
             param ($Path, $ScriptPath, $Scriptblock)
             if ($ScriptPath -ne $null -and $ScriptPath -ne '') {
@@ -66,6 +65,7 @@ Describe "Test route creation" {
             -TestCases @(
             @{ Path = '/test'; ScriptPath = $defaultScriptPath; Scriptblock = $null }
             @{ Path = '/test'; ScriptPath = $null; Scriptblock = $defaultScriptblock }
+            @{ Path = [Regex]::new("/testRegex"); ScriptPath = $null; Scriptblock = $defaultScriptblock }
         ) {
             param ($Path, $ScriptPath, $Scriptblock)
             if ($ScriptPath) {
@@ -83,6 +83,7 @@ Describe "Test route creation" {
             -TestCases @(
             @{ Path = '/test'; ScriptPath = $defaultScriptPath; Scriptblock = $null }
             @{ Path = '/test'; ScriptPath = $null; Scriptblock = $defaultScriptblock }
+            @{ Path = [Regex]::new("/testRegex"); ScriptPath = $null; Scriptblock = $defaultScriptblock }
         ) {
             param ($Path, $ScriptPath, $Scriptblock)
             if ($ScriptPath) {
@@ -100,6 +101,7 @@ Describe "Test route creation" {
             -TestCases @(
             @{ Path = '/test'; ScriptPath = $defaultScriptPath; Scriptblock = $null }
             @{ Path = '/test'; ScriptPath = $null; Scriptblock = $defaultScriptblock }
+            @{ Path = [Regex]::new("/testRegex"); ScriptPath = $null; Scriptblock = $defaultScriptblock }
         ) {
             param ($Path, $ScriptPath, $Scriptblock)
             if ($ScriptPath) {
@@ -128,16 +130,21 @@ Describe "Test route creation" {
     }
 
     Context "Using Get-PolarisRoute and Remove-PolarisRoute" {
+        BeforeEach {
+            New-PolarisRoute -Path "/test" -Method "GET" -Scriptblock $defaultScriptblock
+            New-PolarisRoute -Path ([Regex]::new("/testRegex")) -Method "GET" -Scriptblock $defaultScriptblock
+        }
         It "Will get the object with the routes" {
             ( Get-PolarisRoute -Path "/test" -Method "GET" ).Scriptblock |
-                Should Be $defaultScriptblock.ToString()
+            Should Be $defaultScriptblock.ToString()
+
+            ( Get-PolarisRoute -Path "/testRegex" -Method "GET" ).Scriptblock |
+            Should Be $defaultScriptblock.ToString()
         }
         It "will remove the routes" {
             Remove-PolarisRoute -Path "/test" -Method "GET"
+            Remove-PolarisRoute -Path "/testRegex" -Method "GET"
             (Get-PolarisRoute).Count | Should Be 0
-        }
-        BeforeEach {
-            New-PolarisRoute -Path "/test" -Method "GET" -Scriptblock $defaultScriptblock
         }
         AfterEach {
             Clear-Polaris

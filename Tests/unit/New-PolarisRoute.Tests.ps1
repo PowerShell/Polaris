@@ -166,6 +166,19 @@ Describe "New-PolarisRoute" {
         ( Get-PolarisRoute -Path $Path -Method $Method ).Scriptblock | Should Be $NewContent
     }
 
+    It "Should allow regular expressions for the path" {
+        $Params = @{
+            Path = [Regex]::new(".*")
+            Method = "GET"
+            ScriptBlock = {"RegexParams"}
+        }
+
+        # Create route
+        New-PolarisRoute @Params
+
+        (Get-PolarisRoute -Path $Params.Path -Method $Params.Method).ScriptBlock | Should Be $Params.ScriptBlock
+    }
+
     AfterAll {
 
         #  Clean up test routes

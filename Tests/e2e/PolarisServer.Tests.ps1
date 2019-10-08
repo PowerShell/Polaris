@@ -106,7 +106,6 @@ Describe "Test webserver use (E2E)" {
             $Result.StatusCode | Should Be 200
         }
 
-
         It "test /header router" {
             $Result = Invoke-WebRequest -Uri "http://localhost:$Port/header" -UseBasicParsing
             $Result.Content | Should Be 'Header test'

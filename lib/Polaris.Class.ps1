@@ -1,4 +1,4 @@
-#
+﻿#
 # Copyright (c) Microsoft. All rights reserved.
 # Licensed under the MIT license. See LICENSE file in the project root for full license information.
 #
@@ -6,8 +6,8 @@
 class Polaris {
 
     [int]$Port
-    [System.Collections.Generic.List[PolarisMiddleWare]]$RouteMiddleWare = [System.Collections.Generic.List[PolarisMiddleWare]]::new()
-    [System.Collections.Generic.Dictionary[string, [System.Collections.Generic.Dictionary[string, scriptblock]]]]$ScriptblockRoutes = [System.Collections.Generic.Dictionary[string, [System.Collections.Generic.Dictionary[string, scriptblock]]]]::new()
+    [System.Collections.Generic.List[PolarisMiddleware]]$RouteMiddleWare = [System.Collections.Generic.List[PolarisMiddleWare]]::new()
+    [PolarisRoute[]]$Routes = @()
     hidden [Action[string]]$Logger
     hidden [System.Net.HttpListener]$Listener
     hidden [bool]$StopServer = $False
@@ -42,17 +42,18 @@ class Polaris {
             [PolarisResponse]$Response = [PolarisResponse]::new($Context.Response)
 
 
-            [string]$Route = $RawRequest.Url.AbsolutePath
+            [string]$RequestedRoute = $RawRequest.Url.AbsolutePath
 
             [System.Management.Automation.InformationRecord[]]$InformationVariable = @()
 
-            if ([string]::IsNullOrEmpty($Route)) { $Route = "/" }
+            if ([string]::IsNullOrEmpty($RequestedRoute)) { $RequestedRoute = "/" }
 
             try {
 
                 # Run middleware in the order in which it was added
                 foreach ($Middleware in $Polaris.RouteMiddleware) {
                     if ($Response.Sent -eq $false) {
+                        Write-Debug "Executing middleware: $( $Middlware | ConvertTo-Json )"
                         $InformationVariable += $Polaris.InvokeRoute(
                             $Middleware.Scriptblock,
                             $Null,
@@ -61,34 +62,43 @@ class Polaris {
                         )
                     }
                 }
-                
+
                 if ($Response.Sent -eq $false) {
-                    $Polaris.Log("Parsed Route: $Route")
+                    $Polaris.Log("Parsed Route: $RequestedRoute")
                     $Polaris.Log("Request Method: $($RawRequest.HttpMethod)")
-                    $Routes = $Polaris.ScriptblockRoutes
-    
+                    $Routes = $Polaris.Routes
+
                     #
                     # Searching for the first route that matches by the most specific route paths first.
                     #
-                    $MatchingRoute = $Routes.keys | Sort-Object -Property Length -Descending | Where-Object { $Route -match [Polaris]::ConvertPathToRegex($_) } | Select-Object -First 1
-                    $Request.Parameters = ([PSCustomObject]$Matches)
-                    Write-Debug "Parameters: $Parameters"
-                    $MatchingMethod = $false
-    
-                    if ($MatchingRoute) {
-                        $MatchingMethod = $Routes[$MatchingRoute].keys -contains $Request.Method
+                    $MatchingRoute = $Null
+                    $HasMatchingMethod = $false
+                    foreach ($Route in $Routes) {
+                        Write-Debug "Testing Route: `n`n $( $Route | ConvertTo-Json )"
+                        $IsMatchingMethod = $Route.Method -eq $Request.Method
+                        Write-Debug "`$IsMatchingMethod = `$Route.Method($($Route.Method)) -eq `$Request.Method($($Request.Method))"
+                        $IsMatchingRoute = $RequestedRoute -match $Route.Regex
+                        Write-Debug "`$IsMatchingRoute = `$RequestedRoute($($RequestedRoute)) -match `$Route.Regex($($Route.Regex))"
+                        if ( $IsMatchingRoute ) {
+                            $MatchingRoute = $Route
+                            if ( $IsMatchingMethod ) {
+                                $HasMatchingMethod = $true
+                                break
+                            }
+                        }
                     }
-    
-                    if ($MatchingRoute -and $MatchingMethod) {
+
+                    $Request.Parameters = ([PSCustomObject]$Matches)
+                    Write-Debug "Parameters: $($Request.Parameters)"
+
+                    if ($MatchingRoute -and $HasMatchingMethod) {
                         try {
-    
                             $InformationVariable += $Polaris.InvokeRoute(
-                                $Routes[$MatchingRoute][$Request.Method],
+                                $MatchingRoute.ScriptBlock,
                                 $Parameters,
                                 $Request,
                                 $Response
                             )
-    
                         }
                         catch {
                             $ErrorsBody = ''
@@ -169,20 +179,16 @@ class Polaris {
 
 
     [void] AddRoute (
-        [string]$Path,
+        $Path,
         [string]$Method,
         [scriptblock]$Scriptblock
     ) {
         if ($null -eq $Scriptblock) {
-            throw [ArgumentNullException]::new("scriptBlock")
+            throw [ArgumentNullException]::new("ScriptBlock")
         }
 
-        [string]$SanitizedPath = [Polaris]::SanitizePath($Path)
-
-        if (-not $this.ScriptblockRoutes.ContainsKey($SanitizedPath)) {
-            $this.ScriptblockRoutes[$SanitizedPath] = [System.Collections.Generic.Dictionary[string, string]]::new()
-        }
-        $this.ScriptblockRoutes[$SanitizedPath][$Method] = $Scriptblock
+        $this.Routes += [PolarisRoute]::new($Method, $Path, $Scriptblock)
+        $this.Routes = $this.Routes | Sort-Object -Property { $_.Path.Length } -Descending
     }
 
     RemoveRoute (
@@ -190,54 +196,13 @@ class Polaris {
         [string]$Method
     ) {
         if ($null -eq $Path) {
-            throw [ArgumentNullException]::new("path")
+            throw [ArgumentNullException]::new("Path")
         }
         if ($null -eq $Method) {
-            throw [ArgumentNullException]::new("method")
+            throw [ArgumentNullException]::new("Method")
         }
 
-        [string]$SanitizedPath = [Polaris]::SanitizePath($Path)
-
-        $this.ScriptblockRoutes[$SanitizedPath].Remove($Method)
-        if ($this.ScriptblockRoutes[$SanitizedPath].Count -eq 0) {
-            $this.ScriptblockRoutes.Remove($SanitizedPath)
-        }
-    }
-
-    static [string] SanitizePath([string]$Path) {
-        $SanitizedPath = $Path.TrimEnd('/')
-
-        if ([string]::IsNullOrEmpty($SanitizedPath)) { $SanitizedPath = "/" }
-
-        return $SanitizedPath
-    }
-
-    static [RegEx] ConvertPathToRegex([string]$Path) {
-        Write-Debug "Path: $path"
-        # Replacing all periods with an escaped period to prevent regex wildcard
-        $path = $path -replace '\.', '\.'
-        # Replacing all - with \- to escape the dash
-        $path = $path -replace '-', '\-'
-        # Replacing the wildcard character * with a regex aggressive match .*
-        $path = $path -replace '\*', '.*'
-        # Creating a strictly matching regular expression that must match beginning (^) to end ($)
-        $path = "^$path$"
-        # Creating a route based parameter
-        #   Match any and all word based characters after the : for the name of the parameter
-        #   Use the name in a named capture group that will show up in the $matches variable
-        #   References:
-        #       - https://docs.microsoft.com/en-us/dotnet/standard/base-types/grouping-constructs-in-regular-expressions#named_matched_subexpression
-        #       - https://technet.microsoft.com/en-us/library/2007.11.powershell.aspx
-        #       - https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_automatic_variables?view=powershell-6#matches
-        $path = $path -replace ":(\w+)(\?{0,1})", '(?<$1>.+)$2'
-
-        Write-Debug "Parsed Regex: $path"
-        return [RegEx]::New($path)
-    }
-
-    static [RegEx] ConvertPathToRegex([RegEx]$Path) {
-        Write-Debug "Path is a RegEx"
-        return $Path
+        $this.Routes = $this.Routes | Where-Object { -not ($_.Path -eq $Path -and $_.Method -eq $Method) }
     }
 
     AddMiddleware (

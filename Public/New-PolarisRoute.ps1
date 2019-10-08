@@ -1,4 +1,4 @@
-#
+﻿#
 # Copyright (c) Microsoft. All rights reserved.
 # Licensed under the MIT license. See LICENSE file in the project root for full license information.
 #
@@ -9,7 +9,11 @@
 .DESCRIPTION
     Create web route for server to serve.
 .PARAMETER Path
-    Path (path/route/endpoint) of the web route to to be serviced.
+    The path for which the given scriptblock or script is invoked; can be any of:
+        * A string representing a path.
+        * A path pattern.
+        * A regular expression to match paths.
+    For examples, see Path examples.
 .PARAMETER Method
     HTTP verb/method to be serviced.
     Valid values are GET, HEAD, POST, PUT, DELETE, CONNECT, OPTIONS, TRACE
@@ -37,7 +41,6 @@ function New-PolarisRoute {
     [CmdletBinding()]
     param(
         [Parameter( Mandatory = $True, Position = 0 )]
-        [string]
         $Path,
 
         [Parameter( Mandatory = $True, Position = 1 )]
@@ -50,6 +53,18 @@ function New-PolarisRoute {
         $Scriptblock,
 
         [Parameter( Mandatory = $True, ParameterSetName = 'ScriptPath' )]
+        [ValidateScript( {
+                if (-Not ($_ | Test-Path) ) {
+                    throw "File does not exist"
+                }
+                if (-Not ($_ | Test-Path -PathType Leaf) ) {
+                    throw "The Path argument must be a file. Folder paths are not allowed."
+                }
+                if ([System.IO.Path]::GetExtension($_) -ne ".ps1") {
+                    throw "The file specified in the path argument must be of type .ps1"
+                }
+                return $true
+            })]
         [string]
         $ScriptPath,
 
@@ -61,47 +76,42 @@ function New-PolarisRoute {
     $Method = $Method.ToUpper()
     $ExistingWebRoute = Get-PolarisRoute -Path $Path -Method $Method
 
-    if ( $ExistingWebRoute -and $Force ) {
-        Remove-PolarisRoute -Path $Path -Method $Method
-        $ExistingWebRoute = Get-PolarisRoute -Path $Path -Method $Method
-    }
-
     if ( $ExistingWebRoute ) {
-        $PSCmdlet.WriteError( (
-                New-Object -TypeName System.Management.Automation.ErrorRecord -ArgumentList @(
-                    [System.Exception]'WebRoute already exists.'
-                    $Null
-                    [System.Management.Automation.ErrorCategory]::ResourceExists
-                    "$Path,$Method" ) ) )
+        if ( -not $Force ) {
+            $Exception = [System.Exception]'WebRoute already exists.'
+            $ErrorId = "Polaris.Webroute.RouteAlreadyExists"
+            $ErrorCategory = [System.Management.Automation.ErrorCategory]::ResourceExists
+            $TargetObject = "$Path,$Method"
+
+            $WebRouteExistsError = [System.Management.Automation.ErrorRecord]::new(
+                $Exception,
+                $ErrorId,
+                $ErrorCategory,
+                $TargetObject
+            )
+
+            throw $WebRouteExistsError
+            # If $Force is specified and there is an existing webroute we remove it
+        }
+        Remove-PolarisRoute -Path $Path -Method $Method
     }
-    else {
-        CreateNewPolarisIfNeeded
-        if( -not $Polaris){
-            $Polaris = $Script:Polaris
-        }
 
-        if ( -not $Path.StartsWith( '/' ) ) {
-            $Path = '/' + $Path
-        }
+    CreateNewPolarisIfNeeded
+    if ( -not $Polaris) {
+        $Polaris = $Script:Polaris
+    }
 
-        switch ( $PSCmdlet.ParameterSetName ) {
-            'Scriptblock' {
-                $Polaris.AddRoute( $Path, $Method, $Scriptblock )
-            }
-            'ScriptPath' {
-                if ( Test-Path -Path $ScriptPath ) {
-                    $Script = Get-Content -Path $ScriptPath -Raw
-                    $Polaris.AddRoute( $Path, $Method, [scriptblock]::Create($Script) )
-                }
-                else {
-                    $PSCmdlet.WriteError( (
-                            New-Object -TypeName System.Management.Automation.ErrorRecord -ArgumentList @(
-                                [System.Exception]'ScriptPath not found.'
-                                $Null
-                                [System.Management.Automation.ErrorCategory]::ObjectNotFound
-                                $ScriptPath ) ) )
-                }
-            }
+    if ( $Path -is [string] -and -not $Path.StartsWith( '/' ) ) {
+        $Path = '/' + $Path
+    }
+
+    switch ( $PSCmdlet.ParameterSetName ) {
+        'Scriptblock' {
+            $Polaris.AddRoute( $Path, $Method, $Scriptblock )
+        }
+        'ScriptPath' {
+            $Script = Get-Content -Path $ScriptPath -Raw
+            $Polaris.AddRoute( $Path, $Method, [scriptblock]::Create($Script) )
         }
     }
 }

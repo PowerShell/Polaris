@@ -32,6 +32,10 @@ Describe "Polaris Routing (e2e)" {
                 $Response.Send(($Request.Parameters | ConvertTo-JSON))
             }
 
+            New-PolarisRoute -Path ([Regex]::new("/userRegex/(?<userId>\d+)")) -Method "GET" -Scriptblock {
+                $Response.Send(($Request.Parameters | ConvertTo-JSON))
+            }
+
             New-PolarisRoute -Path "/" -Method "GET" -Scriptblock {
                 $Response.Send("root")
             }
@@ -91,6 +95,11 @@ Describe "Polaris Routing (e2e)" {
 
     It "should allow custom named capture regular expressions" {
         $Result = Invoke-RestMethod -Uri "http://localhost:$Port/user/42" -UseBasicParsing -TimeoutSec 2
+        $Result.userId | Should Be '42'
+    }
+
+    It "should allow custom named capture regular expressions of RegEx type" {
+        $Result = Invoke-RestMethod -Uri "http://localhost:$Port/userRegex/42" -UseBasicParsing -TimeoutSec 2
         $Result.userId | Should Be '42'
     }
 

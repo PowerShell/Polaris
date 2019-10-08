@@ -33,7 +33,7 @@ Describe "Get-PolarisRoute" {
     }
 
     It "Should default to get all routes" {
-        $ExpectedCount = (Get-Polaris).ScriptblockRoutes.Values.Values.Count
+        $ExpectedCount = (Get-Polaris).Routes.Count
         $Routes = Get-PolarisRoute
         @( $Routes ).Count | Should Be $ExpectedCount
     }
