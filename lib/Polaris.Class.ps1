@@ -1,4 +1,4 @@
-#
+﻿#
 # Copyright (c) Microsoft. All rights reserved.
 # Licensed under the MIT license. See LICENSE file in the project root for full license information.
 #
@@ -269,8 +269,21 @@ class Polaris {
         [string]$HostName
     ) {
         $this.StopServer = $false
-        $this.InitListener($Port, $Https, $Auth, $HostName)
-        $this.Listener.BeginGetContext($this.ContextHandler, $this)
+        if($this.Listener -eq $null) {
+            Write-Debug "Creating new listener"
+            $this.InitListener($Port, $Https, $Auth, $HostName)
+            $this.Listener.BeginGetContext($this.ContextHandler, $this)
+        } else {
+            Write-Debug "Listener object already created"
+            if($this.Listener.IsListening){
+                Write-Debug "Listener is already in a listening state. Doing nothing"
+            } else {
+                Write-Debug "Listener object exists but has shut down. Reinitializing..."
+                $this.Stop()
+                $this.InitListener($Port, $Https, $Auth, $HostName)
+                $this.Listener.BeginGetContext($this.ContextHandler, $this)
+            }
+        }
     }
 
     [void] Stop () {
@@ -278,8 +291,8 @@ class Polaris {
         $this.Listener.Close()
         $this.Listener.Dispose()
         $this.Log("Server Stopped.")
-
     }
+
     [void] InitListener (
         [int]$Port,
         [bool]$Https,

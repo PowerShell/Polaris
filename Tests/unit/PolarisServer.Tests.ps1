@@ -19,26 +19,23 @@ Describe "Test webserver use" {
     }
 
     Context "Test starting and stopping of the server" {
-        BeforeAll {
-            if (-not $IsUnix) {
-                Stop-Polaris
-                $Polaris = Get-Polaris
-                $Polaris.Listener.IsListening | Should Be $false
 
-                $Polaris = Start-Polaris -Port 9998
-                $Polaris.Listener.IsListening | Should be $true
-            }
+        It "Should allow starting and stopping the server" {
+            Stop-Polaris
+            $Polaris = Get-Polaris
+            $Polaris.Listener.IsListening | Should Be $false
+
+            $Polaris = Start-Polaris -Port 9998
+            $Polaris.Listener.IsListening | Should be $true
         }
 
-        It "Allows a custom logger" {
+        It "Should allow running Start-Polaris multiple times without error" {
+            Stop-Polaris
             $Polaris = Get-Polaris
-            $Polaris.Logger = {
-                param($Word)
-                $Word | Out-File "TestDrive:\test.log" -NoNewline
-            }
+            $Polaris.Listener.IsListening | Should Be $false
 
-            $Polaris.Log("Hello")
-            Get-Content "TestDrive:\test.log" -Raw | Should be "Hello"
+            $Polaris = Start-Polaris -Port 9998
+            $Polaris.Listener.IsListening | Should be $true
         }
     }
 }

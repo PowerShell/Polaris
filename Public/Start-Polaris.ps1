@@ -74,6 +74,7 @@ function Start-Polaris {
     )
 
     if ( -not $Polaris) {
+        Write-Verbose 'No Polaris found. Creating new.'
         CreateNewPolarisIfNeeded
         $Polaris = $Script:Polaris
     }
@@ -82,6 +83,11 @@ function Start-Polaris {
         Use-PolarisJsonBodyParserMiddleware -Polaris $Polaris
     }
 
+    Write-Verbose "Starting polaris listening"
+    Write-Verbose "   Port: $Port"
+    Write-Verbose "   Https.IsPreset: $($Https.IsPresent)"
+    Write-Verbose "   Auth: $Auth"
+    Write-Verbose "   HostName: $HostName"
     $Polaris.Start( $Port, $Https.IsPresent, $Auth, $HostName)
 
     return $Polaris
