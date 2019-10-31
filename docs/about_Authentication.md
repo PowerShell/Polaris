@@ -102,6 +102,34 @@ It will populate `$Request.User` with an IPrincipal that contains all the Active
 
 Impersonation offers an excellent solution if you are attempting to create a web based file server as access to the files and folders can be managed using standard file and folder permissions and impersonation will ensure that those security rules are honored.
 
+### how-to configure Kerberos Authentication for Polaris in an AD Domain.
+Kerberos can be a little tricky to set up, and if you're just running Polaris with a lambda user account, there's a pretty good chance that it is using NTLM and not kerberos. And you don't want this since NTLM is [quite easy to break](https://en.wikipedia.org/wiki/NT_LAN_Manager#Weakness_and_Vulnerabilities).
+
+#### \#requires : 
+These instructions assumes that you're in a ActiveDirectory Domain and trying to authenticate users from this domain. That Polaris is running on a server joined to this domain. And that you're able to manage an account in this domain or at least modify it using setspn.exe. Also, we won't explain how Kerberos works here.
+
+#### Instructions :
+1. choose the account who'll run polaris :
+    1. **(recommended) Option A** is to create a new AD user account : 
+`New-ADUser -Name "svc_polarisapp" -SamAccountName "svc_polarisapp" -UserPrincipalName "svc_polarisapp@domaine.tld" -Path "OU=ServicesAccounts,DC=domaine,DC=tld" -AccountPassword(Read-Host -AsSecureString "Input Password") -Enabled $true`
+and then to associate a servicePrincipalName with this account using :
+`setspn.exe -S "HTTP/Polarisserver.domain.tld" DOMAIN\svc_polarisapp`
+    2. **Option B** is to [use the local SYSTEM or NETWORK account](https://social.msdn.microsoft.com/Forums/en-US/c2ba1e1c-3ff8-4c74-874e-2de2bcb1a4c1/httplistener-windows-authentication-fails-for-domain-account?forum=netfxnetcom) of the Polaris server and set the SPN on the computer account of the server.
+`setspn.exe -S "HTTP/Polarisserver.domain.tld" DOMAIN\PolarisserverComputerAccount`
+2. Your Polaris Script could require local administrator privilege on the server to use the public IP of the server. A  DNS reverse lookup of its IP must return the same DNS name that you set with setspn.exe as kerberos client will check that before requesting a TGS for the service.
+3. Run your Polaris script with the account you choosed ([doc](https://poshtools.com/2018/11/04/hosting-polaris-in-a-windows-service-using-powershell-pro-tools/),[doc](https://github.com/PowerShell/Polaris/issues/47)) : creating scheduled task is quick and easy way to achieve this, psexec can also be used, nssm and [PowerShell Pro Tools](https://www.powershellgallery.com/packages/powershellprotools/1.3.0) are good options. If running as a service, note that you might want to use a managed service account instead of a classic user account. And in case you're using the standard AD user Account, you could just do an interractive log-on with this account and run a PowerShell console from here.
+Here a simple authenticating script to validate you're Auth :
+```
+New-PolarisRoute -Method GET -Path '/whoami' -ScriptBlock {
+	$Response.Send(($Request.User.identity | ConvertTo-Json))
+}
+Start-Polaris -hostname "<your.server.fq.dn>" -Port 8000 -Verbose -Auth Negotiate
+```
+4. Once you're script is running, you can request it with :
+`Invoke-RestMethod -UseDefaultCredentials -Uri http://<Polarisserver.domain.tld>:8000/whoami`
+Be carefull if you're running this on the serveur, there's a good chance the [client wil request on localhost](https://github.com/PowerShell/Polaris/issues/202) and Kerberos won't work. In doubt, try from a remote client
+If everything fine The server should reply : `AuthenticationType : Kerberos`, and not NTLM.
+
 ## Custom Authentication
 
 Since this is not supported out of the box and needs to be implemented in a middlware you will need to start Polaris with `Start-Polaris -Auth Anonymous` or leave Auth unspecified and it will default to Anonymous.
