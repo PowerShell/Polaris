@@ -27,5 +27,17 @@ Describe "Test webserver use" {
             $Polaris = Start-Polaris -Port $Port
             $Polaris.Listener.IsListening | Should be $true
         }
+
+        It "Allows a custom logger" {
+            $Port = Get-Random -Minimum 8000 -Maximum 8999
+            $Polaris = Start-Polaris -Port $Port
+            $Polaris.Logger = {
+                param($Word)
+                $Word | Out-File "TestDrive:\test.log" -NoNewline
+            }
+
+            $Polaris.Log("Hello")
+            Get-Content "TestDrive:\test.log" -Raw | Should be "Hello"
+        }
     }
 }
