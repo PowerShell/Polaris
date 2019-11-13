@@ -22,9 +22,9 @@ Describe "Test webserver use" {
         It "Should allow running Start-Polaris multiple times without error" {
             $Port = Get-Random -Minimum 8000 -Maximum 8999
             $Polaris = Start-Polaris -Port $Port
-            $Polaris.Listener.IsListening | Should Be $false
+            $Polaris.Listener.IsListening | Should Be $true
 
-            $Polaris = Start-Polaris -Port 9998
+            $Polaris = Start-Polaris -Port $Port
             $Polaris.Listener.IsListening | Should be $true
         }
     }
