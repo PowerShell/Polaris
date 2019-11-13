@@ -7,31 +7,21 @@ Import-Module -Name $PSScriptRoot\..\..\Polaris.psd1
 
 Describe "Test webserver use" {
 
-    BeforeAll {
-
-        $IsUnix = $PSVersionTable.Platform -eq "Unix"
-
-        $Port = Get-Random -Minimum 8000 -Maximum 8999
-
-        # Start the app
-        $Polaris = Start-Polaris -Port $Port -MinRunspaces 1 -MaxRunspaces 5 # all params are optional
-
-    }
-
     Context "Test starting and stopping of the server" {
 
         It "Should allow starting and stopping the server" {
+            $Port = Get-Random -Minimum 8000 -Maximum 8999
+            $Polaris = Start-Polaris -Port $Port
             Stop-Polaris
-            $Polaris = Get-Polaris
             $Polaris.Listener.IsListening | Should Be $false
 
-            $Polaris = Start-Polaris -Port 9998
+            $Polaris = Start-Polaris -Port $Port
             $Polaris.Listener.IsListening | Should be $true
         }
 
         It "Should allow running Start-Polaris multiple times without error" {
-            Stop-Polaris
-            $Polaris = Get-Polaris
+            $Port = Get-Random -Minimum 8000 -Maximum 8999
+            $Polaris = Start-Polaris -Port $Port
             $Polaris.Listener.IsListening | Should Be $false
 
             $Polaris = Start-Polaris -Port 9998
