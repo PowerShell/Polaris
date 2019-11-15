@@ -7,31 +7,30 @@ Import-Module -Name $PSScriptRoot\..\..\Polaris.psd1
 
 Describe "Test webserver use" {
 
-    BeforeAll {
-
-        $IsUnix = $PSVersionTable.Platform -eq "Unix"
-
-        $Port = Get-Random -Minimum 8000 -Maximum 8999
-
-        # Start the app
-        $Polaris = Start-Polaris -Port $Port -MinRunspaces 1 -MaxRunspaces 5 # all params are optional
-
-    }
-
     Context "Test starting and stopping of the server" {
-        BeforeAll {
-            if (-not $IsUnix) {
-                Stop-Polaris
-                $Polaris = Get-Polaris
-                $Polaris.Listener.IsListening | Should Be $false
 
-                $Polaris = Start-Polaris -Port 9998
-                $Polaris.Listener.IsListening | Should be $true
-            }
+        It "Should allow starting and stopping the server" {
+            $Port = Get-Random -Minimum 8000 -Maximum 8999
+            $Polaris = Start-Polaris -Port $Port
+            Stop-Polaris
+            $Polaris.Listener.IsListening | Should Be $false
+
+            $Polaris = Start-Polaris -Port $Port
+            $Polaris.Listener.IsListening | Should be $true
+        }
+
+        It "Should allow running Start-Polaris multiple times without error" {
+            $Port = Get-Random -Minimum 8000 -Maximum 8999
+            $Polaris = Start-Polaris -Port $Port
+            $Polaris.Listener.IsListening | Should Be $true
+
+            $Polaris = Start-Polaris -Port $Port
+            $Polaris.Listener.IsListening | Should be $true
         }
 
         It "Allows a custom logger" {
-            $Polaris = Get-Polaris
+            $Port = Get-Random -Minimum 8000 -Maximum 8999
+            $Polaris = Start-Polaris -Port $Port
             $Polaris.Logger = {
                 param($Word)
                 $Word | Out-File "TestDrive:\test.log" -NoNewline
