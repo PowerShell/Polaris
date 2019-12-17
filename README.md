@@ -26,11 +26,11 @@ Start-Polaris
 
 There have been a great list of [other](https://github.com/StartAutomating/Pipeworks) [micro](https://github.com/toenuff/flancy) [web](https://github.com/Jaykul/NancyPS/) [frameworks](https://github.com/toenuff/PshOdata) [written](https://github.com/straightdave/presley) [over](https://github.com/cofonseca/WebListener) [the](https://github.com/DataBooster/PS-WebApi) [years](https://github.com/ChristopherGLewis/PowerShellWebServers) (Thanks @jaykul for the list!).
 
-Polaris' differentiation is that it is cross-platform and uses the .NET HttpListener class.
+Polaris' differentiation is that it is cross-platform and uses the .NET [HttpListener](https://docs.microsoft.com/en-us/dotnet/api/system.net.httplistener?view=netcore-3.1) class.
 
 ## Getting Started
 
-### Prereqs
+### Prerequisites
 
 - [PowerShell](https://github.com/powershell/powershell)
 
@@ -39,7 +39,7 @@ Polaris' differentiation is that it is cross-platform and uses the .NET HttpList
 #### From the [PowerShell Gallery](https://powershellgallery.com)
 
 ```powershell
-PS > Install-Module Polaris
+PS > Install-Module -Name Polaris -Scope CurrentUser -Force
 ```
 
 You can now try out the [example above](#example) or checkout [the site](https://PowerShell.github.io/Polaris) for more usage information!
@@ -60,18 +60,16 @@ Check out the [docs folder](https://github.com/PowerShell/Polaris/tree/master/do
 
 ## Troubleshooting / Questions
 
-**Twitter:** #PSPolaris
-**Slack:** See us in the #Polaris channel of the [PowerShell Slack](http://slack.poshcode.org/)
-**GitHub Issues:** Submit a bug / new feature idea / or just a question as a new GitHub issue
+- **Twitter:** #PSPolaris
+- **Slack:** See us in the #Polaris channel of the [PowerShell Slack](http://slack.poshcode.org/)
+- **GitHub Issues:** Submit a bug / new feature idea / or just a question as a new GitHub issue
 
 ## Roadmap
 
 We have a few paths we are interested in taking. We hope the community helps direct us.
 
 - Expanding on the current implementation using HttpListener to deliver features you'd expect from projects ASP.NET or Expressjs (route parameters, query parameters, middleware, auth etc)
-
 - Investigating the use of [Kestrel](https://github.com/aspnet/KestrelHttpServer)/[ASP.NET Routing](https://github.com/aspnet/routing) instead of HttpListener
-
 - Creating a routing domain-specific language (DSL) for isolating and running script blocks as routes. Drawing inspiration from [Pester](https://github.com/pester/Pester/).
 
 ## Feedback
