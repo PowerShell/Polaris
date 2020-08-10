@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 param ( [string]$target )
 if ( ! (test-path ${target} ) ) {
     new-item -type directory ${target}
