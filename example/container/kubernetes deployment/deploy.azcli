@@ -1,0 +1,21 @@
+#set the config to our polaris kubernetes
+kubectl config set-context palarisk8s
+
+#create a dedicated k8s namespace
+kubectl create namespace polaris
+#verify the namespace
+kubectl get namespace polaris
+
+#deploy the polaris-pshtml container
+kubectl apply -f 'polarispshtml_service.yml' --namespace polaris
+kubectl get services --namespace polaris
+
+kubectl create -f 'polarispshtml_deployment.yml' --namespace polaris
+#wait for the polarispshtml pods
+kubectl get pods --selector=app=polarispshtml --namespace polaris --watch
+
+#do we have an IP now?
+kubectl get services --namespace polarispshtml --watch
+
+#Browse the kubernetes dashboard using cloudshell
+az aks browse --enable-cloud-console-aks-browse -g polarisk8s-rg --name polarisk8s

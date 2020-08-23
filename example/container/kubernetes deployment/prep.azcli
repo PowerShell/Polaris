@@ -1,0 +1,42 @@
+# az login
+
+$rgname="polarisk8s-rg"
+$location="westeurope"
+$acrName="polarisk8sacr"
+$aksName="polarisk8s"
+
+#create service principle
+$sp = az ad sp create-for-rbac --skip-assignment
+$sp = $sp | ConvertFrom-Json
+
+#create resourcegroup
+az group create --location $location --name $rgname
+
+#create registry
+az acr create --location $location --name $acrName --resource-group $rgname --sku Basic --admin-enabled
+$pass=$(az acr credential show --name $acrName --query "passwords[0].value" -o tsv)
+$acrId = az acr show --resource-group $rgname --name $acrname --query "id" --output tsv
+az role assignment create --assignee $($sp.appId) --scope $acrId --role Reader
+
+#create cluster
+az aks create --location $location --name $aksName --resource-group $rgname --node-count 2 --generate-ssh-keys --service-principal $($sp.appId) --client-secret $($sp.password)
+az aks enable-addons --addons monitoring --name $aksName --resource-group $rgname
+
+#get kubectl and verify
+#az aks install-cli
+#kubectl create clusterrolebinding kubernetes-dashboard --clusterrole=cluster-admin --serviceaccount=kube-system:kubernetes-dashboard #bad - no prodcution use!!!!
+az aks get-credentials --resource-group $rgname -n $aksName
+kubectl cluster-info
+
+kubectl get nodes
+#see also vscode kubernetes extension
+az aks browse --enable-cloud-console-aks-browse --resource-group $rgname --name $aksName #needs to run from shell.azure.com
+
+#create secret
+kubectl create secret docker-registry acr --docker-server=$acrName.azurecr.io --docker-username=$acrName --docker-password=$pass --docker-email=$email
+kubectl describe secret
+
+az aks get-versions -g $rgname -n $aksName -o table
+
+#browse k8s dashboard
+az aks browse --enable-cloud-console-aks-browse --resource-group $rgName --name $aksName
